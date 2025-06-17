@@ -1,0 +1,3018 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 13 Concept</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter, Poppins, Orbitron, Roboto Mono, Open Sans, Fira Code, Cantarell (as general sans-serif fallback) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700&family=Orbitron:wght@700&family=Roboto+Mono:wght@400;700&family=Open+Sans:wght@400;600&family=Fira+Code:wght@400;700&family=Cantarell:wght@300;400&display=swap" rel="stylesheet">
+    <!-- Google Material Symbols Outlined -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400" rel="stylesheet" />
+    <style>
+        /* Custom styles for the app */
+        body {
+            font-family: 'Poppins', sans-serif;
+            user-select: none; /* Prevent text selection during drag */
+            color: #e0e0e0;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .font-inter { /* Added for explicit Inter font use where needed, though Poppins is body default */
+            font-family: 'Inter', sans-serif;
+        }
+        .font-roboto-mono { /* Added for terminal */
+            font-family: 'Roboto Mono', monospace;
+        }
+        .font-open-sans { /* Added for general text in some apps */
+            font-family: 'Open Sans', sans-serif;
+        }
+        .font-fira-code { /* Fira Code font for terminal */
+            font-family: 'Fira Code', monospace;
+        }
+        /* New: Candara Light with Cantarell as fallback */
+        .font-candara-light {
+            font-family: 'Candara Light', 'Candara', 'Cantarell', sans-serif;
+            font-weight: 300;
+        }
+
+
+        /* Define the wallpaper for light and dark mode */
+        #desktop {
+            transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .desktop-light {
+             background-image: url('Assets/Background/Background_Light.png'); /* Local path for light background */
+        }
+
+        .desktop-dark {
+             background-image: url('Assets/Background/Background_Dark.png'); /* Local path for dark background */
+        }
+
+        /* Glassmorphism effect for the dock and windows */
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .dark .glassmorphism {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Scrollbar styles (customizing default scrollbars) */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        /* Animation for window/menu opening */
+        @keyframes open-animation {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fade-out {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .animate-open { animation: open-animation 0.2s ease-out; }
+        .animate-fade-out { animation: fade-out 0.5s ease-out forwards; }
+
+        .window {
+            transition: opacity 0.2s, transform 0.2s, top 0.2s, left 0.2s, width 0.2s, height 0.2s;
+            position: absolute; /* Ensure absolute positioning for drag/snap */
+            min-width: 250px;
+            min-height: 150px; /* Adjusted min-height for general windows */
+            height: fit-content; /* Allow height to adjust to content */
+            max-height: calc(100vh - 120px); /* Max height for window, considering dock and some margins */
+        }
+        .window.maximized {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: calc(100vh - 80px) !important; /* Adjust for dock height */
+            border-radius: 0 !important;
+        }
+        .window.snapped-left {
+            top: 0 !important;
+            left: 0 !important;
+            width: 50% !important;
+            height: calc(100vh - 80px) !important;
+            border-radius: 0.5rem 0 0 0.5rem !important; /* Rounded on left side */
+        }
+        .window.snapped-right {
+            top: 0 !important;
+            right: 0 !important;
+            left: 50% !important; /* Explicitly set left for right snap */
+            width: 50% !important;
+            height: calc(100vh - 80px) !important;
+            border-radius: 0 0.5rem 0.5rem 0 !important; /* Rounded on right side */
+        }
+        .title-bar { cursor: grab; }
+        .title-bar.dragging { cursor: grabbing; }
+
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: transparent; /* Invisible handles */
+            z-index: 100; /* Above window content */
+        }
+
+        /* Corner handles */
+        .resize-handle.top-left { top: -5px; left: -5px; cursor: nwse-resize; }
+        .resize-handle.top-right { top: -5px; right: -5px; cursor: nesw-resize; }
+        .resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: nesw-resize; }
+        .resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: nwse-resize; }
+
+        /* Edge handles */
+        .resize-handle.top { top: -5px; left: 10px; right: 10px; height: 10px; cursor: ns-resize; }
+        .resize-handle.bottom { bottom: -5px; left: 10px; right: 10px; height: 10px; cursor: ns-resize; }
+        .resize-handle.left { left: -5px; top: 10px; bottom: 10px; width: 10px; cursor: ew-resize; }
+        .resize-handle.right { right: -5px; top: 10px; bottom: 10px; width: 10px; cursor: ew-resize; }
+
+
+        .text-shadow { text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+
+        /* Custom styles for dock and desktop icons */
+        .app-icon-div {
+            cursor: pointer;
+            height: 3.5rem; /* h-14 */
+            width: 3.5rem;  /* w-14 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem; /* rounded-xl */
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms; /* transition-all */
+            transform: var(--tw-transform); /* transform */
+            padding: 0.5rem; /* p-2 */
+            text-align: center;
+        }
+        .app-icon-div:hover {
+            transform: scale(1.1); /* hover:scale-110 */
+        }
+
+        .app-icon-div span.material-symbols-outlined {
+            font-size: 2.5rem; /* Large icons for desktop */
+            line-height: 1;
+        }
+        .app-icon-div span.icon-text {
+            font-size: 0.75rem; /* Text size for desktop icons */
+            margin-top: 0.25rem;
+            color: #fff; /* White text for contrast on desktop */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Text shadow for readability */
+        }
+
+        /* Style for active dock icon */
+        .dock-icon-div.active {
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+            --tw-ring-color: #3b82f6; /* blue-500 */
+            border-width: 2px; /* ring-2 */
+            border-style: solid; /* Added for clarity */
+        }
+        .dock-icon-div.minimized-active {
+            opacity: 0.7; /* Slightly faded for minimized apps */
+            transform: scale(0.9); /* Slightly smaller for minimized apps */
+        }
+
+        /* Terminal input cursor animation */
+        .terminal-cursor {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { background-color: transparent; }
+            50% { background-color: white; }
+        }
+
+        /* Desktop hover effect */
+        #desktop-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            transition: background-color 0.3s ease;
+            pointer-events: none; /* Allows clicks to pass through to desktop */
+        }
+
+        #desktop:hover #desktop-overlay {
+            background-color: rgba(0, 0, 0, 0.05); /* Subtle dark overlay on hover */
+        }
+
+        /* Settings nav and content styles */
+        .settings-nav button.active {
+            background-color: rgba(255, 255, 255, 0.2); /* bg-white/20 */
+        }
+        .dark .settings-nav button.active {
+            background-color: rgba(0, 0, 0, 0.2); /* dark:bg-black/20 */
+        }
+
+        /* File Explorer item styles */
+        .file-item {
+            display: flex;
+            align-items: center;
+            column-gap: 0.5rem; /* space-x-2 */
+            padding: 0.5rem; /* p-2 */
+            border-radius: 0.375rem; /* rounded-md */
+            transition-property: background-color;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms; /* transition-colors */
+            cursor: pointer;
+        }
+        .file-item:hover {
+            background-color: rgba(255, 255, 255, 0.1); /* hover:bg-white/10 */
+        }
+        .dark .file-item:hover {
+            background-color: rgba(0, 0, 0, 0.1); /* dark:hover:bg-black/10 */
+        }
+        .file-item.selected {
+            background-color: #2563eb; /* bg-blue-600 */
+            color: #ffffff; /* text-white */
+        }
+
+        /* Tutorial Overlay and Modal */
+        #tutorial-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            z-index: 60; /* Above desktop, below tutorial modal */
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #tutorial-modal {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 61; /* Above tutorial overlay */
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative; /* For tooltip positioning */
+        }
+
+        .highlight-pulse {
+            animation: pulse-border 1s infinite alternate;
+            border: 3px solid transparent; /* Ensure border for pulse effect */
+            box-sizing: border-box; /* Include padding/border in element's total width/height */
+        }
+
+        @keyframes pulse-border {
+            from { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 0 rgba(59, 130, 246, 0.8); }
+            to { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.8), 0 0 0 8px rgba(59, 130, 246, 0); }
+        }
+
+        /* Tooltip for tutorial */
+        .tutorial-tooltip {
+            position: absolute;
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 62;
+            pointer-events: none; /* Do not block clicks on elements behind */
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .tutorial-tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Positioning for tooltip (example: above target) */
+        .tutorial-tooltip-top {
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .tutorial-tooltip-bottom {
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .tutorial-tooltip-left {
+            right: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .tutorial-tooltip-right {
+            left: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Clock as a button */
+        #clock-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            color: inherit; /* Inherit text color from parent */
+            display: inline-block; /* To allow padding/margin/width if needed */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            /* Initially apply Candara Light to clock elements */
+            font-family: 'Candara Light', 'Candara', 'Cantarell', sans-serif;
+            font-weight: 300;
+        }
+        /* Custom Widget styling (inherits window styles but can be distinct) */
+        .custom-widget {
+            position: absolute;
+            width: 300px; /* Default size for new widgets */
+            height: fit-content; /* Allow height to adjust to content */
+            min-height: 150px; /* Minimum height for custom widgets */
+            max-height: calc(100vh - 120px); /* Max height for widget, same as general window */
+            background: rgba(255, 255, 255, 0.15); /* Slightly more opaque glassmorphism */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: none; /* No transition on position/size for custom widgets for smoother drag/resize */
+        }
+        .dark .custom-widget {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        /* Ensure content areas within windows scroll */
+        .window .window-content,
+        .window .widget-content,
+        .window #terminal-output,
+        .window #file-list,
+        .window .settings-panel ul, /* This targets the ul specifically */
+        .window #updates-content-update,
+        .window #updates-content-recent {
+            flex-grow: 1; /* Occupy available space */
+            overflow-y: auto; /* Add scrollbar if content overflows vertically */
+            min-height: 0; /* Allow flex item to shrink below content size */
+        }
+    </style>
+</head>
+<body class="overflow-hidden bg-black">
+
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" class="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-br from-purple-700 to-blue-800 text-white transition-opacity duration-500">
+        <h1 class="text-6xl font-orbitron font-bold mb-6 text-shadow animate-pulse">Windows 13</h1>
+        <p class="text-xl font-poppins mb-10 text-center px-4 max-w-xl">
+            Welcome to the future of computing. Let's get you set up or dive right in!
+        </p>
+        <div class="flex space-x-6">
+            <button id="start-tutorial-btn" class="px-8 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-lg font-semibold transition-all shadow-lg border border-white/30">
+                Start Tutorial
+            </button>
+            <button id="skip-tutorial-btn" class="px-8 py-3 bg-purple-500 hover:bg-purple-600 rounded-full text-lg font-semibold transition-colors shadow-lg">
+                Skip Tutorial
+            </button>
+        </div>
+    </div>
+
+
+    <div id="login-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-900 transition-opacity duration-500 hidden opacity-0">
+        <img src="https://placehold.co/128x128/7c3aed/ffffff?text=User" alt="User Avatar" class="rounded-full w-32 h-32 border-4 border-purple-500 mb-4">
+        <h2 class="text-4xl font-orbitron font-bold text-white mb-6 animate-pulse">Windows 13</h2>
+        <div class="w-full max-w-xs space-y-4">
+            <input type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white font-inter focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <button id="sign-in-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold transition-colors font-poppins">
+                Sign In
+            </button>
+        </div>
+    </div>
+
+
+    <div id="desktop" class="h-screen w-screen relative overflow-hidden opacity-0">
+        <div id="desktop-overlay"></div>
+
+        <main class="p-6">
+            <!-- Clock Button -->
+            <button id="clock-button" class="text-5xl font-bold text-white text-shadow text-right mb-6 float-right">
+                <span id="clock"></span>
+            </button>
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-4 absolute top-24 left-6">
+                <div class="app-icon-div" data-window="file-explorer-window">
+                    <span class="material-symbols-outlined text-yellow-500">folder_open</span>
+                    <span class="icon-text">File Explorer</span>
+                </div>
+                <div class="app-icon-div" data-window="terminal-window">
+                    <span class="material-symbols-outlined">terminal</span>
+                    <span class="icon-text">Terminal</span>
+                </div>
+                <div class="app-icon-div" data-window="settings-window">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="icon-text">Settings</span>
+                </div>
+                <div class="app-icon-div" data-window="updates-window">
+                    <span class="material-symbols-outlined text-green-500">update</span>
+                    <span class="icon-text">Updates</span>
+                </div>
+                <!-- New: Desktop icon for Widget.js -->
+                <div id="widget-desktop-icon" class="app-icon-div hidden" data-window="widget-maker-window">
+                    <span class="material-symbols-outlined text-purple-400">widgets</span>
+                    <span class="icon-text">Widget.js</span>
+                </div>
+            </div>
+        </main>
+
+
+        <div id="context-menu" class="hidden absolute w-56 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-lg shadow-2xl border border-white/30 dark:border-black/30 p-2 z-50 text-sm text-gray-800 dark:text-gray-200 animate-open">
+            <a href="#" id="open-settings-context" class="block px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-md cursor-pointer">Personalize</a>
+            <a href="#" id="open-widget-maker-context" class="hidden block px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-md cursor-pointer">Widget Maker</a>
+        </div>
+
+        <div id="start-menu" class="hidden absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 glassmorphism rounded-lg shadow-2xl text-gray-800 dark:text-gray-200 animate-open z-40 flex flex-col">
+            <div class="flex-grow grid grid-cols-3 gap-4">
+                 <div></div>
+                 <div class="text-center">
+                    <h4 class="font-bold text-lg mb-4">Windows Update</h4>
+                    <div class="bg-white/20 dark:bg-black/20 p-4 rounded-lg">
+                        <span class="material-symbols-outlined text-blue-500 text-5xl mx-auto mb-2">cloud_download</span>
+                        <p class="font-semibold">You're up to date</p>
+                        <p class="text-xs">Last checked: Today</p>
+                    </div>
+                </div>
+                <div>
+                     <h4 class="font-bold text-lg mb-4">Apps</h4>
+                     <div class="space-y-2">
+                        <div class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors cursor-pointer" data-window="file-explorer-window">
+                             <span class="material-symbols-outlined text-yellow-500 text-2xl">folder_open</span>
+                             <span>File Explorer</span>
+                        </div>
+                        <div class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors cursor-pointer" data-window="terminal-window">
+                            <span class="material-symbols-outlined text-2xl">terminal</span>
+                             <span>Terminal</span>
+                        </div>
+                        <div class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors cursor-pointer" data-window="settings-window">
+                            <span class="material-symbols-outlined text-2xl">settings</span>
+                             <span>Settings</span>
+                        </div>
+                        <div class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors cursor-pointer" data-window="updates-window">
+                            <span class="material-symbols-outlined text-green-500 text-2xl">update</span>
+                             <span>Windows 13 Updates</span>
+                        </div>
+                        <!-- New: Start menu icon for Widget.js -->
+                         <div id="widget-start-menu-icon" class="start-menu-app-icon hidden flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors cursor-pointer" data-window="widget-maker-window">
+                            <span class="material-symbols-outlined text-purple-400 text-2xl">widgets</span>
+                            <span>Widget.js</span>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="windows-container" class="absolute inset-0 w-full h-full pointer-events-none">
+            <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-xl">settings</span>
+                        <span>Settings</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="minimize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="settings-window">
+                            <span class="material-symbols-outlined text-lg">minimize</span>
+                        </button>
+                        <button class="maximize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="settings-window">
+                            <span class="material-symbols-outlined text-lg">web_asset</span>
+                        </button>
+                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-grow">
+                    <div class="w-1/4 p-4 border-r border-white/30 dark:border-black/30 flex flex-col settings-nav">
+                        <button class="settings-nav-btn flex items-center space-x-2 p-2 rounded-md hover:bg-white/20 dark:hover:bg-black/20 transition-colors active" data-settings-panel="personalization">
+                            <span class="material-symbols-outlined text-xl">palette</span>
+                            <span>Personalization</span>
+                        </button>
+                        <button class="settings-nav-btn flex items-center space-x-2 p-2 rounded-md hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-settings-panel="display">
+                            <span class="material-symbols-outlined text-xl">display_settings</span>
+                            <span>Display</span>
+                        </button>
+                        <button class="settings-nav-btn flex items-center space-x-2 p-2 rounded-md hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-settings-panel="sound">
+                            <span class="material-symbols-outlined text-xl">volume_up</span>
+                            <span>Sound</span>
+                        </button>
+                        <button class="settings-nav-btn flex items-center space-x-2 p-2 rounded-md hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-settings-panel="about">
+                            <span class="material-symbols-outlined text-xl">info</span>
+                            <span>About</span>
+                        </button>
+                    </div>
+
+                    <!-- Window content for Settings -->
+                    <!-- The window-content is set to be a flex column and overflow-y-auto to allow content to scroll -->
+                    <div class="window-content w-3/4 p-4 flex-grow flex flex-col overflow-y-auto">
+                        <div id="settings-personalization" class="settings-panel">
+                            <h4 class="font-semibold mb-2 text-lg">Personalization</h4>
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20">
+                                <label for="bgColorPicker">Background Color</label>
+                                <input type="color" id="bgColorPicker" class="w-10 h-10 rounded-md cursor-pointer border-none bg-transparent">
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 mt-2">
+                                <label for="fontSelect">System Font</label>
+                                <select id="fontSelect" class="bg-gray-800 text-white rounded-md p-1">
+                                    <option value="Poppins">Poppins</option>
+                                    <option value="Inter">Inter</option>
+                                    <option value="Open Sans">Open Sans</option>
+                                    <option value="Orbitron">Orbitron</option>
+                                    <option value="Fira Code">Fira Code</option>
+                                    <option value="Candara Light">Candara Light</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="settings-display" class="settings-panel hidden">
+                            <h4 class="font-semibold mb-2 text-lg">Display</h4>
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20">
+                                <span>Theme</span>
+                                <div>
+                                    <button id="display-theme-light-btn" class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-white text-sm">Light</button>
+                                    <button id="display-theme-dark-btn" class="px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-white text-sm">Dark</button>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Change system-wide light or dark mode.</p>
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 mt-2">
+                                <span>Screen Resolution</span>
+                                <select class="bg-gray-800 text-white rounded-md p-1">
+                                    <option>1920 x 1080 (Recommended)</option>
+                                    <option>1600 x 900</option>
+                                    <option>1366 x 768</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="settings-sound" class="settings-panel hidden">
+                            <h4 class="font-semibold mb-2 text-lg">Sound</h4>
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20">
+                                <span>Master Volume</span>
+                                <input type="range" id="masterVolumeSlider" min="0" max="100" value="50" class="w-1/2 appearance-none h-2 rounded-lg bg-gray-700 cursor-pointer accent-blue-500">
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 mt-2">
+                                <span>Output Device</span>
+                                <select class="bg-gray-800 text-white rounded-md p-1">
+                                    <option>Speakers (Realtek Audio)</option>
+                                    <option>Headphones (Bluetooth)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- settings-about panel: It is a flex column and takes up available space, its ul child is scrollable -->
+                        <div id="settings-about" class="settings-panel flex flex-col hidden flex-grow min-h-0">
+                            <h4 class="font-semibold mb-2 text-lg">About Windows 13</h4>
+                            <!-- The ul now correctly scrolls within the flex parent -->
+                            <ul class="space-y-2 text-sm overflow-y-auto pr-2"> <!-- Added pr-2 for a bit of padding for the scrollbar -->
+                                <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                    <p class="font-semibold">Edition:</p>
+                                    <p>Windows 13 Pro</p>
+                                </li>
+                                <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                    <p class="font-semibold">Version:</p>
+                                    <p>25H2</p>
+                                </li>
+                                <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                    <p class="font-semibold">OS Build:</p>
+                                    <p>23456.1</p>
+                                </li>
+                                <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                    <p class="font-semibold">Processor:</p>
+                                    <p>Intel(R) Core(TM) i9-13900K CPU @ 3.00GHz</p>
+                                </li>
+                                <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                    <p class="font-semibold">Installed RAM:</p>
+                                    <p>32.0 GB (31.7 GB usable)</p>
+                                </li>
+                                <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                    <p class="font-semibold">System type:</p>
+                                    <p>64-bit operating system, x64-based processor</p>
+                                </li>
+                                <!-- Reduced dummy items here -->
+                                <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                    <p class="font-semibold">Device ID:</p>
+                                    <p>9F7B3C1D-8E2A-4F6B-9C0A-1E2F3D4C5B6A</p>
+                                </li>
+                                <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                    <p class="font-semibold">Product ID:</p>
+                                    <p>00330-80000-00000-AA000</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Resize Handles -->
+                <div class="resize-handle top-left"></div>
+                <div class="resize-handle top-right"></div>
+                <div class="resize-handle bottom-left"></div>
+                <div class="resize-handle bottom-right"></div>
+                <div class="resize-handle top"></div>
+                <div class="resize-handle bottom"></div>
+                <div class="resize-handle left"></div>
+                <div class="resize-handle right"></div>
+            </div>
+            <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-yellow-500 text-xl">folder_open</span>
+                        <span>File Explorer</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="minimize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="file-explorer-window">
+                            <span class="material-symbols-outlined text-lg">minimize</span>
+                        </button>
+                        <button class="maximize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="file-explorer-window">
+                            <span class="material-symbols-outlined text-lg">web_asset</span>
+                        </button>
+                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="file-explorer-window">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Flex container for sidebar and main content, main content has overflow-y-auto -->
+                <div class="flex-grow flex">
+                    <div class="w-1/4 p-4 border-r border-white/30 dark:border-black/30 overflow-y-auto">
+                        <h5 class="font-semibold mb-2 text-md">Quick Access</h5>
+                        <ul class="space-y-1 text-sm">
+                            <li class="file-item" data-path="Desktop">
+                                <span class="material-symbols-outlined text-lg">desktop_windows</span>
+                                <span>Desktop</span>
+                            </li>
+                            <li class="file-item" data-path="Documents">
+                                <span class="material-symbols-outlined text-lg">description</span>
+                                <span>Documents</span>
+                            </li>
+                            <li class="file-item" data-path="Downloads">
+                                <span class="material-symbols-outlined text-lg">download</span>
+                                <span>Downloads</span>
+                            </li>
+                            <li class="file-item" data-path="Pictures">
+                                <span class="material-symbols-outlined text-lg">image</span>
+                                <span>Pictures</span>
+                            </li>
+                        </ul>
+                        <h5 class="font-semibold mt-4 mb-2 text-md">This PC</h5>
+                        <ul class="space-y-1 text-sm">
+                            <li class="file-item" data-path="Local Disk (C:)">
+                                <span class="material-symbols-outlined text-lg">hard_drive</span>
+                                <span>Local Disk (C:)</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- The main file list area has overflow-y-auto -->
+                    <div class="w-3/4 p-4 flex-grow overflow-y-auto">
+                        <div class="flex items-center space-x-2 mb-4 text-sm text-gray-300">
+                            <span id="file-explorer-path">C:\Users\You\Desktop</span>
+                            <button id="file-explorer-new-folder" class="ml-auto px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-md text-white text-sm">
+                                <span class="material-symbols-outlined text-sm align-middle mr-1">create_new_folder</span>New Folder
+                            </button>
+                        </div>
+                        <div id="file-list" class="space-y-1">
+                            </div>
+                    </div>
+                </div>
+                <!-- Resize Handles -->
+                <div class="resize-handle top-left"></div>
+                <div class="resize-handle top-right"></div>
+                <div class="resize-handle bottom-left"></div>
+                <div class="resize-handle bottom-right"></div>
+                <div class="resize-handle top"></div>
+                <div class="resize-handle bottom"></div>
+                <div class="resize-handle left"></div>
+                <div class="resize-handle right"></div>
+            </div>
+            <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto">
+                 <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-xl">terminal</span>
+                        <span>Terminal</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="minimize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="terminal-window">
+                            <span class="material-symbols-outlined text-lg">minimize</span>
+                        </button>
+                        <button class="maximize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="terminal-window">
+                            <span class="material-symbols-outlined text-lg">web_asset</span>
+                        </button>
+                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="terminal-window">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Terminal output area has overflow-y-auto -->
+                <div id="terminal-output" class="p-4 flex-grow bg-black/80 rounded-b-lg font-roboto-mono text-white text-sm overflow-y-auto">
+                    <p>Windows 13 [Version 10.0.23456.1]</p>
+                    <p>(c) Contoso Corporation. All rights reserved.</p>
+                    <br>
+                    <div class="flex items-center">
+                        <span id="terminal-prompt">C:\Users\You>&nbsp;</span>
+                        <input type="text" id="terminal-input" class="flex-grow bg-transparent border-none outline-none text-white font-roboto-mono caret-white" autofocus spellcheck="false">
+                        <span id="terminal-cursor" class="bg-white w-2 h-4 inline-block terminal-cursor"></span>
+                    </div>
+                </div>
+                <!-- Resize Handles -->
+                <div class="resize-handle top-left"></div>
+                <div class="resize-handle top-right"></div>
+                <div class="resize-handle bottom-left"></div>
+                <div class="resize-handle bottom-right"></div>
+                <div class="resize-handle top"></div>
+                <div class="resize-handle bottom"></div>
+                <div class="resize-handle left"></div>
+                <div class="resize-handle right"></div>
+            </div>
+
+            <div id="updates-window" class="window updates hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-green-500 text-xl">update</span>
+                        <span>Windows 13 Updates</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="minimize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="updates-window">
+                            <span class="material-symbols-outlined text-lg">minimize</span>
+                        </button>
+                        <button class="maximize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="updates-window">
+                            <span class="material-symbols-outlined text-lg">web_asset</span>
+                        </button>
+                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="updates-window">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Flex container for tabs and content, content areas have overflow-y-auto -->
+                <div class="flex-grow flex flex-col">
+                    <div class="flex border-b border-white/30 dark:border-black/30">
+                        <button id="updates-tab-update" class="px-4 py-2 text-sm font-semibold rounded-tl-lg focus:outline-none transition-colors border-r border-white/30 dark:border-black/30 bg-white/20 dark:bg-black/20">Update Windows</button>
+                        <button id="updates-tab-recent" class="px-4 py-2 text-sm font-semibold rounded-tr-lg focus:outline-none transition-colors">Recent Updates</button>
+                    </div>
+                    <!-- Updates content areas are set to overflow-y-auto -->
+                    <div id="updates-content-update" class="p-4 flex-grow overflow-y-auto">
+                        <h4 class="font-semibold mb-2 text-lg">Update Windows 13</h4>
+                        <div class="bg-white/10 dark:bg-black/10 p-4 rounded-lg flex items-center justify-between">
+                            <div>
+                                <p class="text-md" id="updates-status-message">You're up to date!</p>
+                                <p class="text-xs text-gray-400" id="last-checked-status">Last checked: Just now</p>
+                            </div>
+                            <button id="check-for-updates-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-semibold transition-colors">Check for updates</button>
+                        </div>
+                        <div id="update-progress-section" class="hidden mt-4">
+                            <p class="text-md mb-2">Downloading updates... <span id="update-percentage">0%</span></p>
+                            <div id="update-progress-bar" class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0%;"></div>
+                            </div>
+                            <p id="update-status" class="text-sm mt-2 text-gray-400"></p>
+                        </div>
+                    </div>
+                    <div id="updates-content-recent" class="p-4 flex-grow overflow-y-auto hidden">
+                        <h4 class="font-semibold mb-2 text-lg">Recent Updates</h4>
+                        <ul id="recent-updates-list" class="space-y-2">
+                            <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                <p class="font-semibold">Security Update for Windows 13 (KB5012345)</p>
+                                <p class="text-xs text-gray-400">Installed on: 2025-06-10</p>
+                            </li>
+                            <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                <p class="font-semibold">Terminal Core Libraries (Build 1.2.3)</p>
+                                <p class="text-xs text-gray-400">Installed on: 2025-06-15</p>
+                            </li>
+                            <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                <p class="font-semibold">Feature Update to Windows 13, version 25H2</p>
+                                <p class="text-xs text-gray-400">Installed on: 2025-05-20</p>
+                            </li>
+                            <!-- More dummy updates to ensure scrolling -->
+                            <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                <p class="font-semibold">Windows Defender Definitions Update (v1.0.1)</p>
+                                <p class="text-xs text-gray-400">Installed on: 2025-06-08</p>
+                            </li>
+                            <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                <p class="font-semibold">Microsoft Edge Browser Update (v115.0.1901.183)</p>
+                                <p class="text-xs text-gray-400">Installed on: 2025-06-05</p>
+                            </li>
+                             <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                <p class="font-semibold">Cumulative Update for Windows 13 (KB5012347)</p>
+                                <p class="text-xs text-gray-400">Installed on: 2025-06-01</p>
+                            </li>
+                            <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                <p class="font-semibold">Driver Update for NVIDIA GeForce RTX 4090</p>
+                                <p class="text-xs text-gray-400">Installed on: 2025-05-28</p>
+                            </li>
+                             <li class="bg-white/10 dark:bg-black/10 p-3 rounded-lg">
+                                <p class="font-semibold">Windows Media Player Security Update (KB5012348)</p>
+                                <p class="text-xs text-gray-400">Installed on: 2025-05-25</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Resize Handles -->
+                <div class="resize-handle top-left"></div>
+                <div class="resize-handle top-right"></div>
+                <div class="resize-handle bottom-left"></div>
+                <div class="resize-handle bottom-right"></div>
+                <div class="resize-handle top"></div>
+                <div class="resize-handle bottom"></div>
+                <div class="resize-handle left"></div>
+                <div class="resize-handle right"></div>
+            </div>
+
+            <!-- Widget Maker Window (formerly just placeholder) -->
+            <div id="widget-maker-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-96 glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-xl">widgets</span>
+                        <span>Widget Maker</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="minimize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="widget-maker-window">
+                            <span class="material-symbols-outlined text-lg">minimize</span>
+                        </button>
+                        <button class="maximize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="widget-maker-window">
+                            <span class="material-symbols-outlined text-lg">web_asset</span>
+                        </button>
+                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="widget-maker-window">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-4 flex-grow flex flex-col overflow-y-auto">
+                    <h4 class="text-xl font-semibold mb-4">Create a New Widget</h4>
+                    <div class="mb-4">
+                        <label for="widgetTitleInput" class="block text-sm font-medium text-gray-300 mb-1">Widget Title:</label>
+                        <input type="text" id="widgetTitleInput" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g., My Notes, To-Do List">
+                    </div>
+                    <div class="mb-6 flex-grow">
+                        <label for="widgetContentInput" class="block text-sm font-medium text-gray-300 mb-1">Widget Content (Markdown/Plain Text):</label>
+                        <textarea id="widgetContentInput" class="w-full h-full min-h-[100px] px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-roboto-mono" placeholder="Write your widget's content here..."></textarea>
+                    </div>
+                    <button id="createWidgetBtn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold transition-colors">
+                        Create Widget
+                    </button>
+                </div>
+                <!-- Resize Handles -->
+                <div class="resize-handle top-left"></div>
+                <div class="resize-handle top-right"></div>
+                <div class="resize-handle bottom-left"></div>
+                <div class="resize-handle bottom-right"></div>
+                <div class="resize-handle top"></div>
+                <div class="resize-handle bottom"></div>
+                <div class="resize-handle left"></div>
+                <div class="resize-handle right"></div>
+            </div>
+
+            <!-- New: Date Window -->
+            <div id="date-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md h-96 glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-xl">calendar_month</span>
+                        <span>Date & Time</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="minimize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="date-window">
+                            <span class="material-symbols-outlined text-lg">minimize</span>
+                        </button>
+                        <button class="maximize-btn p-1 rounded-full hover:bg-white/20 hover:text-white transition-colors" data-window="date-window">
+                            <span class="material-symbols-outlined text-lg">web_asset</span>
+                        </button>
+                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="date-window">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-4 flex-grow flex flex-col items-center justify-center">
+                    <p id="date-display-large" class="text-5xl font-bold font-orbitron text-white text-shadow mb-4"></p>
+                    <p id="time-display-large" class="text-7xl font-bold font-candara-light text-white text-shadow mb-8"></p>
+                    <div id="calendar-display" class="grid grid-cols-7 gap-1 text-sm font-inter text-gray-200 w-full max-w-sm">
+                        <!-- Calendar will be populated by JS -->
+                        <div class="text-center font-bold text-blue-300">Su</div>
+                        <div class="text-center font-bold">Mo</div>
+                        <div class="text-center font-bold">Tu</div>
+                        <div class="text-center font-bold">We</div>
+                        <div class="text-center font-bold">Th</div>
+                        <div class="text-center font-bold">Fr</div>
+                        <div class="text-center font-bold text-red-300">Sa</div>
+                    </div>
+                </div>
+                <!-- Resize Handles -->
+                <div class="resize-handle top-left"></div>
+                <div class="resize-handle top-right"></div>
+                <div class="resize-handle bottom-left"></div>
+                <div class="resize-handle bottom-right"></div>
+                <div class="resize-handle top"></div>
+                <div class="resize-handle bottom"></div>
+                <div class="resize-handle left"></div>
+                <div class="resize-handle right"></div>
+            </div>
+
+        </div>
+
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 p-2 glassmorphism rounded-2xl shadow-lg z-30">
+            <div id="start-menu-btn" class="app-icon-div dock-icon-div bg-blue-500 text-white hover:bg-blue-600">
+                <span class="material-symbols-outlined text-4xl">widgets</span>
+            </div>
+            <div class="h-10 w-px bg-white/20"></div>
+
+            <div id="file-explorer-dock-icon" class="app-icon-div dock-icon-div hover:bg-white/20" data-window-target="file-explorer-window">
+                <span class="material-symbols-outlined text-yellow-500 text-4xl">folder_open</span>
+            </div>
+            <div id="terminal-dock-icon" class="app-icon-div dock-icon-div hover:bg-white/20" data-window-target="terminal-window">
+                <span class="material-symbols-outlined text-4xl">terminal</span>
+            </div>
+            <div id="settings-dock-icon" class="app-icon-div dock-icon-div hover:bg-white/20" data-window-target="settings-window">
+                <span class="material-symbols-outlined text-4xl">settings</span>
+            </div>
+            <div id="updates-dock-icon" class="app-icon-div dock-icon-div hover:bg-white/20" data-window-target="updates-window">
+                <span class="material-symbols-outlined text-green-500 text-4xl">update</span>
+            </div>
+            <!-- New: Dock icon for Widget.js (initially hidden) -->
+            <div id="widget-dock-icon" class="app-icon-div dock-icon-div hidden hover:bg-white/20" data-window-target="widget-maker-window">
+                <span class="material-symbols-outlined text-purple-400 text-4xl">widgets</span>
+            </div>
+
+
+            <div class="h-10 w-px bg-white/20"></div>
+
+            <div id="theme-light-btn" class="app-icon-div dock-icon-div hover:bg-white/20">
+                <span class="material-symbols-outlined text-yellow-400 text-4xl">light_mode</span>
+            </div>
+            <div id="theme-dark-btn" class="app-icon-div dock-icon-div hover:bg-white/20">
+                <span class="material-symbols-outlined text-4xl">dark_mode</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Overlay and Modal (initially hidden) -->
+    <div id="tutorial-overlay" class="hidden">
+        <div id="tutorial-modal" class="hidden">
+            <h3 id="tutorial-title" class="text-2xl font-bold font-poppins mb-2"></h3>
+            <p id="tutorial-message" class="text-md font-open-sans mb-4"></p>
+            <div class="flex justify-center space-x-4">
+                <button id="tutorial-skip-btn" class="px-5 py-2 bg-gray-600 hover:bg-gray-700 rounded-md text-white font-semibold transition-colors">Skip Tutorial</button>
+                <button id="tutorial-next-btn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-semibold transition-colors">Next</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Global Error Handling ---
+            // This will catch unhandled JavaScript errors and display a user-friendly message.
+            window.addEventListener('error', (event) => {
+                console.error('Unhandled error caught by global handler:', event.error);
+                const errorMessage = `An unexpected error occurred: ${event.message}. Please refresh the page. If the issue persists, contact support with this detail: ${event.filename}:${event.lineno}`;
+                // Using a custom message box instead of alert
+                const msgDialog = document.createElement('div');
+                msgDialog.classList.add('fixed', 'inset-0', 'bg-black/70', 'flex', 'items-center', 'justify-center', 'z-[1000]'); // Very high z-index
+                msgDialog.innerHTML = `
+                    <div class="bg-red-900 p-8 rounded-lg shadow-2xl text-white text-center max-w-md mx-4">
+                        <h5 class="text-2xl font-bold mb-4">Application Error</h5>
+                        <p class="mb-6 text-base">${errorMessage}</p>
+                        <button id="closeErrorDialog" class="px-6 py-2 bg-red-700 hover:bg-red-800 rounded-md text-lg font-semibold transition-colors">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(msgDialog);
+                document.getElementById('closeErrorDialog').addEventListener('click', () => {
+                    document.body.removeChild(msgDialog);
+                });
+                // Attempt to stop propagation if this error is part of an event chain
+                if (event.preventDefault) event.preventDefault();
+            });
+
+            // For unhandled promise rejections (e.g., from async operations)
+            window.addEventListener('unhandledrejection', (event) => {
+                console.error('Unhandled promise rejection caught by global handler:', event.reason);
+                const errorMessage = `An unexpected asynchronous error occurred: ${event.reason}. Please refresh the page.`;
+                // Reuse the same dialog logic
+                const msgDialog = document.createElement('div');
+                msgDialog.classList.add('fixed', 'inset-0', 'bg-black/70', 'flex', 'items-center', 'justify-center', 'z-[1000]');
+                msgDialog.innerHTML = `
+                    <div class="bg-red-900 p-8 rounded-lg shadow-2xl text-white text-center max-w-md mx-4">
+                        <h5 class="text-2xl font-bold mb-4">Application Error (Async)</h5>
+                        <p class="mb-6 text-base">${errorMessage}</p>
+                        <button id="closeErrorDialog" class="px-6 py-2 bg-red-700 hover:bg-red-800 rounded-md text-lg font-semibold transition-colors">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(msgDialog);
+                document.getElementById('closeErrorDialog').addEventListener('click', () => {
+                    document.body.removeChild(msgDialog);
+                });
+            });
+
+
+            // --- DOM Element Selection ---
+            const html = document.documentElement;
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const startTutorialBtn = document.getElementById('start-tutorial-btn');
+            const skipTutorialBtn = document.getElementById('skip-tutorial-btn');
+            const loginScreen = document.getElementById('login-screen');
+            const signInBtn = document.getElementById('sign-in-btn');
+            const desktop = document.getElementById('desktop');
+            const clockEl = document.getElementById('clock');
+            const clockButton = document.getElementById('clock-button'); // New: Clock as a button
+            const contextMenu = document.getElementById('context-menu');
+            const startMenu = document.getElementById('start-menu');
+            const startMenuBtn = document.getElementById('start-menu-btn');
+            const openSettingsContext = document.getElementById('open-settings-context');
+            const openWidgetMakerContext = document.getElementById('open-widget-maker-context');
+            const themeLightBtn = document.getElementById('theme-light-btn');
+            const themeDarkBtn = document.getElementById('theme-dark-btn');
+            const bgColorPicker = document.getElementById('bgColorPicker');
+
+            // Terminal Elements
+            const terminalInput = document.getElementById('terminal-input');
+            const terminalOutput = document.getElementById('terminal-output');
+            const terminalPrompt = document.getElementById('terminal-prompt');
+            const terminalCursor = document.getElementById('terminal-cursor');
+
+            // Updates App Elements
+            const updatesTabUpdate = document.getElementById('updates-tab-update');
+            const updatesTabRecent = document.getElementById('updates-tab-recent');
+            const updatesContentUpdate = document.getElementById('updates-content-update');
+            const updatesContentRecent = document.getElementById('updates-content-recent');
+            const checkForUpdatesBtn = document.getElementById('check-for-updates-btn');
+            const updateProgressSection = document.getElementById('update-progress-section');
+            const updateProgressBar = document.getElementById('update-progress-bar');
+            const updatePercentage = document.getElementById('update-percentage');
+            const updateStatus = document.getElementById('update-status');
+            const updatesStatusMessage = document.getElementById('updates-status-message');
+            const lastCheckedStatus = document.getElementById('last-checked-status');
+            const recentUpdatesList = document.getElementById('recent-updates-list');
+
+            // Settings App Elements
+            const settingsNavBtns = document.querySelectorAll('.settings-nav-btn');
+            const settingsPanels = document.querySelectorAll('.settings-panel');
+            const displayThemeLightBtn = document.getElementById('display-theme-light-btn');
+            const displayThemeDarkBtn = document.getElementById('display-theme-dark-btn');
+            const masterVolumeSlider = document.getElementById('masterVolumeSlider');
+            const fontSelect = document.getElementById('fontSelect');
+
+            // File Explorer Elements
+            const fileExplorerPathEl = document.getElementById('file-explorer-path');
+            const fileListEl = document.getElementById('file-list');
+            const fileExplorerNavItems = document.querySelectorAll('.file-item[data-path]');
+            const newFolderBtn = document.getElementById('file-explorer-new-folder');
+
+            // Window controls
+            const minimizeBtns = document.querySelectorAll('.minimize-btn');
+            const maximizeBtns = document.querySelectorAll('.maximize-btn');
+
+            // Dock icons
+            const dockIcons = document.querySelectorAll('.dock-icon-div[data-window-target]');
+
+            // All windows and their title bars (for initial setup)
+            const systemWindows = document.querySelectorAll('.window:not(.custom-widget)');
+
+            // New Widget Maker elements
+            const widgetTitleInput = document.getElementById('widgetTitleInput');
+            const widgetContentInput = document.getElementById('widgetContentInput');
+            const createWidgetBtn = document.getElementById('createWidgetBtn'); // Reverted to original ID
+
+            // New Widget.js icons
+            const widgetDesktopIcon = document.getElementById('widget-desktop-icon');
+            const widgetStartMenuIcon = document.getElementById('widget-start-menu-icon');
+            const widgetDockIcon = document.getElementById('widget-dock-icon');
+
+            // Date Window elements
+            const dateDisplayLarge = document.getElementById('date-display-large');
+            const timeDisplayLarge = document.getElementById('time-display-large');
+            const calendarDisplay = document.getElementById('calendar-display');
+
+            // Tutorial Elements
+            const tutorialOverlay = document.getElementById('tutorial-overlay');
+            const tutorialModal = document.getElementById('tutorial-modal');
+            const tutorialTitle = document.getElementById('tutorial-title');
+            const tutorialMessage = document.getElementById('tutorial-message');
+            const tutorialNextBtn = document.getElementById('tutorial-next-btn');
+            const tutorialSkipBtn = document.getElementById('tutorial-skip-btn');
+
+
+            // --- File System (mock) ---
+            const fileSystem = {
+                'Local Disk (C:)': {
+                    'Users': {
+                        'You': {
+                            'Desktop': {
+                                'Documents': {},
+                                'Downloads': {},
+                                'Pictures': {},
+                                'My Awesome Project': {
+                                    'index.html': '<html><body>Hello World!</body></html>',
+                                    'style.css': 'body { color: blue; }'
+                                }
+                            },
+                            'Documents': {
+                                'Report.docx': 'This is a mock document content.',
+                                'Meeting Notes.txt': 'Notes from the meeting on 2025-06-15.'
+                            },
+                            'Downloads': {
+                                // Corrected loop for dummy data generation
+                                // This loop will now correctly add 10 dummy files.
+                                /* No longer needed as it's correctly populated below */
+                            },
+                            'Pictures': {
+                                'holiday.png': 'PNG image',
+                                'selfie.jpg': 'JPEG image'
+                            }
+                        }
+                    },
+                    'Program Files': {}, // For installed apps
+                    'Windows': {}
+                }
+            };
+            let currentPath = ['Local Disk (C:)', 'Users', 'You', 'Desktop'];
+
+            // Add more dummy files to the file system for scrolling demonstration
+            for (let i = 1; i <= 20; i++) {
+                fileSystem['Local Disk (C:)'].Users.You.Desktop[`file_${i}.txt`] = `Content of file ${i}.`;
+                fileSystem['Local Disk (C:)'].Users.You.Desktop[`folder_${i}`] = {};
+            }
+            for (let i = 1; i <= 15; i++) {
+                fileSystem['Local Disk (C:)'].Users.You.Documents[`document_${i}.txt`] = `Content of document ${i}.`;
+            }
+            // Corrected dummy data generation for downloads
+            for (let i = 1; i <= 10; i++) { // Corrected loop condition from i => 10 to i <= 10
+                fileSystem['Local Disk (C:)'].Users.You.Downloads[`downloaded_file_${i}.zip`] = `Content of zip file ${i}.`;
+            }
+
+
+            // Mock Applications for Terminal Installation
+            const mockApplications = {
+                'notepad': {
+                    name: 'Notepad',
+                    executable: 'notepad.exe',
+                    content: 'This is a simple text editor.',
+                    icon: 'edit_note',
+                    installPath: ['Local Disk (C:)', 'Program Files', 'Notepad']
+                },
+                'browser': {
+                    name: 'Web Browser',
+                    executable: 'browser.exe',
+                    content: 'Welcome to the internet!',
+                    icon: 'public',
+                    installPath: ['Local Disk (C:)', 'Program Files', 'Web Browser']
+                },
+                'calculator': {
+                    name: 'Calculator',
+                    executable: 'calc.exe',
+                    content: '0',
+                    icon: 'calculate',
+                    installPath: ['Local Disk (C:)', 'Program Files', 'Calculator']
+                },
+                // New: Widget.js application
+                'widget.js': {
+                    name: 'Widget.js',
+                    executable: 'Widget.js',
+                    content: '// Widget.js core code\nconsole.log("Widget.js loaded!");',
+                    icon: 'widgets', // Assuming Material Symbols "widgets" icon
+                    installPath: ['Local Disk (C:)', 'Users', 'You', 'Desktop'] // Install directly to desktop
+                }
+            };
+
+            // System updates that can be "discovered" and installed
+            let systemUpdatesAvailable = [
+                {
+                    title: 'Windows 13 Performance Patch (KB5012346)',
+                    description: 'Improves system responsiveness and stability.',
+                    name: 'Performance Patch',
+                    type: 'system',
+                    requiredForWidgetMaker: false
+                },
+                {
+                    title: 'Widget Maker Core Update (Required)',
+                    description: 'Installs core libraries for Widget Maker application.',
+                    name: 'Widget Maker Core Update',
+                    type: 'system',
+                    requiredForWidgetMaker: true // Flag to enable widget maker
+                },
+                {
+                    title: 'Security Intelligence Update (v1.0.1)',
+                    description: 'Latest definitions for Windows Security.',
+                    name: 'Security Intelligence',
+                    type: 'system',
+                    requiredForWidgetMaker: false
+                }
+            ];
+
+
+            // Initial recent updates data (with a terminal install example)
+            // Reduced the number of items for the "About" section to avoid immediate scrolling.
+            const initialRecentUpdates = [
+                { title: 'Security Update for Windows 13 (KB5012345)', date: '2025-06-10' },
+                { title: 'Terminal Core Libraries (Build 1.2.3)', date: '2025-06-15' },
+                { title: 'Feature Update to Windows 13, version 25H2', date: '2025-05-20' },
+                { title: 'Windows Defender Definitions Update (v1.0.1)', date: '2025-06-08' },
+                { title: 'Microsoft Edge Browser Update (v115.0.1901.183)', date: '2025-06-05' },
+                { title: 'Cumulative Update for Windows 13 (KB5012347)', date: '2025-06-01' },
+            ];
+
+            // Render initial recent updates
+            const renderRecentUpdates = () => {
+                if (recentUpdatesList) { // Added check
+                    recentUpdatesList.innerHTML = '';
+                    initialRecentUpdates.forEach(update => {
+                        const li = document.createElement('li');
+                        li.classList.add('bg-white/10', 'dark:bg-black/10', 'p-3', 'rounded-lg');
+                        li.innerHTML = `<p class="font-semibold">${update.title}</p><p class="text-xs text-gray-400">Installed on: ${update.date}</p>`;
+                        recentUpdatesList.appendChild(li);
+                    });
+                }
+            };
+            renderRecentUpdates(); // Call on load
+
+            // --- Welcome Screen Logic ---
+            startTutorialBtn.addEventListener('click', () => {
+                if (welcomeScreen && loginScreen && desktop) { // Added checks
+                    welcomeScreen.classList.add('animate-fade-out');
+                    welcomeScreen.addEventListener('animationend', () => {
+                        welcomeScreen.classList.add('hidden');
+                        // Directly proceed to tutorial instead of login
+                        loginScreen.classList.remove('opacity-0'); // Ensure it's not faded if shown temporarily
+                        loginScreen.classList.add('hidden'); // Hide login screen
+                        desktop.style.opacity = '1';
+                        applyTheme(currentTheme); // Apply theme after login
+                        startTutorial(); // Start the tutorial
+                    }, { once: true });
+                }
+            });
+
+            skipTutorialBtn.addEventListener('click', () => {
+                if (welcomeScreen && loginScreen) { // Added checks
+                    welcomeScreen.classList.add('animate-fade-out');
+                    welcomeScreen.addEventListener('animationend', () => {
+                        welcomeScreen.classList.add('hidden');
+                        loginScreen.classList.remove('hidden');
+                        // Start login screen animation after welcome screen fades out
+                        setTimeout(() => loginScreen.style.opacity = '1', 10);
+                    }, { once: true });
+                }
+            });
+
+
+            // --- Login Logic ---
+            signInBtn.addEventListener('click', () => {
+                if (loginScreen && desktop) { // Added checks
+                    loginScreen.classList.add('animate-fade-out');
+                    loginScreen.addEventListener('animationend', () => {
+                        loginScreen.classList.add('hidden');
+                        desktop.style.opacity = '1';
+                        applyTheme(currentTheme); // Apply theme after login
+                        renderSavedWidgets(); // Render any previously saved widgets
+                    }, { once: true });
+                }
+            });
+
+            // --- Clock & Date Logic ---
+            const updateClock = () => {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const formattedHours = String(hours % 12 || 12).padStart(2, '0'); // 12-hour format
+                if (clockEl) clockEl.textContent = `${formattedHours}:${minutes} ${ampm}`; // Added check
+
+                // Update date window if open
+                const dateWindowEl = document.getElementById('date-window');
+                if (dateWindowEl && !dateWindowEl.classList.contains('hidden')) { // Added check
+                    updateDateDisplay();
+                }
+            };
+            setInterval(updateClock, 1000);
+            updateClock(); // Initial call to display clock immediately
+
+            const updateDateDisplay = () => {
+                const now = new Date();
+                if (dateDisplayLarge) dateDisplayLarge.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); // Added check
+                if (timeDisplayLarge) timeDisplayLarge.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }); // Added check
+
+                // Populate calendar
+                if (calendarDisplay) { // Added check
+                    calendarDisplay.innerHTML = `
+                        <div class="text-center font-bold text-blue-300">Su</div>
+                        <div class="text-center font-bold">Mo</div>
+                        <div class="text-center font-bold">Tu</div>
+                        <div class="text-center font-bold">We</div>
+                        <div class="text-center font-bold">Th</div>
+                        <div class="text-center font-bold">Fr</div>
+                        <div class="text-center font-bold text-red-300">Sa</div>
+                    `;
+
+                    const year = now.getFullYear();
+                    const month = now.getMonth(); // 0-indexed
+                    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 for Sunday
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                    // Add empty cells for days before the 1st
+                    for (let i = 0; i < firstDayOfMonth; i++) {
+                        const emptyDiv = document.createElement('div');
+                        calendarDisplay.appendChild(emptyDiv);
+                    }
+
+                    // Add days of the month
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const dayDiv = document.createElement('div');
+                        dayDiv.classList.add('text-center', 'p-1', 'rounded-md');
+                        dayDiv.textContent = day;
+                        if (day === now.getDate()) {
+                            dayDiv.classList.add('bg-blue-600', 'text-white'); // Highlight current day
+                        }
+                        calendarDisplay.appendChild(dayDiv);
+                    }
+                }
+            };
+
+            // Event listener for clock button to open date window
+            if (clockButton) { // Added check
+                clockButton.addEventListener('click', () => {
+                    openWindow('date-window');
+                    updateDateDisplay(); // Ensure date display is current when opened
+                });
+            }
+
+
+            // --- Theme Management ---
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let currentTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+            let currentFont = localStorage.getItem('font') || 'Poppins';
+
+            const applyTheme = (theme) => {
+                currentTheme = theme;
+                localStorage.setItem('theme', theme);
+                if (html && desktop) { // Added checks
+                    if (theme === 'dark') {
+                        html.classList.add('dark');
+                        desktop.classList.remove('desktop-light');
+                        desktop.classList.add('desktop-dark');
+                    } else {
+                        html.classList.remove('dark');
+                        desktop.classList.add('desktop-light');
+                        desktop.classList.remove('desktop-dark');
+                    }
+                }
+            };
+
+            const applyFont = (font) => {
+                currentFont = font;
+                localStorage.setItem('font', font);
+                // Set the primary body font
+                if (document.body) document.body.style.fontFamily = `'${font}', sans-serif`; // Added check
+
+                // Reset specific fonts first to avoid accumulation
+                if (terminalOutput) terminalOutput.style.fontFamily = ``; // Added check
+                if (terminalInput) terminalInput.style.fontFamily = ``; // Added check
+                if (clockEl) clockEl.style.fontFamily = ``; // Added check
+                if (clockButton) clockButton.style.fontFamily = ``; // Added check
+                if (timeDisplayLarge) timeDisplayLarge.style.fontFamily = ``; // Added check
+
+                // Apply specific fonts based on selection
+                if (font === 'Fira Code') {
+                    if (terminalOutput) terminalOutput.style.fontFamily = `'Fira Code', monospace`; // Added check
+                    if (terminalInput) terminalInput.style.fontFamily = `'Fira Code', monospace`; // Added check
+                } else {
+                    // Default terminal font if Fira Code is not selected
+                    if (terminalOutput) terminalOutput.style.fontFamily = `'Roboto Mono', monospace`; // Added check
+                    if (terminalInput) terminalInput.style.fontFamily = `'Roboto Mono', monospace`; // Added check
+                }
+
+                // Apply Candara Light for clock and large time display
+                if (font === 'Candara Light') {
+                    if (clockEl) { // Added check
+                        clockEl.style.fontFamily = `'Candara Light', 'Candara', 'Cantarell', sans-serif`;
+                        clockEl.style.fontWeight = '300';
+                    }
+                    if (clockButton) { // Added check
+                        clockButton.style.fontFamily = `'Candara Light', 'Candara', 'Cantarell', sans-serif`;
+                        clockButton.style.fontWeight = '300';
+                    }
+                    if (timeDisplayLarge) { // Added check
+                        timeDisplayLarge.style.fontFamily = `'Candara Light', 'Candara', 'Cantarell', sans-serif`;
+                        timeDisplayLarge.style.fontWeight = '300';
+                    }
+                } else {
+                    // Revert to Orbitron for clock if Candara Light is not selected
+                    if (clockEl) { // Added check
+                        clockEl.style.fontFamily = `'Orbitron', sans-serif`;
+                        clockEl.style.fontWeight = '700'; // Or default bold weight for Orbitron
+                    }
+                    if (clockButton) { // Added check
+                        clockButton.style.fontFamily = `'Orbitron', sans-serif';`
+                        clockButton.style.fontWeight = '700';
+                    }
+                    if (timeDisplayLarge) { // Added check
+                        timeDisplayLarge.style.fontFamily = `'Orbitron', sans-serif`;
+                        timeDisplayLarge.style.fontWeight = '700';
+                    }
+                }
+            };
+
+            if (themeLightBtn) themeLightBtn.addEventListener('click', () => applyTheme('light')); // Added check
+            if (themeDarkBtn) themeDarkBtn.addEventListener('click', () => applyTheme('dark')); // Added check
+            if (displayThemeLightBtn) displayThemeLightBtn.addEventListener('click', () => applyTheme('light')); // Added check
+            if (displayThemeDarkBtn) displayThemeDarkBtn.addEventListener('click', () => applyTheme('dark')); // Added check
+            if (fontSelect) fontSelect.addEventListener('change', (e) => applyFont(e.target.value)); // Added check
+
+            applyFont(currentFont); // Initial apply font
+
+
+            // --- Background Personalization ---
+            if (bgColorPicker && desktop) { // Added checks
+                bgColorPicker.addEventListener('input', (e) => {
+                    desktop.style.backgroundImage = 'none';
+                    desktop.style.backgroundColor = e.target.value;
+                });
+            }
+
+            // --- Menu & Window Opening Logic ---
+            // Stores original positions and dimensions for restore
+            const windowStates = {}; // Stores {top, left, width, height} for each window/widget
+            let activeWindows = {}; // Keep track of active system windows for dock icon state
+            let currentWindowZIndex = 45; // To manage z-index for active window
+
+            const updateDockIconState = (windowId, isActive, isMinimized) => {
+                const dockIcon = document.querySelector(`.dock-icon-div[data-window-target="${windowId}"]`);
+                if (dockIcon) {
+                    if (isActive) {
+                        dockIcon.classList.add('active');
+                        dockIcon.classList.remove('minimized-active');
+                    } else if (isMinimized) {
+                        dockIcon.classList.remove('active');
+                        dockIcon.classList.add('minimized-active');
+                    }
+                    else {
+                        dockIcon.classList.remove('active', 'minimized-active');
+                    }
+                }
+            };
+
+            const openWindow = (windowId) => {
+                const windowEl = document.getElementById(windowId);
+                if (windowEl) {
+                    windowEl.classList.remove('hidden');
+                    // Bring to front
+                    document.querySelectorAll('.window').forEach(w => w.style.zIndex = '40');
+                    windowEl.style.zIndex = '45';
+
+                    // For system windows, update dock icons
+                    if (!windowEl.classList.contains('custom-widget')) {
+                        Object.keys(activeWindows).forEach(id => {
+                            updateDockIconState(id, false, activeWindows[id] ? activeWindows[id].isMinimized : false); // Check if activeWindows[id] exists
+                        });
+                    }
+
+                    // Restore if minimized, or reset if maximized/snapped
+                    if (windowEl.classList.contains('minimized')) {
+                        windowEl.classList.remove('minimized');
+                        if (windowStates[windowId]) { // Only restore if a state was saved
+                            windowEl.style.top = windowStates[windowId].top;
+                            windowEl.style.left = windowStates[windowId].left;
+                            windowEl.style.width = windowStates[windowId].width;
+                            windowEl.style.height = windowStates[windowId].height;
+                        }
+                        if (!windowEl.classList.contains('custom-widget')) {
+                            activeWindows[windowId].isMinimized = false;
+                        }
+                    } else if (windowEl.classList.contains('maximized') || windowEl.classList.contains('snapped-left') || windowEl.classList.contains('snapped-right')) {
+                         windowEl.classList.remove('maximized', 'snapped-left', 'snapped-right');
+                        if (windowStates[windowId]) { // Only restore if a state was saved
+                            windowEl.style.top = windowStates[windowId].top;
+                            windowEl.style.left = windowStates[windowId].left;
+                            windowEl.style.width = windowStates[windowId].width;
+                            windowEl.style.height = windowStates[windowId].height;
+                        }
+                    }
+
+                    if (!windowEl.classList.contains('custom-widget')) {
+                        activeWindows[windowId] = { isOpen: true, isMinimized: false };
+                        updateDockIconState(windowId, true, false); // Mark as active
+                    }
+
+
+                    // Focus on terminal input when terminal opens
+                    if (windowId === 'terminal-window' && terminalInput) { // Added check
+                        terminalInput.focus();
+                    }
+                    // Set initial tab for updates window
+                    if (windowId === 'updates-window') {
+                        showUpdatesTab('update');
+                        updateUpdatesStatus(); // Ensure status is updated when updates app opens
+                    }
+                    // Set initial panel for settings window
+                    if (windowId === 'settings-window') {
+                        showSettingsPanel('personalization');
+                    }
+                    // Load File Explorer content
+                    if (windowId === 'file-explorer-window') {
+                        renderFileList();
+                    }
+                }
+            };
+
+            const closeWindow = (windowId) => {
+                const windowEl = document.getElementById(windowId);
+                if (windowEl) {
+                    windowEl.classList.add('hidden');
+                    // If it's a custom widget, also remove it from DOM and localStorage
+                    if (windowEl.classList.contains('custom-widget')) {
+                        windowEl.remove();
+                        let savedWidgets = JSON.parse(localStorage.getItem('customWidgets') || '[]');
+                        savedWidgets = savedWidgets.filter(w => w.id !== windowId);
+                        localStorage.setItem('customWidgets', JSON.stringify(savedWidgets));
+                    } else {
+                        delete activeWindows[windowId];
+                        updateDockIconState(windowId, false, false); // Mark as inactive
+                    }
+                }
+            };
+
+
+            // Context Menu
+            if (desktop && contextMenu && startMenu) { // Added checks
+                desktop.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    startMenu.classList.add('hidden');
+                    const x = Math.min(e.clientX, window.innerWidth - contextMenu.offsetWidth - 10);
+                    const y = Math.min(e.clientY, window.innerHeight - contextMenu.offsetHeight - 10);
+                    contextMenu.style.top = `${y}px`;
+                    contextMenu.style.left = `${x}px`;
+                    contextMenu.classList.remove('hidden');
+                });
+            }
+
+            if (openSettingsContext) { // Added check
+                openSettingsContext.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openWindow('settings-window');
+                    if (contextMenu) contextMenu.classList.add('hidden'); // Added check
+                });
+            }
+
+            // New: Open Widget Maker from Context Menu
+            if (openWidgetMakerContext) { // Added check
+                openWidgetMakerContext.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openWindow('widget-maker-window');
+                    if (contextMenu) contextMenu.classList.add('hidden'); // Added check
+                });
+            }
+
+
+            // Start Menu
+            if (startMenuBtn && startMenu && contextMenu) { // Added checks
+                startMenuBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    startMenu.classList.toggle('hidden');
+                    contextMenu.classList.add('hidden');
+                });
+            }
+
+            // General Click to close menus
+            document.addEventListener('click', (e) => {
+                if (contextMenu && !contextMenu.contains(e.target)) contextMenu.classList.add('hidden'); // Added check
+                if (startMenu && startMenuBtn && !startMenu.contains(e.target) && !startMenuBtn.contains(e.target)) { // Added check
+                    startMenu.classList.add('hidden');
+                }
+            });
+
+            // Elements that open windows (from desktop icons or start menu)
+            document.querySelectorAll('.app-icon-div[data-window]').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openWindow(element.getAttribute('data-window'));
+                    if (startMenu) startMenu.classList.add('hidden'); // Close start menu when app is opened // Added check
+                });
+            });
+
+            // Dock icons click handler (now restores minimized windows)
+            dockIcons.forEach(dockIcon => {
+                dockIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const windowId = dockIcon.getAttribute('data-window-target');
+                    const windowEl = document.getElementById(windowId);
+
+                    if (windowEl) {
+                        if (windowEl.classList.contains('hidden') || windowEl.classList.contains('minimized')) {
+                            // If hidden or minimized, open/restore it
+                            openWindow(windowId);
+                        } else {
+                            // If open, minimize it
+                            const minimizeButton = windowEl.querySelector('.minimize-btn');
+                            if (minimizeButton) {
+                                minimizeButton.click(); // Trigger the minimize functionality
+                            }
+                        }
+                    }
+                });
+            });
+
+
+            // Window close buttons
+            // Event listener for all close buttons (system windows and custom widgets)
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.close-btn')) {
+                    const button = e.target.closest('.close-btn');
+                    const windowId = button.getAttribute('data-window');
+                    e.stopPropagation();
+                    closeWindow(windowId);
+                }
+            });
+
+            // Minimize Window
+            minimizeBtns.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const windowEl = button.closest('.window');
+                    const windowId = windowEl.id;
+
+                    // Save current state before minimizing/maximizing/snapping
+                    windowStates[windowId] = {
+                        top: windowEl.style.top,
+                        left: windowEl.style.left,
+                        width: windowEl.style.width,
+                        height: windowEl.style.height
+                    };
+
+                    windowEl.classList.add('hidden'); // Hide the window
+                    // Only update activeWindows for system windows
+                    if (!windowEl.classList.contains('custom-widget')) {
+                        activeWindows[windowId] = { isOpen: false, isMinimized: true };
+                        updateDockIconState(windowId, false, true); // Mark as minimized
+                    }
+                });
+            });
+
+            // Maximize/Restore Window
+            maximizeBtns.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const windowEl = button.closest('.window');
+                    const windowId = windowEl.id;
+
+                    // Ensure window is brought to front on maximize/restore
+                    document.querySelectorAll('.window').forEach(w => w.style.zIndex = '40');
+                    windowEl.style.zIndex = '45';
+                    currentWindowZIndex = 45; // Reset current Z-index to avoid it growing too large
+
+                    if (windowEl.classList.contains('maximized')) {
+                        // Restore
+                        windowEl.classList.remove('maximized', 'snapped-left', 'snapped-right');
+                        if (windowStates[windowId]) {
+                            windowEl.style.top = windowStates[windowId].top;
+                            windowEl.style.left = windowStates[windowId].left;
+                            windowEl.style.width = windowStates[windowId].width;
+                            windowEl.style.height = windowStates[windowId].height;
+                        }
+                    } else {
+                        // Maximize
+                        // Save current state before maximizing
+                        windowStates[windowId] = {
+                            top: windowEl.style.top,
+                            left: windowEl.style.left,
+                            width: windowEl.style.width,
+                            height: windowEl.style.height
+                        };
+                        windowEl.classList.add('maximized');
+                        windowEl.classList.remove('snapped-left', 'snapped-right'); // Remove any snapping before maximizing
+                    }
+                    if (!windowEl.classList.contains('custom-widget')) {
+                        activeWindows[windowId] = { isOpen: true, isMinimized: false }; // Ensure it's not marked as minimized
+                        updateDockIconState(windowId, true, false); // Update dock icon
+                    }
+                });
+            });
+
+            // --- Draggable Windows/Widgets ---
+            let activeDragElement = null; // Can be a window or a custom widget
+            let offsetX_drag, offsetY_drag;
+            let isDragging = false;
+
+            const startDrag = (e, element) => {
+                if (element.classList.contains('maximized') || element.classList.contains('snapped-left') || element.classList.contains('snapped-right')) {
+                    // If maximized or snapped, restore to original size before dragging
+                    element.classList.remove('maximized', 'snapped-left', 'snapped-right');
+                    if (windowStates[element.id]) {
+                        element.style.top = windowStates[element.id].top;
+                        element.style.left = windowStates[element.id].left;
+                        element.style.width = windowStates[element.id].width;
+                        element.style.height = windowStates[element.id].height;
+                    }
+                }
+
+                activeDragElement = element;
+                isDragging = true;
+                e.currentTarget.classList.add('dragging'); // Add dragging cursor to title bar
+
+                // Bring to front
+                document.querySelectorAll('.window').forEach(w => {
+                    // Only decrease z-index of other windows/widgets if their z-index is higher than default
+                    if (w !== activeDragElement && parseInt(w.style.zIndex) > 40) {
+                        w.style.zIndex = '40';
+                    }
+                });
+                activeDragElement.style.zIndex = ++currentWindowZIndex; // Bring active element to top
+
+                const event = e.type === 'touchstart' ? e.touches[0] : e;
+                offsetX_drag = event.clientX - activeDragElement.offsetLeft;
+                offsetY_drag = event.clientY - activeDragElement.offsetTop;
+
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchmove', drag, { passive: false });
+                document.addEventListener('touchend', endDrag);
+            };
+
+            const drag = (e) => {
+                if (!activeDragElement || !isDragging) return;
+                e.preventDefault();
+                const event = e.type === 'touchmove' ? e.touches[0] : e;
+
+                let newLeft = event.clientX - offsetX_drag;
+                let newTop = event.clientY - offsetY_drag;
+
+                // Simple boundary checks for dragging
+                newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - activeDragElement.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, window.innerHeight - activeDragElement.offsetHeight - 60)); // 60px for dock
+
+                activeDragElement.style.left = `${newLeft}px`;
+                activeDragElement.style.top = `${newTop}px`;
+
+                // Visual feedback for snapping (clear existing snap classes) only for system windows
+                if (!activeDragElement.classList.contains('custom-widget')) {
+                    activeDragElement.classList.remove('maximized', 'snapped-left', 'snapped-right');
+
+                    const threshold = 50; // pixels from edge to trigger snap
+                    if (event.clientX < threshold) {
+                        activeDragElement.style.boxShadow = '0 0 0 4px rgba(66, 153, 225, 0.5) inset'; // Blue glow for snap area
+                    } else if (event.clientX > window.innerWidth - threshold) {
+                        activeDragElement.style.boxShadow = '0 0 0 4px rgba(66, 153, 225, 0.5) inset';
+                    } else {
+                        activeDragElement.style.boxShadow = ''; // Remove glow
+                    }
+                }
+            };
+
+            const endDrag = (e) => {
+                if (!activeDragElement) return;
+                isDragging = false;
+                const titleBar = activeDragElement.querySelector('.title-bar');
+                if (titleBar) titleBar.classList.remove('dragging'); // Added check
+                activeDragElement.style.boxShadow = ''; // Remove any lingering glow
+
+                const event = e.type === 'touchend' ? e.changedTouches[0] : e;
+                const threshold = 50; // pixels from edge to trigger snap
+
+                // Save current position for restore before snapping
+                windowStates[activeDragElement.id] = {
+                    top: activeDragElement.style.top,
+                    left: activeDragElement.style.left,
+                    width: activeDragElement.style.width,
+                    height: activeDragElement.style.height
+                };
+
+                // Apply snapping only for system windows, not custom widgets
+                if (!activeDragElement.classList.contains('custom-widget')) {
+                    if (event.clientX < threshold) {
+                        // Snap left
+                        activeDragElement.classList.add('snapped-left');
+                        activeDragElement.classList.remove('maximized', 'snapped-right');
+                    } else if (event.clientX > window.innerWidth - threshold) {
+                        // Snap right
+                        activeDragElement.classList.add('snapped-right');
+                        activeDragElement.classList.remove('maximized', 'snapped-left');
+                    } else if (event.clientY < threshold) {
+                        // Maximize if dragged to top edge
+                        activeDragElement.classList.add('maximized');
+                        activeDragElement.classList.remove('snapped-left', 'snapped-right');
+                    }
+                }
+
+                // If it's a custom widget, save its new position
+                if (activeDragElement.classList.contains('custom-widget')) {
+                    saveWidgetState(activeDragElement.id);
+                }
+
+                activeDragElement = null;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('mouseup', endDrag);
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('touchend', endDrag);
+            };
+
+            // Initialize draggable for existing system windows
+            systemWindows.forEach(windowEl => {
+                const titleBar = windowEl.querySelector('.title-bar');
+                if (titleBar) { // Added check
+                    titleBar.addEventListener('mousedown', (e) => startDrag(e, windowEl));
+                    titleBar.addEventListener('touchstart', (e) => startDrag(e, windowEl));
+                    // Double click to maximize/restore for system windows
+                    titleBar.addEventListener('dblclick', (e) => {
+                        const windowId = windowEl.id;
+                        if (windowEl.classList.contains('maximized')) {
+                            windowEl.classList.remove('maximized');
+                            if (windowStates[windowId]) {
+                                windowEl.style.top = windowStates[windowId].top;
+                                windowEl.style.left = windowStates[windowId].left;
+                                windowEl.style.width = windowStates[windowId].width;
+                                windowEl.style.height = windowStates[windowId].height;
+                            }
+                        } else {
+                            // Maximize
+                            windowStates[windowId] = { // Save current state before maximizing
+                                top: windowEl.style.top,
+                                left: windowEl.style.left,
+                                width: windowEl.style.width,
+                                height: windowEl.style.height
+                            };
+                            windowEl.classList.add('maximized');
+                            windowEl.classList.remove('snapped-left', 'snapped-right'); // Remove any snapping before maximizing
+                        }
+                        activeWindows[windowId] = { isOpen: true, isMinimized: false }; // Ensure active status
+                        updateDockIconState(windowId, true, false); // Update dock icon
+                    });
+                }
+            });
+
+
+            // --- Window/Widget Resizing ---
+            let activeResizeElement = null; // Can be a window or a custom widget
+            let resizeStartX, resizeStartY, startWidth, startHeight, startLeft, startTop;
+            let resizeDirection = '';
+
+            const startResize = (e, element, direction) => {
+                e.stopPropagation(); // Prevent drag from starting
+                activeResizeElement = element;
+                resizeDirection = direction;
+
+                // Prevent resizing if maximized or snapped
+                if (element.classList.contains('maximized') || element.classList.contains('snapped-left') || element.classList.contains('snapped-right')) {
+                    activeResizeElement = null; // Disable resize if snapped/maximized
+                    return;
+                }
+
+                // Bring to front
+                document.querySelectorAll('.window').forEach(w => {
+                    if (w !== activeResizeElement && parseInt(w.style.zIndex) > 40) {
+                        w.style.zIndex = '40';
+                    }
+                });
+                activeResizeElement.style.zIndex = ++currentWindowZIndex;
+
+                const event = e.type === 'touchstart' ? e.touches[0] : e;
+                resizeStartX = event.clientX;
+                resizeStartY = event.clientY;
+                startWidth = activeResizeElement.offsetWidth;
+                startHeight = activeResizeElement.offsetHeight;
+                startLeft = activeResizeElement.offsetLeft;
+                startTop = activeResizeElement.offsetTop;
+
+                document.addEventListener('mousemove', resize);
+                document.addEventListener('mouseup', endResize);
+                document.addEventListener('touchmove', resize, { passive: false });
+                document.addEventListener('touchend', endResize);
+            };
+
+            const resize = (e) => {
+                if (!activeResizeElement) return;
+                e.preventDefault();
+                const event = e.type === 'touchmove' ? e.touches[0] : e;
+
+                const dx = event.clientX - resizeStartX;
+                const dy = event.clientY - resizeStartY;
+
+                let newWidth = startWidth;
+                let newHeight = startHeight;
+                let newLeft = startLeft;
+                let newTop = startTop;
+
+                switch (resizeDirection) {
+                    case 'right':
+                        newWidth = startWidth + dx;
+                        break;
+                    case 'left':
+                        newWidth = startWidth - dx;
+                        newLeft = startLeft + dx;
+                        break;
+                    case 'bottom':
+                        newHeight = startHeight + dy;
+                        break;
+                    case 'top':
+                        newHeight = startHeight - dy;
+                        newTop = startTop + dy;
+                        break;
+                    case 'bottom-right':
+                        newWidth = startWidth + dx;
+                        newHeight = startHeight + dy;
+                        break;
+                    case 'bottom-left':
+                        newWidth = startWidth - dx;
+                        newHeight = startHeight + dy;
+                        newLeft = startLeft + dx;
+                        break;
+                    case 'top-right':
+                        newWidth = startWidth + dx;
+                        newHeight = startHeight - dy;
+                        newTop = startTop + dy;
+                        break;
+                    case 'top-left':
+                        newWidth = startWidth - dx;
+                        newHeight = startHeight - dy;
+                        newLeft = startLeft + dx;
+                        break;
+                }
+
+                // Apply minimum dimensions (e.g., to prevent window from collapsing completely)
+                // These values ensure the title bar and at least some content area are visible.
+                const minWidth = 150; // Smaller minimum width for flexibility
+                const minHeight = 100; // Smaller minimum height for flexibility
+
+                newWidth = Math.max(newWidth, minWidth);
+                newHeight = Math.max(newHeight, minHeight);
+
+                // Ensure it doesn't go off-screen to the top/left when resizing from top/left
+                newLeft = Math.max(0, newLeft);
+                newTop = Math.max(0, newTop);
+
+                activeResizeElement.style.width = `${newWidth}px`;
+                activeResizeElement.style.height = `${newHeight}px`;
+                activeResizeElement.style.left = `${newLeft}px`;
+                activeResizeElement.style.top = `${newTop}px`;
+            };
+
+            const endResize = () => {
+                // If it's a custom widget, save its new size/position
+                if (activeResizeElement && activeResizeElement.classList.contains('custom-widget')) {
+                    saveWidgetState(activeResizeElement.id);
+                }
+
+                activeResizeElement = null;
+                resizeDirection = '';
+                document.removeEventListener('mousemove', resize);
+                document.removeEventListener('mouseup', endResize);
+                document.removeEventListener('touchmove', resize);
+                document.removeEventListener('touchend', endResize);
+            };
+
+            // Function to attach draggable and resizable listeners to an element
+            const makeDraggableAndResizable = (element) => {
+                const titleBar = element.querySelector('.title-bar');
+                const resizeHandles = element.querySelectorAll('.resize-handle');
+
+                // Make Draggable
+                if (titleBar) {
+                    titleBar.addEventListener('mousedown', (e) => startDrag(e, element));
+                    titleBar.addEventListener('touchstart', (e) => startDrag(e, element));
+                }
+
+                // Make Resizable
+                resizeHandles.forEach(handle => {
+                    const direction = Array.from(handle.classList).find(cls =>
+                        cls !== 'resize-handle' &&
+                        ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'top', 'bottom', 'left', 'right'].includes(cls)
+                    );
+                    if (direction) {
+                        handle.addEventListener('mousedown', (e) => startResize(e, element, direction));
+                        handle.addEventListener('touchstart', (e) => startResize(e, element, direction));
+                    } else {
+                        console.error('Resize handle found without a valid direction class:', handle);
+                    }
+                });
+            };
+
+
+            // Attach resize handles to existing system windows
+            document.querySelectorAll('.window:not(.custom-widget)').forEach(windowEl => {
+                makeDraggableAndResizable(windowEl);
+            });
+
+
+            // --- Interactive Terminal Logic ---
+            let commandHistory = [];
+            let historyIndex = -1;
+
+            const getTerminalCurrentDir = () => {
+                return `C:\\${currentPath.slice(1).join('\\')}`;
+            };
+
+            const generateProgressBar = (progress) => {
+                const numHashes = Math.floor(progress / 10); // Each '#' represents 10%
+                const numSlashes = 10 - numHashes; // Total of 10 characters for the bar
+                return '#'.repeat(numHashes) + '/'.repeat(numSlashes);
+            };
+
+
+            const printToTerminal = (text, className = '') => {
+                if (terminalOutput && terminalPrompt && terminalPrompt.parentNode) { // Added checks
+                    const p = document.createElement('p');
+                    // Ensure text is treated as a string before calling replace
+                    const safeText = String(text);
+                    p.innerHTML = safeText.replace(/\n/g, '<br>');
+                    if (className) p.classList.add(className);
+                    terminalOutput.insertBefore(p, terminalPrompt.parentNode);
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight; // Scroll to bottom
+                }
+            };
+
+            const executeCommand = (command) => {
+                printToTerminal(`${getTerminalCurrentDir()}>${command}`);
+                commandHistory.push(command);
+                historyIndex = commandHistory.length; // Reset history index to end
+
+                let output = '';
+                const parts = command.trim().split(/\s+/);
+                const cmd = parts[0].toLowerCase();
+                const args = parts.slice(1);
+
+                try { // Added try-catch for command execution
+                    switch (cmd) {
+                        case 'help':
+                            output = 'Available commands:\n  help - Show this help message\n  echo [text] - Print text\n  ls - List directory contents\n  cd [directory] - Change directory\n  mkdir [directory] - Create a new directory\n  install [app_name] - Install a mock application\n  install repos [app_name] - Install from mock repository\n  clear - Clear the terminal\n  date - Display the current date\n  time - Display the current time\n  exit - Close the terminal';
+                            break;
+                        case 'echo':
+                            output = args.join(' ');
+                            break;
+                        case 'ls':
+                            let currentDirContent = getCurrentFsNode();
+                            if (currentDirContent && typeof currentDirContent === 'object') {
+                                output = Object.keys(currentDirContent).map(itemName => {
+                                    const isDirectory = typeof currentDirContent[itemName] === 'object';
+                                    return isDirectory ? `<span style="color:#87CEEB;">${itemName}\\</span>` : itemName; // Cyan for folders
+                                }).join('\n');
+                                if (Object.keys(currentDirContent).length === 0) {
+                                    output = 'Directory is empty.';
+                                }
+                            } else {
+                                output = `Error: Cannot list contents of a file.`;
+                            }
+                            break;
+                        case 'cd':
+                            if (args.length === 0) {
+                                output = 'Usage: cd [directory]';
+                            } else {
+                                const target = args[0];
+                                if (target === '..') {
+                                    if (currentPath.length > 1) { // Cannot go above root (C:)
+                                        currentPath.pop();
+                                    } else {
+                                        output = 'Already at root directory.';
+                                    }
+                                } else {
+                                    const newPath = [...currentPath, target];
+                                    if (resolveFsPath(newPath) && typeof resolveFsPath(newPath) === 'object') {
+                                        currentPath = newPath;
+                                    } else {
+                                        output = `The system cannot find the path specified: ${target}`;
+                                    }
+                                }
+                                if (terminalPrompt) terminalPrompt.textContent = `${getTerminalCurrentDir()}> `; // Added check
+                            }
+                            break;
+                        case 'mkdir':
+                            if (args.length === 0) {
+                                output = 'Usage: mkdir [directory_name]';
+                            } else {
+                                const newDirName = args[0];
+                                const currentFsNode = getCurrentFsNode();
+                                if (currentFsNode && typeof currentFsNode === 'object') {
+                                    if (currentFsNode[newDirName]) {
+                                        output = `A subdirectory or file ${newDirName} already exists.`;
+                                    } else {
+                                        currentFsNode[newDirName] = {};
+                                        output = `Directory created: ${getTerminalCurrentDir()}\\${newDirName}`;
+                                        renderFileList(); // Update file explorer
+                                    }
+                                } else {
+                                    output = `Cannot create directory in a file location.`;
+                                }
+                            }
+                            break;
+                        case 'install':
+                            if (args.length < 1) {
+                                output = 'Usage: install [app_name] | install repos [app_name]\nAvailable apps: notepad, browser, calculator, Widget.js (via repos)';
+                                printToTerminal(output);
+                                return;
+                            }
+
+                            if (args[0].toLowerCase() === 'repos' && args.length === 2) {
+                                const appName = args[1].toLowerCase();
+                                const appToInstall = mockApplications[appName];
+                                if (appName === 'widget.js' && appToInstall) {
+                                    // Check if already installed
+                                    let targetNode = resolveFsPath(appToInstall.installPath);
+                                    if (targetNode && targetNode[appToInstall.executable]) {
+                                        printToTerminal(`${appToInstall.name} is already installed.`);
+                                        if (terminalInput) terminalInput.value = ''; // Added check
+                                        if (terminalInput) terminalInput.focus(); // Added check
+                                        return;
+                                    }
+
+                                    printToTerminal(`Initiating installation of ${appToInstall.name} from repository...`);
+                                    let progress = 0;
+                                    const installSteps = [
+                                        { message: `Downloading ${appToInstall.name}...`, delay: 1000 },
+                                        { message: `Verifying integrity...`, delay: 800 },
+                                        { message: `Extracting files...`, delay: 1200 },
+                                        { message: `Configuring ${appToInstall.name}...`, delay: 1500 },
+                                        { message: `Finalizing installation...`, delay: 700 }
+                                    ];
+
+                                    const executeInstallStep = (stepIndex) => {
+                                        if (stepIndex < installSteps.length) {
+                                            const step = installSteps[stepIndex];
+                                            // Calculate actual percentage for display, ensure it reaches 100% on last step
+                                            const totalSteps = installSteps.length;
+                                            const currentProgressRaw = (stepIndex / totalSteps) * 100;
+                                            let currentProgress = Math.min(100, Math.floor(currentProgressRaw + (100 / totalSteps))); // Ensure progress increments
+                                            if (stepIndex === totalSteps - 1) currentProgress = 100; // Force 100% on last step
+
+                                            printToTerminal(`${step.message} ${generateProgressBar(currentProgress)} (${currentProgress}%)`);
+
+                                            setTimeout(() => {
+                                                if (stepIndex === installSteps.length - 1) {
+                                                    // Last step: actually install the file
+                                                    let targetDir = fileSystem;
+                                                    for (const segment of appToInstall.installPath) {
+                                                        if (!targetDir[segment]) {
+                                                            targetDir[segment] = {};
+                                                        }
+                                                        targetDir = targetDir[segment];
+                                                    }
+                                                    targetDir[appToInstall.executable] = appToInstall.content;
+
+                                                    // Update UI: show desktop and dock icons for Widget.js
+                                                    if (widgetDesktopIcon) widgetDesktopIcon.classList.remove('hidden'); // Added check
+                                                    if (widgetStartMenuIcon) widgetStartMenuIcon.classList.remove('hidden'); // Added check
+                                                    if (widgetDockIcon) widgetDockIcon.classList.remove('hidden'); // Added check
+
+                                                    // Add to recent updates
+                                                    const today = new Date().toISOString().slice(0, 10);
+                                                    initialRecentUpdates.unshift({
+                                                        title: `Installed: ${appToInstall.name} (from repos)`,
+                                                        date: today
+                                                    });
+                                                    renderRecentUpdates(); // Update updates list
+
+                                                    printToTerminal(`${appToInstall.name} installed successfully!`);
+                                                    renderFileList(); // Update file explorer to show Widget.js
+                                                    if (terminalInput) terminalInput.value = ''; // Added check
+                                                    if (terminalInput) terminalInput.focus(); // Added check
+
+                                                } else {
+                                                    executeInstallStep(stepIndex + 1);
+                                                }
+                                            }, step.delay);
+                                        }
+                                    };
+                                    executeInstallStep(0);
+                                    return; // Important: return here to prevent immediate input clear
+                                } else {
+                                    output = `Application '${appName}' not found in repositories.`;
+                                }
+                            } else {
+                                // Existing regular install logic
+                                const appName = args[0].toLowerCase();
+                                const appToInstall = mockApplications[appName];
+                                if (appToInstall) {
+                                    let programFilesNode = resolveFsPath(['Local Disk (C:)', 'Program Files']);
+                                    if (programFilesNode && programFilesNode[appToInstall.name]) {
+                                        output = `${appToInstall.name} is already installed.`;
+                                    } else {
+                                        // Simulate installation by creating directory and executable
+                                        let targetNode = fileSystem;
+                                        for (let i = 0; i < appToInstall.installPath.length - 1; i++) {
+                                            const segment = appToInstall.installPath[i];
+                                            if (!targetNode[segment]) {
+                                                targetNode[segment] = {};
+                                            }
+                                            targetNode = targetNode[segment];
+                                        }
+                                        targetNode[appToInstall.installPath[appToInstall.installPath.length - 1]] = {
+                                            [appToInstall.executable]: appToInstall.content
+                                        };
+
+                                        // Add to recent updates
+                                        const today = new Date().toISOString().slice(0, 10);
+                                        initialRecentUpdates.unshift({
+                                            title: `Installed: ${appToInstall.name}`,
+                                            date: today
+                                        });
+                                        renderRecentUpdates(); // Update updates list
+                                        output = `${appToInstall.name} installed successfully!`;
+                                        renderFileList(); // Update file explorer
+                                    }
+                                } else {
+                                    output = `Application '${appName}' not found. Available apps: notepad, browser, calculator, Widget.js (via repos)`;
+                                }
+                            }
+                            break; // Break after handling install logic
+
+
+                        case 'clear':
+                            // Clear all but the initial lines
+                            if (terminalOutput) { // Added check
+                                while (terminalOutput.children.length > 3) { // Keep initial 3 lines
+                                    terminalOutput.removeChild(terminalOutput.children[0]);
+                                }
+                            }
+                            if (terminalInput) terminalInput.value = ''; // Clear input as well // Added check
+                            if (terminalInput) terminalInput.focus(); // Added check
+                            return; // Don't print empty line or prompt
+                        case 'date':
+                            output = new Date().toLocaleDateString();
+                            break;
+                        case 'time':
+                            output = new Date().toLocaleTimeString();
+                            break;
+                        case 'exit':
+                            closeWindow('terminal-window');
+                            return; // Don't print prompt after exit
+                        case '':
+                            // Do nothing for empty command
+                            break;
+                        default:
+                            output = `'${command}' is not recognized as an internal or external command, operable program or batch file.`;
+                            break;
+                    }
+                } catch (e) {
+                    console.error('Error executing terminal command:', e);
+                    output = `An internal error occurred while executing command: ${e.message}`;
+                }
+
+                if (output) {
+                    printToTerminal(output);
+                }
+                if (terminalInput) terminalInput.value = ''; // Added check
+                if (terminalInput) terminalInput.focus(); // Added check
+            };
+
+            if (terminalInput) { // Added check
+                terminalInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent default Enter key behavior (new line)
+                        const command = terminalInput.value.trim();
+                        executeCommand(command);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (historyIndex > 0) {
+                            historyIndex--;
+                            terminalInput.value = commandHistory[historyIndex];
+                        }
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (historyIndex < commandHistory.length - 1) {
+                            historyIndex++;
+                            terminalInput.value = commandHistory[historyIndex];
+                        } else if (historyIndex === commandHistory.length - 1) {
+                            historyIndex = commandHistory.length;
+                            terminalInput.value = '';
+                        }
+                    }
+                });
+            }
+
+            // Focus terminal input when clicking anywhere in the terminal window content area
+            if (terminalOutput && terminalInput) { // Added checks
+                terminalOutput.addEventListener('click', () => {
+                    terminalInput.focus();
+                });
+            }
+
+            // Ensure cursor blinks when input is not focused, and stops when focused
+            if (terminalInput && terminalCursor) { // Added checks
+                terminalInput.addEventListener('focus', () => {
+                    terminalCursor.classList.remove('terminal-cursor');
+                });
+                terminalInput.addEventListener('blur', () => {
+                    terminalCursor.classList.add('terminal-cursor');
+                });
+            }
+
+
+            // --- Windows 13 Updates App Logic ---
+
+            // Function to format current time for "Last checked" status
+            const formatTime = (date) => {
+                const hours = date.getHours();
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const formattedHours = String(hours % 12 || 12);
+                return `${formattedHours}:${minutes} ${ampm}`;
+            };
+
+            // Function to update the status message and button state in the Updates app
+            const updateUpdatesStatus = () => {
+                const now = new Date();
+                if (lastCheckedStatus) lastCheckedStatus.textContent = `Last checked: Today at ${formatTime(now)}`; // Added check
+
+                if (updatesStatusMessage && checkForUpdatesBtn) { // Added checks
+                    if (systemUpdatesAvailable.length > 0) {
+                        updatesStatusMessage.textContent = 'Updates available. Click to install.';
+                        checkForUpdatesBtn.disabled = false;
+                        checkForUpdatesBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        updatesStatusMessage.textContent = 'You\'re up to date!';
+                        checkForUpdatesBtn.disabled = true;
+                        checkForUpdatesBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            };
+
+
+            const showUpdatesTab = (tabName) => {
+                // Hide all content and remove active class from all tabs
+                if (updatesContentUpdate) updatesContentUpdate.classList.add('hidden'); // Added check
+                if (updatesContentRecent) updatesContentRecent.classList.add('hidden'); // Added check
+                if (updatesTabUpdate) updatesTabUpdate.classList.remove('bg-white/20', 'dark:bg-black/20'); // Added check
+                if (updatesTabRecent) updatesTabRecent.classList.remove('bg-white/20', 'dark:bg-black/20'); // Added check
+
+                // Show selected tab content and add active class
+                if (tabName === 'update') {
+                    if (updatesContentUpdate) updatesContentUpdate.classList.remove('hidden'); // Added check
+                    if (updatesTabUpdate) updatesTabUpdate.classList.add('bg-white/20', 'dark:bg-black/20'); // Added check
+                    updateUpdatesStatus(); // Update status when switching to update tab
+                } else if (tabName === 'recent') {
+                    if (updatesContentRecent) updatesContentRecent.classList.remove('hidden'); // Added check
+                    if (updatesTabRecent) updatesTabRecent.classList.add('bg-white/20', 'dark:bg-black/20'); // Added check
+                }
+            };
+
+            if (updatesTabUpdate) updatesTabUpdate.addEventListener('click', () => showUpdatesTab('update')); // Added check
+            if (updatesTabRecent) updatesTabRecent.addEventListener('click', () => showUpdatesTab('recent')); // Added check
+
+            if (checkForUpdatesBtn) { // Added check
+                checkForUpdatesBtn.addEventListener('click', () => {
+                    if (systemUpdatesAvailable.length > 0) {
+                        const updateToInstall = systemUpdatesAvailable.shift(); // Get next update
+                        if (updateProgressSection) updateProgressSection.classList.remove('hidden'); // Added check
+                        if (updateProgressBar) updateProgressBar.style.width = '0%'; // Added check
+                        if (updatePercentage) updatePercentage.textContent = '0%'; // Added check
+                        if (updateStatus) updateStatus.textContent = `Downloading ${updateToInstall.name}...`; // Added check
+                        checkForUpdatesBtn.disabled = true; // Disable button during update
+                        checkForUpdatesBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+
+                        let progress = 0;
+                        const downloadInterval = setInterval(() => {
+                            progress += Math.floor(Math.random() * 5) + 3; // Slower progress for "realism"
+                            if (progress > 40) progress = 40; // Max 40% for download phase
+                            if (updateProgressBar) updateProgressBar.style.width = `${progress}%`; // Added check
+                            if (updatePercentage) updatePercentage.textContent = `${progress}%`; // Added check
+
+                            if (progress === 40) {
+                                clearInterval(downloadInterval);
+                                if (updateStatus) updateStatus.textContent = `Verifying ${updateToInstall.name}...`; // Added check
+                                setTimeout(() => {
+                                    if (updateProgressBar) updateProgressBar.style.width = `60%`; // Added check
+                                    if (updatePercentage) updatePercentage.textContent = `60%`; // Added check
+                                    if (updateStatus) updateStatus.textContent = `Installing ${updateToInstall.name}...`; // Added check
+                                    const installInterval = setInterval(() => {
+                                        progress += Math.floor(Math.random() * 5) + 3;
+                                        if (progress > 90) progress = 90; // Max 90% for install phase
+                                        if (updateProgressBar) updateProgressBar.style.width = `${progress}%`; // Added check
+                                        if (updatePercentage) updatePercentage.textContent = `${progress}%`; // Added check
+
+                                        if (progress === 90) {
+                                            clearInterval(installInterval);
+                                            if (updateStatus) updateStatus.textContent = `Configuring ${updateToInstall.name}...`; // Added check
+                                            setTimeout(() => {
+                                                if (updateProgressBar) updateProgressBar.style.width = `100%`; // Added check
+                                                if (updatePercentage) updatePercentage.textContent = `100%`; // Added check
+                                                if (updateStatus) updateStatus.textContent = `Installation complete: ${updateToInstall.name}.`; // Added check
+
+                                                // Add to recent updates
+                                                const today = new Date().toISOString().slice(0, 10);
+                                                initialRecentUpdates.unshift({
+                                                    title: `${updateToInstall.title}`,
+                                                    date: today
+                                                });
+                                                renderRecentUpdates();
+
+                                                if (openWidgetMakerContext) openWidgetMakerContext.classList.remove('hidden'); // Added check
+
+                                                // Re-evaluate update status and button state after installation
+                                                updateUpdatesStatus();
+
+                                                // Optionally, reset progress section or add a message to recent updates
+                                                setTimeout(() => {
+                                                    if (updateProgressSection) updateProgressSection.classList.add('hidden'); // Added check
+                                                }, 2000);
+                                            }, 1000); // Delay for "configuring"
+                                        }
+                                    }, 200); // Faster install progress
+                                }, 1500); // Delay for "verifying"
+                            }
+                        }, 200); // Faster download progress
+                    } else {
+                        updateUpdatesStatus(); // If no updates, just update status
+                        if (updateProgressSection) updateProgressSection.classList.add('hidden'); // Hide progress if no updates were found/installed // Added check
+                    }
+                });
+            }
+
+            // --- Settings App Logic ---
+            const showSettingsPanel = (panelId) => {
+                // Hide all panels and remove active class from nav buttons
+                settingsPanels.forEach(panel => panel.classList.add('hidden'));
+                settingsNavBtns.forEach(btn => btn.classList.remove('active'));
+
+                // Show the selected panel and add active class to its nav button
+                const targetPanel = document.getElementById(`settings-${panelId}`);
+                const targetNavBtn = document.querySelector(`.settings-nav-btn[data-settings-panel="${panelId}"]`);
+                if (targetPanel) targetPanel.classList.remove('hidden'); // Added check
+                if (targetNavBtn) targetNavBtn.classList.add('active'); // Added check
+            };
+
+            settingsNavBtns.forEach(button => {
+                button.addEventListener('click', () => {
+                    showSettingsPanel(button.getAttribute('data-settings-panel'));
+                });
+            });
+
+            // Initial volume setting (can be saved to localStorage later)
+            if (masterVolumeSlider) { // Added check
+                masterVolumeSlider.addEventListener('input', (e) => {
+                    // You can add actual audio control here if using a library like Tone.js
+                    console.log('Master Volume:', e.target.value);
+                });
+            }
+
+            // --- File Explorer Logic ---
+            const resolveFsPath = (pathArray) => {
+                let currentNode = fileSystem;
+                for (const segment of pathArray) {
+                    if (currentNode && currentNode[segment] !== undefined) { // Check for undefined to allow empty objects as valid directories
+                        currentNode = currentNode[segment];
+                    } else {
+                        return null; // Path not found
+                    }
+                }
+                return currentNode;
+            };
+
+            const getCurrentFsNode = () => {
+                return resolveFsPath(currentPath);
+            };
+
+            const renderFileList = () => {
+                if (fileListEl && fileExplorerPathEl) { // Added checks
+                    fileListEl.innerHTML = '';
+                    const currentFsNode = getCurrentFsNode();
+                    fileExplorerPathEl.textContent = currentPath.join('\\');
+
+                    if (currentFsNode && typeof currentFsNode === 'object') {
+                        const sortedItems = Object.keys(currentFsNode).sort((a, b) => {
+                            const isADir = typeof currentFsNode[a] === 'object';
+                            const isBDir = typeof currentFsNode[b] === 'object';
+                            if (isADir && !isBDir) return -1; // Directories first
+                            if (!isADir && isBDir) return 1;
+                            return a.localeCompare(b); // Then alphabetical
+                        });
+
+                        if (sortedItems.length === 0) {
+                            fileListEl.innerHTML = '<p class="text-gray-400">This folder is empty.</p>';
+                        } else {
+                            sortedItems.forEach(itemName => {
+                                const isDirectory = typeof currentFsNode[itemName] === 'object';
+                                const itemEl = document.createElement('div');
+                                itemEl.classList.add('file-item');
+                                itemEl.setAttribute('data-name', itemName); // Store name for double click
+
+                                itemEl.innerHTML = `
+                                    <span class="material-symbols-outlined text-lg ${isDirectory ? 'text-yellow-400' : 'text-gray-400'}">
+                                        ${isDirectory ? 'folder' : 'article'}
+                                    </span>
+                                    <span>${itemName}</span>
+                                `;
+                                fileListEl.appendChild(itemEl);
+
+                                // Add click handler for selection
+                                itemEl.addEventListener('click', () => {
+                                    document.querySelectorAll('.file-item').forEach(item => item.classList.remove('selected'));
+                                    itemEl.classList.add('selected');
+                                });
+
+
+                                // Double click to open folder/file
+                                itemEl.addEventListener('dblclick', () => {
+                                    if (isDirectory) {
+                                        currentPath.push(itemName);
+                                        renderFileList();
+                                    } else {
+                                        // For files, print content to terminal
+                                        printToTerminal(`--- Content of ${itemName} ---\n${currentFsNode[itemName]}\n--- End of file ---`);
+                                        openWindow('terminal-window'); // Open terminal to show content
+                                    }
+                                });
+                            });
+                        }
+                    } else {
+                        fileListEl.innerHTML = '<p class="text-gray-400">Directory not found or accessible.</p>';
+                    }
+                }
+            };
+
+            // Handle sidebar navigation clicks
+            fileExplorerNavItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetPath = item.getAttribute('data-path');
+                    if (targetPath === 'Desktop') {
+                        currentPath = ['Local Disk (C:)', 'Users', 'You', 'Desktop'];
+                    } else if (targetPath === 'Documents') {
+                        currentPath = ['Local Disk (C:)', 'Users', 'You', 'Documents'];
+                    } else if (targetPath === 'Downloads') {
+                        currentPath = ['Local Disk (C:)', 'Users', 'You', 'Downloads'];
+                    } else if (targetPath === 'Pictures') {
+                        currentPath = ['Local Disk (C:)', 'Users', 'You', 'Pictures'];
+                    } else if (targetPath === 'Local Disk (C:)') {
+                        currentPath = ['Local Disk (C:)'];
+                    }
+                    renderFileList();
+                });
+            });
+
+            // New Folder Button
+            if (newFolderBtn) { // Added check
+                newFolderBtn.addEventListener('click', () => {
+                    // Using a custom message box instead of prompt
+                    const inputDialog = document.createElement('div');
+                    inputDialog.classList.add('fixed', 'inset-0', 'bg-black/50', 'flex', 'items-center', 'justify-center', 'z-50');
+                    inputDialog.innerHTML = `
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-xl text-white">
+                            <h5 class="text-lg font-semibold mb-4">Enter New Folder Name</h5>
+                            <input type="text" id="newFolderNameInput" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md mb-4 text-white" placeholder="Folder Name">
+                            <div class="flex justify-end space-x-2">
+                                <button id="cancelNewFolder" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md">Cancel</button>
+                                <button id="confirmNewFolder" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md">Create</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(inputDialog);
+
+                    const newFolderNameInput = document.getElementById('newFolderNameInput');
+                    if (newFolderNameInput) newFolderNameInput.focus(); // Added check
+
+                    const confirmNewFolder = document.getElementById('confirmNewFolder');
+                    const cancelNewFolder = document.getElementById('cancelNewFolder');
+
+                    const cleanup = () => {
+                        if (inputDialog && inputDialog.parentNode) document.body.removeChild(inputDialog); // Added check
+                    };
+
+                    if (confirmNewFolder) { // Added check
+                        confirmNewFolder.addEventListener('click', () => {
+                            const folderName = newFolderNameInput.value.trim();
+                            if (folderName) {
+                                const currentDir = getCurrentFsNode();
+                                if (currentDir && typeof currentDir === 'object') {
+                                    if (currentDir[folderName]) {
+                                        printToTerminal(`Error: Folder '${folderName}' already exists.`);
+                                    } else {
+                                        currentDir[folderName] = {};
+                                        printToTerminal(`Folder '${folderName}' created in ${getTerminalCurrentDir()}`);
+                                        renderFileList();
+                                    }
+                                } else {
+                                    printToTerminal("Error: Cannot create folder in this location.");
+                                }
+                            }
+                            cleanup();
+                        });
+                    }
+
+                    if (cancelNewFolder) cancelNewFolder.addEventListener('click', cleanup); // Added check
+
+                    if (newFolderNameInput && confirmNewFolder && cancelNewFolder) { // Added check
+                        newFolderNameInput.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                confirmNewFolder.click();
+                            } else if (e.key === 'Escape') {
+                                cancelNewFolder.click();
+                            }
+                        });
+                    }
+                });
+            }
+
+
+            // Initial call to update status when the page loads (after login, if applicable)
+            updateUpdatesStatus();
+
+
+            // --- Custom Widget Logic ---
+            let customWidgets = []; // Stores the data for created widgets
+
+            const saveWidgetsToLocalStorage = () => {
+                try {
+                    localStorage.setItem('customWidgets', JSON.stringify(customWidgets));
+                } catch (e) {
+                    console.error("Error saving widgets to localStorage:", e);
+                    // Inform the user via the global error handler or a specific message
+                    window.dispatchEvent(new ErrorEvent('error', { message: `Failed to save widgets: ${e.message}`, filename: 'main.js', lineno: 0 }));
+                }
+            };
+
+            const loadWidgetsFromLocalStorage = () => {
+                try {
+                    const storedWidgets = localStorage.getItem('customWidgets');
+                    if (storedWidgets) {
+                        customWidgets = JSON.parse(storedWidgets);
+                    } else {
+                        customWidgets = [];
+                    }
+                } catch (e) {
+                    console.error("Error loading widgets from localStorage:", e);
+                    // Clear corrupted data to prevent persistent errors
+                    localStorage.removeItem('customWidgets');
+                    customWidgets = [];
+                    // Inform the user via the global error handler or a specific message
+                    window.dispatchEvent(new ErrorEvent('error', { message: `Failed to load widgets (corrupted data cleared): ${e.message}`, filename: 'main.js', lineno: 0 }));
+                }
+            };
+
+            const renderWidget = (widgetData) => {
+                const { id, title, content, top, left, width, height } = widgetData;
+
+                const widgetEl = document.createElement('div');
+                widgetEl.id = id;
+                widgetEl.classList.add('window', 'custom-widget', 'glassmorphism', 'rounded-lg', 'shadow-xl', 'flex', 'flex-col', 'animate-open', 'pointer-events-auto');
+                widgetEl.style.top = top;
+                widgetEl.style.left = left;
+                widgetEl.style.width = width;
+                widgetEl.style.height = height;
+
+                widgetEl.innerHTML = `
+                    <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+                        <div class="flex items-center space-x-2">
+                            <span class="material-symbols-outlined text-purple-400 text-xl">widgets</span>
+                            <span class="widget-title">${title}</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="${id}">
+                                <span class="material-symbols-outlined text-lg">close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="widget-content p-4 flex-grow overflow-y-auto text-sm">
+                        ${content.replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="resize-handle top-left"></div>
+                    <div class="resize-handle top-right"></div>
+                    <div class="resize-handle bottom-left"></div>
+                    <div class="resize-handle bottom-right"></div>
+                    <div class="resize-handle top"></div>
+                    <div class="resize-handle bottom"></div>
+                    <div class="resize-handle left"></div>
+                    <div class="resize-handle right"></div>
+                `;
+
+                const windowsContainer = document.getElementById('windows-container');
+                if (windowsContainer) { // Added check
+                    windowsContainer.appendChild(widgetEl);
+                    makeDraggableAndResizable(widgetEl); // Make new widget draggable and resizable
+                    openWindow(id); // Bring new widget to front and mark as active
+                }
+            };
+
+            const renderSavedWidgets = () => {
+                loadWidgetsFromLocalStorage();
+                customWidgets.forEach(widget => {
+                    if (!document.getElementById(widget.id)) { // Prevent re-rendering if already exists
+                        renderWidget(widget);
+                    }
+                });
+            };
+
+            const saveWidgetState = (widgetId) => {
+                const widgetEl = document.getElementById(widgetId);
+                if (widgetEl) {
+                    const index = customWidgets.findIndex(w => w.id === widgetId);
+                    if (index !== -1) {
+                        customWidgets[index].top = widgetEl.style.top;
+                        customWidgets[index].left = widgetEl.style.left;
+                        customWidgets[index].width = widgetEl.style.width;
+                        customWidgets[index].height = widgetEl.style.height;
+                        saveWidgetsToLocalStorage();
+                    }
+                }
+            };
+
+            if (createWidgetBtn && widgetTitleInput && widgetContentInput) { // Added checks
+                createWidgetBtn.addEventListener('click', () => {
+                    const title = widgetTitleInput.value.trim();
+                    const content = widgetContentInput.value.trim();
+
+                    if (!title || !content) {
+                        // Using a custom message box instead of alert
+                        const msgDialog = document.createElement('div');
+                        msgDialog.classList.add('fixed', 'inset-0', 'bg-black/50', 'flex', 'items-center', 'justify-center', 'z-50');
+                        msgDialog.innerHTML = `
+                            <div class="bg-red-800 p-6 rounded-lg shadow-xl text-white text-center">
+                                <h5 class="text-lg font-semibold mb-4">Error</h5>
+                                <p class="mb-4">Please enter both a title and content for your widget.</p>
+                                <button id="closeMsgDialog" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md">OK</button>
+                            </div>
+                        `;
+                        document.body.appendChild(msgDialog);
+                        document.getElementById('closeMsgDialog').addEventListener('click', () => {
+                            if (msgDialog && msgDialog.parentNode) document.body.removeChild(msgDialog); // Added check
+                        });
+                        return;
+                    }
+
+                    const newWidgetId = `custom-widget-${Date.now()}`;
+                    const newWidget = {
+                        id: newWidgetId,
+                        title: title,
+                        content: content,
+                        top: '100px', // Default initial position
+                        left: '100px',
+                        width: '300px', // Default initial size
+                        height: '200px'
+                    };
+
+                    customWidgets.push(newWidget);
+                    saveWidgetsToLocalStorage();
+                    renderWidget(newWidget);
+
+                    widgetTitleInput.value = '';
+                    widgetContentInput.value = '';
+                    // Optional: Close widget maker window after creating widget
+                    closeWindow('widget-maker-window');
+                });
+            }
+
+
+            // --- Tutorial System ---
+            let tutorialStep = 0;
+            const tutorialSteps = [
+                {
+                    title: "Welcome to Windows 13!",
+                    message: "This quick tour will show you around. Click 'Next' to continue.",
+                    highlight: null,
+                    action: null
+                },
+                {
+                    title: "The Clock & Date",
+                    message: "The time is always visible here. Click on it to open the full Date & Time app.",
+                    highlight: clockButton,
+                    action: () => { if (clockButton) clockButton.addEventListener('click', nextTutorialStepHandler); } // Added check
+                },
+                {
+                    title: "Start Menu",
+                    message: "Access all your applications from the Start Menu. Click the Windows icon.",
+                    highlight: startMenuBtn,
+                    action: () => { if (startMenuBtn) startMenuBtn.addEventListener('click', nextTutorialStepHandler); } // Added check
+                },
+                {
+                    title: "Dock",
+                    message: "Your frequently used apps are pinned to the dock. Click on 'File Explorer' to open it.",
+                    highlight: document.getElementById('file-explorer-dock-icon'),
+                    action: () => { const dockIcon = document.getElementById('file-explorer-dock-icon'); if (dockIcon) dockIcon.addEventListener('click', nextTutorialStepHandler); } // Added check
+                },
+                {
+                    title: "File Explorer",
+                    message: "Browse your files and folders here. Try double-clicking a folder to open it, or click 'New Folder'.",
+                    highlight: document.getElementById('file-explorer-window'), // Highlight the entire window
+                    action: null // User interacts freely, then "Next"
+                },
+                {
+                    title: "Terminal",
+                    message: "For advanced users, the Terminal allows command-line interaction. Type 'help' and press Enter to see commands.",
+                    highlight: document.getElementById('terminal-window'),
+                    action: null
+                },
+                {
+                    title: "Settings",
+                    message: "Personalize your Windows 13 experience in Settings. Try changing the theme or font!",
+                    highlight: document.getElementById('settings-dock-icon'),
+                    action: () => { const dockIcon = document.getElementById('settings-dock-icon'); if (dockIcon) dockIcon.addEventListener('click', nextTutorialStepHandler); } // Added check
+                },
+                {
+                    title: "Window Management",
+                    message: "You can drag windows by their title bar, resize them, maximize, or snap them to screen edges.",
+                    highlight: document.getElementById('settings-window'), // Highlight a general window for demo
+                    action: null
+                },
+                {
+                    title: "Updates",
+                    message: "Keep your system up-to-date with Windows 13 Updates.",
+                    highlight: document.getElementById('updates-dock-icon'),
+                    action: () => { const dockIcon = document.getElementById('updates-dock-icon'); if (dockIcon) dockIcon.addEventListener('click', nextTutorialStepHandler); } // Added check
+                },
+                {
+                    title: "That's it!",
+                    message: "You've completed the tour. Feel free to explore Windows 13!",
+                    highlight: null,
+                    action: null
+                }
+            ];
+            let currentHighlightElement = null;
+            let currentTooltipElement = null;
+
+            const showTutorialModal = () => {
+                if (tutorialOverlay && tutorialModal) { // Added checks
+                    tutorialOverlay.classList.remove('hidden');
+                    tutorialOverlay.style.display = 'flex'; // Ensure flexbox for centering
+                    tutorialModal.classList.remove('hidden');
+                    tutorialModal.style.display = 'flex'; // Ensure flexbox for centering
+                }
+            };
+
+            const hideTutorialModal = () => {
+                if (tutorialOverlay && tutorialModal) { // Added checks
+                    tutorialOverlay.classList.add('hidden');
+                    tutorialModal.classList.add('hidden');
+                    removeHighlight();
+                }
+            };
+
+            const showTooltip = (targetElement, message, position = 'bottom') => {
+                removeTooltip(); // Remove any existing tooltip
+                currentTooltipElement = document.createElement('div');
+                currentTooltipElement.classList.add('tutorial-tooltip', `tutorial-tooltip-${position}`);
+                currentTooltipElement.textContent = message;
+
+                // Append to body to ensure it's on top of everything
+                document.body.appendChild(currentTooltipElement);
+
+                // Position the tooltip relative to the target element
+                const rect = targetElement.getBoundingClientRect();
+
+                // Center tooltip based on target element
+                currentTooltipElement.style.left = `${rect.left + rect.width / 2}px`;
+
+                if (position === 'top') {
+                    currentTooltipElement.style.top = `${rect.top - currentTooltipElement.offsetHeight - 10}px`;
+                } else if (position === 'bottom') {
+                    currentTooltipElement.style.top = `${rect.bottom + 10}px`;
+                } else if (position === 'left') {
+                    currentTooltipElement.style.left = `${rect.left - currentTooltipElement.offsetWidth - 10}px`;
+                    currentTooltipElement.style.top = `${rect.top + rect.height / 2 - currentTooltipElement.offsetHeight / 2}px`;
+                } else if (position === 'right') {
+                    currentTooltipElement.style.left = `${rect.right + 10}px`;
+                    currentTooltipElement.style.top = `${rect.top + rect.height / 2 - currentTooltipElement.offsetHeight / 2}px`;
+                }
+
+                // Make visible after positioning
+                setTimeout(() => {
+                    if (currentTooltipElement) currentTooltipElement.classList.add('show'); // Added check
+                }, 50);
+            };
+
+            const removeTooltip = () => {
+                if (currentTooltipElement) {
+                    currentTooltipElement.classList.remove('show');
+                    currentTooltipElement.addEventListener('transitionend', () => {
+                        if (currentTooltipElement && currentTooltipElement.parentNode) {
+                            currentTooltipElement.parentNode.removeChild(currentTooltipElement);
+                        }
+                        currentTooltipElement = null;
+                    }, { once: true });
+                }
+            };
+
+
+            const applyHighlight = (element) => {
+                removeHighlight(); // Remove any previous highlight
+                if (element) {
+                    currentHighlightElement = element;
+                    currentHighlightElement.classList.add('highlight-pulse');
+                }
+            };
+
+            const removeHighlight = () => {
+                if (currentHighlightElement) {
+                    currentHighlightElement.classList.remove('highlight-pulse');
+                    currentHighlightElement = null;
+                }
+            };
+
+            const nextTutorialStepHandler = (e) => {
+                if (e) e.stopPropagation(); // Stop propagation for clicks on highlighted elements
+                showNextTutorialStep();
+            };
+
+            const startTutorial = () => {
+                tutorialStep = 0;
+                showNextTutorialStep();
+            };
+
+            const showNextTutorialStep = () => {
+                if (tutorialStep < tutorialSteps.length) {
+                    const step = tutorialSteps[tutorialStep];
+                    if (tutorialTitle) tutorialTitle.textContent = step.title; // Added check
+                    if (tutorialMessage) tutorialMessage.textContent = step.message; // Added check
+
+                    // Remove previous highlights and listeners
+                    removeHighlight();
+                    removeTooltip();
+                    if (tutorialNextBtn) tutorialNextBtn.removeEventListener('click', nextTutorialStepHandler); // Added check
+                    // Remove old action listener if any
+                    if (tutorialStep > 0 && tutorialSteps[tutorialStep - 1].action) {
+                        const prevStep = tutorialSteps[tutorialStep - 1];
+                        if (prevStep.highlight) {
+                             // This is a generic way to remove, might need refinement for complex listeners
+                             prevStep.highlight.removeEventListener('click', nextTutorialStepHandler);
+                        }
+                    }
+
+
+                    // Apply new highlight
+                    if (step.highlight) {
+                        applyHighlight(step.highlight);
+                        // Reposition tooltip
+                        let tooltipPosition = 'bottom'; // Default position
+                        if (step.highlight.id === 'clock-button' || step.highlight.id === 'start-menu-btn') {
+                            tooltipPosition = 'top';
+                        } else if (step.highlight.classList.contains('app-icon-div') || step.highlight.classList.contains('dock-icon-div')) {
+                            tooltipPosition = 'bottom'; // Assume desktop/dock icons
+                        }
+                        showTooltip(step.highlight, step.message, tooltipPosition);
+
+                        // For steps that require user interaction with the highlighted element
+                        if (step.action) {
+                            step.action(); // Add the specific event listener for this step
+                            if (tutorialNextBtn) tutorialNextBtn.style.display = 'none'; // Hide next button if specific action is needed // Added check
+                        } else {
+                            if (tutorialNextBtn) tutorialNextBtn.style.display = 'inline-block'; // Show next button otherwise // Added check
+                            if (tutorialNextBtn) tutorialNextBtn.addEventListener('click', nextTutorialStepHandler); // Added check
+                        }
+                    } else {
+                        if (tutorialNextBtn) tutorialNextBtn.style.display = 'inline-block'; // Show next button for modal-only steps // Added check
+                        if (tutorialNextBtn) tutorialNextBtn.addEventListener('click', nextTutorialStepHandler); // Added check
+                    }
+
+                    showTutorialModal(); // Ensure modal is visible
+                    tutorialStep++;
+                } else {
+                    // Tutorial finished
+                    hideTutorialModal();
+                    // Using a custom message box instead of alert
+                    const msgDialog = document.createElement('div');
+                    msgDialog.classList.add('fixed', 'inset-0', 'bg-black/50', 'flex', 'items-center', 'justify-center', 'z-50');
+                    msgDialog.innerHTML = `
+                        <div class="bg-blue-800 p-6 rounded-lg shadow-xl text-white text-center">
+                            <h5 class="text-lg font-semibold mb-4">Tutorial Complete!</h5>
+                            <p class="mb-4">Enjoy your Windows 13 experience!</p>
+                            <button id="closeMsgDialog" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md">OK</button>
+                        </div>
+                    `;
+                    document.body.appendChild(msgDialog);
+                    document.getElementById('closeMsgDialog').addEventListener('click', () => {
+                        if (msgDialog && msgDialog.parentNode) document.body.removeChild(msgDialog); // Added check
+                    });
+                }
+            };
+
+            if (tutorialNextBtn) tutorialNextBtn.addEventListener('click', nextTutorialStepHandler); // Added check
+            if (tutorialSkipBtn) { // Added check
+                tutorialSkipBtn.addEventListener('click', () => {
+                    hideTutorialModal();
+                    // Using a custom message box instead of alert
+                    const msgDialog = document.createElement('div');
+                    msgDialog.classList.add('fixed', 'inset-0', 'bg-black/50', 'flex', 'items-center', 'justify-center', 'z-50');
+                    msgDialog.innerHTML = `
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-xl text-white text-center">
+                            <h5 class="text-lg font-semibold mb-4">Tutorial Skipped</h5>
+                            <p class="mb-4">Enjoy your Windows 13 experience!</p>
+                            <button id="closeMsgDialog" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md">OK</button>
+                        </div>
+                    `;
+                    document.body.appendChild(msgDialog);
+                    document.getElementById('closeMsgDialog').addEventListener('click', () => {
+                        if (msgDialog && msgDialog.parentNode) document.body.removeChild(msgDialog); // Added check
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
