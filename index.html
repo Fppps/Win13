@@ -2,38 +2,282 @@
 <html lang="en" class="">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows 13 Concept</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght=700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
-        body { font-family: 'Poppins', sans-serif; user-select: none; color: #e0e0e0; }
+        /* Base styles for body and fonts */
+        body { font-family: 'Poppins', sans-serif; user-select: none; color: #e0e0e0; overflow: hidden; }
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
-        .font-mono { font-family: 'Fira Code', monospace; } /* Changed to Fira Code */
+        .font-mono { font-family: 'Fira Code', monospace; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+        /* Desktop background transitions */
         #desktop { transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out, opacity 0.5s ease-in-out; background-size: cover; background-position: center; }
         .desktop-light { background-image: url('Assets/Background/Background_Light.png'); }
         .desktop-dark { background-image: url('Assets/Background/Background_dark.png'); }
-        .glassmorphism { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); transition: background 0.3s, border 0.3s; }
-        .dark .glassmorphism { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); }
-        /* Removed .no-scrollbar to allow default scrollbars */
+
+        /* Modern Glassmorphism Effect */
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1); /* Lighter transparency */
+            backdrop-filter: blur(20px); /* Stronger blur for more depth */
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Clearer, softer border */
+            border-radius: 1.5rem; /* Even more rounded corners */
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4); /* Deeper shadow */
+            transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
+        }
+        .dark .glassmorphism {
+            background: rgba(0, 0, 0, 0.25); /* Darker transparency for dark mode */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Scrollbar hiding (optional, toggled by user) */
         .hide-scrollbars::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
         .hide-scrollbars { -ms-overflow-style: none !important; scrollbar-width: none !important; }
-        @keyframes open-animation { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .animate-open { animation: open-animation 0.2s ease-out; }
-        .window { transition: opacity 0.2s, transform 0.2s; min-width: 300px; min-height: 200px; }
-        .title-bar { cursor: move; }
+
+        /* General animations and window styling */
+        @keyframes open-animation { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .animate-open { animation: open-animation 0.3s ease-out forwards; } /* Smoother, slightly longer animation */
+        .window {
+            position: absolute;
+            transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Added box-shadow transition */
+            min-width: 300px;
+            min-height: 200px;
+            border-radius: 1.5rem; /* Apply consistent rounded corners */
+            overflow: hidden; /* Ensure content stays within rounded corners */
+            display: flex;
+            flex-direction: column;
+        }
+        .title-bar {
+            cursor: grab;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25); /* More visible separator */
+            background: rgba(255, 255, 255, 0.1); /* Slight background for title bar */
+            display: flex; /* Ensure flexbox for title bar content */
+            align-items: center;
+            justify-content: space-between;
+        }
+        .dark .title-bar { border-color: rgba(0, 0, 0, 0.2); background: rgba(0, 0, 0, 0.2); }
         .text-shadow { text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
-        .resize-handle { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: se-resize; }
+        .resize-handle { position: absolute; bottom: 0; right: 0; width: 20px; height: 20px; cursor: se-resize; background: rgba(255,255,255,0.1); border-top-left-radius: 0.5rem; /* Visual handle */ }
+        .close-btn, .min-btn, .max-btn {
+            padding: 0.5rem; /* Larger click area */
+            border-radius: 50%; /* Circular buttons */
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-btn:hover { background-color: #ef4444; color: white; transform: scale(1.1); }
+        .min-btn:hover { background-color: #facc15; color: white; transform: scale(1.1); } /* Yellow for minimize */
+        .max-btn:hover { background-color: #34d399; color: white; transform: scale(1.1); } /* Green for maximize */
+
+        /* Dock Icon styles */
+        .dock-icon {
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .dock-icon:hover {
+            transform: translateY(-8px) scale(1.1); /* Lift and grow */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .dock-icon:active {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
 
         /* Custom style for text editor textarea to give a "code" hint */
         #text-editor-textarea {
             background-color: #1a202c; /* Darker background for code feel */
             border: 1px solid #4a5568; /* Subtle border */
-            border-radius: 0.25rem; /* Slightly rounded corners */
+            border-radius: 0.75rem; /* Slightly more rounded corners */
             padding: 1rem; /* More padding */
             line-height: 1.5; /* Better readability for code */
+            font-size: 0.875rem; /* Slightly smaller font */
+        }
+
+        /* Calculator specific styles */
+        #calculator-display {
+            min-height: 60px;
+            font-size: 2.5rem;
+            padding: 0.5rem 1rem; /* Added horizontal padding */
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 0.75rem; /* More rounded */
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            overflow-x: auto;
+            color: white; /* Ensure text is white */
+        }
+        #calculator-keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+        .calculator-btn {
+            background-color: rgba(75, 85, 99, 0.7); /* Slightly lighter gray */
+            color: white;
+            padding: 1.25rem;
+            border-radius: 1rem; /* Even more rounded */
+            font-size: 1.6rem; /* Slightly larger font */
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Subtle shadow */
+        }
+        .calculator-btn:hover { background-color: rgba(90, 100, 115, 0.8); transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .calculator-btn:active { background-color: rgba(60, 70, 85, 0.9); transform: translateY(0); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .calculator-btn.operator { background-color: rgba(139, 92, 246, 0.7); } /* Lighter purple */
+        .calculator-btn.operator:hover { background-color: rgba(154, 107, 255, 0.8); }
+        .calculator-btn.operator:active { background-color: rgba(114, 77, 219, 0.9); }
+        .calculator-btn.equals { background-color: rgba(52, 211, 153, 0.7); } /* Lighter green */
+        .calculator-btn.equals:hover { background-color: rgba(67, 226, 168, 0.8); }
+        .calculator-btn.equals:active { background-color: rgba(37, 187, 134, 0.9); }
+        .calculator-btn.clear { background-color: rgba(248, 113, 113, 0.7); } /* Lighter red */
+        .calculator-btn.clear:hover { background-color: rgba(255, 128, 128, 0.8); }
+        .calculator-btn.clear:active { background-color: rgba(213, 98, 98, 0.9); }
+        .calculator-btn.span-2 { grid-column: span 2; }
+
+        /* Task Manager specific styles */
+        .process-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem; /* Rounded corners */
+            background-color: rgba(255,255,255,0.05); /* Very subtle background */
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .process-item:hover {
+            background-color: rgba(255,255,255,0.15); /* Lighter on hover */
+        }
+        .process-item.selected {
+            background-color: rgba(147, 51, 234, 0.7); /* Stronger highlight for selected */
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .process-item span:first-child { /* App Name */
+            font-weight: 500;
+            color: white;
+        }
+        .process-item span:last-child { /* PID/ID */
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Sticky Note specific styles */
+        .sticky-note {
+            background-color: #fef08a; /* Light yellow */
+            color: #4a5568; /* Dark gray text */
+            padding: 1.25rem;
+            border-radius: 1.25rem; /* Rounded corners */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            resize: both; /* Allow manual resizing */
+            overflow: auto; /* Scroll if content overflows */
+            min-width: 200px;
+            min-height: 200px;
+            max-width: 80vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            position: absolute; /* Needed for dragging */
+            z-index: 50; /* Ensure notes are above desktop but below modals/dock */
+            transition: box-shadow 0.2s ease;
+        }
+        .sticky-note:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+        .sticky-note-textarea {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.5;
+            padding-right: 20px; /* Space for resize handle */
+        }
+        .sticky-note .title-bar {
+            cursor: grab;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background-color: rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            margin-bottom: 0.5rem;
+            border-radius: 0.75rem;
+            color: #333;
+        }
+        .sticky-note .title-bar .material-symbols-outlined {
+            font-size: 1.25rem;
+            color: #333;
+        }
+        .sticky-note .title-bar button {
+            color: #333;
+            transition: color 0.2s ease;
+        }
+        .sticky-note .title-bar button:hover {
+            color: #ef4444; /* Red for close */
+        }
+        .sticky-note-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .sticky-note-toolbar button {
+            background-color: #8b5cf6; /* Purple */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s ease;
+        }
+        .sticky-note-toolbar button:hover {
+            background-color: #7c3aed;
+        }
+        .sticky-note .resize-handle {
+            background: none; /* Hide background on sticky notes */
+            border-top-left-radius: 0;
+        }
+
+        /* Updater Hub styles */
+        .update-item {
+            background-color: rgba(255,255,255,0.08);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background-color 0.2s ease;
+        }
+        .update-item.installed {
+            background-color: rgba(52, 211, 153, 0.2); /* Light green for installed */
+            border-color: rgba(52, 211, 153, 0.4);
+        }
+        .update-item:hover:not(.installed) {
+            background-color: rgba(255,255,255,0.15);
+        }
+        .update-log-entry {
+            padding: 0.5rem;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+        .update-log-entry:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
@@ -43,10 +287,10 @@
     <div id="power-off-screen" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-500"><h2 id="power-off-message" class="text-2xl font-bold text-white mb-6"></h2></div>
 
     <div id="message-box" class="hidden absolute inset-0 z-[60] flex items-center justify-center bg-black/50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm text-center animate-open">
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg max-w-sm text-center animate-open">
             <h3 id="message-box-title" class="font-bold text-lg text-white mb-2"></h3>
             <p id="message-box-content" class="text-sm text-gray-300 mb-4"></p>
-            <button id="message-box-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold">OK</button>
+            <button id="message-box-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition-colors">OK</button>
         </div>
     </div>
     
@@ -54,49 +298,74 @@
         <div id="login-view">
             <img src="https://placehold.co/128x128/7c3aed/ffffff?text=U" alt="User Avatar" class="rounded-full w-32 h-32 border-4 border-purple-500 mb-4 mx-auto">
             <h2 class="text-2xl font-bold text-white mb-6 text-center">Welcome Back</h2>
-            <div class="w-full max-w-xs space-y-4"><input id="login-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><input id="login-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><button id="sign-in-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold transition-colors">Sign In</button><p class="text-center text-sm text-gray-400">No account? <button id="show-create-account-btn" class="text-purple-400 hover:underline">Create one</button></p></div>
+            <div class="w-full max-w-xs space-y-4">
+                <input id="login-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <input id="login-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <button id="sign-in-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-semibold transition-colors">Sign In</button>
+                <p class="text-center text-sm text-gray-400">No account? <button id="show-create-account-btn" class="text-purple-400 hover:underline">Create one</button></p>
+            </div>
         </div>
         <div id="create-account-view" class="hidden">
             <h2 class="text-2xl font-bold text-white mb-6 text-center">Create Account</h2>
-            <div class="w-full max-w-xs space-y-4"><input id="create-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><input id="create-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><button id="create-account-btn" class="w-full py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-semibold transition-colors">Create Account</button><p class="text-center text-sm text-gray-400">Already have an account? <button id="show-login-btn" class="text-purple-400 hover:underline">Sign In</button></p></div>
+            <div class="w-full max-w-xs space-y-4">
+                <input id="create-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <input id="create-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <button id="create-account-btn" class="w-full py-2 bg-green-600 hover:bg-green-700 rounded-xl text-white font-semibold transition-colors">Create Account</button>
+                <p class="text-center text-sm text-gray-400">Already have an account? <button id="show-login-btn" class="text-purple-400 hover:underline">Sign In</button></p>
+            </div>
         </div>
     </div>
     
     <div id="disclaimer-modal" class="hidden absolute inset-0 z-[60] flex items-center justify-center bg-black/50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm text-center animate-open">
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg max-w-sm text-center animate-open">
             <h3 class="font-bold text-lg text-white mb-2">Disclaimer</h3>
             <p class="text-sm text-gray-300 mb-4">The images in this concept are placeholders used by the creator. All other elements, logic, and designs are generated by an AI. This is a conceptual demonstration and not a final product.</p>
-            <button id="disclaimer-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold">Got it</button>
+            <button id="disclaimer-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold">Got it</button>
         </div>
     </div>
 
     <div id="desktop" class="h-screen w-screen relative overflow-hidden opacity-0">
         <main class="p-6">
-            <div id="clock-container" class="inline-block cursor-pointer" tabindex="0" role="button" aria-label="Open time settings">
-                <div id="clock" class="font-orbitron text-5xl font-bold text-white text-shadow text-right mb-6"></div>
+            <div id="clock-container" class="absolute top-6 right-6 inline-block cursor-pointer" tabindex="0" role="button" aria-label="Open time settings">
+                <div id="time-display" class="font-orbitron text-5xl font-bold text-white text-shadow text-right"></div>
+                <div id="date-display" class="text-xs opacity-75 font-orbitron text-white text-shadow text-right mb-2"></div>
+                <div id="year-display" class="font-orbitron text-3xl font-bold text-white text-shadow text-right"></div>
             </div>
         </main>
-        <div id="context-menu" class="hidden absolute w-56 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-lg shadow-2xl border border-white/30 dark:border-black/30 p-2 z-50 text-sm animate-open">
-            <a href="#" id="open-settings-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-md cursor-pointer"><span class="material-symbols-outlined">tune</span><span>Personalize</span></a>
+        <!-- Sticky Notes Container -->
+        <div id="sticky-notes-container" class="absolute inset-0 pointer-events-none">
+            <!-- Sticky notes will be appended here by JavaScript -->
         </div>
-        <div id="file-explorer-context-menu" class="hidden absolute w-56 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-lg shadow-2xl border border-white/30 dark:border-black/30 p-2 z-50 text-sm animate-open">
-            <a href="#" id="fe-rename-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-md cursor-pointer"><span class="material-symbols-outlined">edit</span><span>Rename</span></a>
-            <a href="#" id="fe-delete-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-red-500/50 dark:hover:bg-red-500/50 rounded-md cursor-pointer text-red-400"><span class="material-symbols-outlined">delete</span><span>Delete</span></a>
+
+        <div id="context-menu" class="hidden absolute w-56 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-xl shadow-2xl border border-white/30 dark:border-black/30 p-2 z-50 text-sm animate-open">
+            <a href="#" id="open-settings-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">tune</span><span>Personalize</span></a>
+            <hr class="my-1 border-white/20 dark:border-black/20">
+            <a href="#" id="new-sticky-note-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">note_add</span><span>New Sticky Note</span></a>
         </div>
-        <div id="start-menu" class="hidden absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 glassmorphism rounded-lg shadow-2xl animate-open z-40 flex flex-col">
+        <div id="file-explorer-context-menu" class="hidden absolute w-56 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-xl shadow-2xl border border-white/30 dark:border-black/30 p-2 z-50 text-sm animate-open">
+            <a href="#" id="fe-rename-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">edit</span><span>Rename</span></a>
+            <a href="#" id="fe-delete-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-red-500/50 dark:hover:bg-red-500/50 rounded-lg cursor-pointer text-red-400"><span class="material-symbols-outlined">delete</span><span>Delete</span></a>
+        </div>
+        <div id="start-menu" class="hidden absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 glassmorphism rounded-2xl shadow-2xl animate-open z-40 flex flex-col">
              <div class="flex-grow grid grid-cols-3 gap-4">
-                 <div class="text-center flex flex-col justify-between"><h4 class="font-bold text-lg mb-4">Updates</h4><a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="updates-window"><span class="material-symbols-outlined text-green-400">update</span><span>Update Center</span></a></div>
+                 <div class="text-center flex flex-col justify-between"><h4 class="font-bold text-lg mb-4">Updates</h4><a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="updates-window"><span class="material-symbols-outlined text-green-400">update</span><span>Update Center</span></a></div>
                  <div class="text-center"><h4 class="font-bold text-lg mb-4">Quick Access</h4>
                     <div id="quick-access-content" class="space-y-2 text-left px-2">
                         <p class="text-sm text-gray-400">No recent files.</p>
                     </div>
                  </div>
                  <div><h4 class="font-bold text-lg mb-4">Pinned Apps</h4><div class="space-y-2">
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined text-yellow-500">folder</span><span>File Explorer</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="text-editor-window"><span class="material-symbols-outlined text-lime-400">edit_note</span><span>Notepad</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="settings-window"><span class="material-symbols-outlined">settings</span><span>Settings</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="cpu-monitor-window"><span class="material-symbols-outlined text-purple-400">developer_board</span><span>CPU Monitor</span></a>
+                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined text-yellow-500">folder</span><span>File Explorer</span></a>
+                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></a>
+                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="text-editor-window"><span class="material-symbols-outlined text-lime-400">edit_note</span><span>Notepad</span></a>
+                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="settings-window"><span class="material-symbols-outlined">settings</span><span>Settings</span></a>
+                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="cpu-monitor-window"><span class="material-symbols-outlined text-purple-400">developer_board</span><span>CPU Monitor</span></a>
+                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="calculator-window"><span class="material-symbols-outlined text-orange-400">calculate</span><span>Calculator</span></a>
+                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="task-manager-window"><span class="material-symbols-outlined text-blue-400">task_alt</span><span>Task Manager</span></a>
+                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="sticky-notes-window"><span class="material-symbols-outlined text-yellow-300">sticky_note_2</span><span>Sticky Notes</span></a>
+                    <div id="start-menu-installable-apps">
+                        <!-- Installable apps will be dynamically added here -->
+                    </div>
                 </div></div>
             </div>
             <div class="flex items-center justify-between p-2 mt-4 border-t border-white/20 dark:border-black/20">
@@ -108,27 +377,27 @@
                     <button id="power-options-btn" class="p-2 rounded-full hover:bg-white/20 dark:hover:bg-black/20 transition-colors">
                         <span class="material-symbols-outlined">power_settings_new</span>
                     </button>
-                    <div id="power-options-menu" class="hidden absolute bottom-12 right-0 w-32 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-lg shadow-xl p-2 text-sm">
-                        <a href="#" id="sign-out-btn" class="flex items-center space-x-2 px-2 py-1 hover:bg-white/50 dark:hover:bg-black/50 rounded-md cursor-pointer"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
-                        <a href="#" id="restart-btn" class="flex items-center space-x-2 px-2 py-1 hover:bg-white/50 dark:hover:bg-black/50 rounded-md cursor-pointer"><span class="material-symbols-outlined">refresh</span><span>Restart</span></a>
+                    <div id="power-options-menu" class="hidden absolute bottom-12 right-0 w-32 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-xl shadow-xl p-2 text-sm">
+                        <a href="#" id="sign-out-btn" class="flex items-center space-x-2 px-2 py-1 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
+                        <a href="#" id="restart-btn" class="flex items-center space-x-2 px-2 py-1 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">refresh</span><span>Restart</span></a>
                     </div>
                 </div>
             </div>
         </div>
         <div id="windows-container" class="absolute inset-0 w-full h-full pointer-events-none">
-            <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
-                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+            <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
                     <div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div>
                     <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button>
                 </div>
                 <div class="flex flex-grow">
                     <div class="w-1/3 p-4 border-r border-white/20 dark:border-black/20 overflow-y-auto">
                         <h4 class="font-semibold mb-2">System</h4>
-                        <a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20" data-content-id="about-content">About</a>
+                        <a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="about-content">About</a>
                         <h4 class="font-semibold mb-2 mt-4">Personalization</h4>
-                        <a href="#background" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20" data-content-id="background-content">Background</a>
+                        <a href="#background" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="background-content">Background</a>
                         <h4 class="font-semibold mb-2 mt-4">Account</h4>
-                        <a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20" data-content-id="account-content">Your Info</a>
+                        <a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="account-content">Your Info</a>
                     </div>
                     <div class="w-2/3 p-4 overflow-y-auto">
                         <div id="about-content" class="settings-content">
@@ -146,8 +415,8 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Desktop Background Image:</label>
                                     <div class="flex space-x-4">
-                                        <button id="set-light-bg" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-white font-semibold transition-colors">Light Theme</button>
-                                        <button id="set-dark-bg" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-white font-semibold transition-colors">Dark Theme</button>
+                                        <button id="set-light-bg" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-colors">Light Theme</button>
+                                        <button id="set-dark-bg" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-colors">Dark Theme</button>
                                     </div>
                                 </div>
                                 <div class="flex items-center justify-between">
@@ -167,19 +436,19 @@
                 </div>
                 <div class="resize-handle"></div>
             </div>
-            <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
-                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+            <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
                     <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-yellow-500">folder</span><span>File Explorer</span></div>
                     <div class="flex items-center">
-                        <button id="new-file-btn" class="p-1 rounded-full hover:bg-white/20"><span class="material-symbols-outlined">note_add</span></button>
+                        <button id="new-file-btn" class="p-1 rounded-full hover:bg-white/20 transition-colors"><span class="material-symbols-outlined">note_add</span></button>
                         <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined">close</span></button>
                     </div>
                 </div>
                 <div id="file-explorer-output" class="p-4 flex-grow overflow-y-auto grid grid-cols-4 gap-4 content-start"></div>
                 <div class="resize-handle"></div>
             </div>
-            <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
-                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+            <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
                     <div class="flex items-center space-x-2"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></div>
                     <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">close</span></button>
                 </div>
@@ -187,8 +456,8 @@
                 <div class="resize-handle"></div>
             </div>
             
-            <div id="text-editor-window" class="window hidden absolute top-1/4 left-1/4 w-1/2 h-1/2 glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
-                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+            <div id="text-editor-window" class="window hidden absolute top-1/4 left-1/4 w-1/2 h-1/2 glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
                     <div class="flex items-center space-x-2">
                         <span class="material-symbols-outlined" id="text-editor-icon"></span>
                         <span id="text-editor-title"></span>
@@ -206,15 +475,16 @@
                 <div class="resize-handle"></div>
             </div>
 
-            <div id="updates-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-lg max-h-[90vh] glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
-                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+            <div id="updates-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-lg max-h-[90vh] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
                     <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-green-400">update</span><span>Update Center</span></div>
                     <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="updates-window"><span class="material-symbols-outlined">close</span></button>
                 </div>
                 <div class="flex flex-grow">
                     <div class="w-1/3 p-4 border-r border-white/20 dark:border-black/20 overflow-y-auto">
-                        <a href="#updates" class="updates-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20" data-content-id="updates-list-content">Updates</a>
-                        <a href="#disclaimer" class="updates-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20" data-content-id="updates-disclaimer-content">Disclaimer</a>
+                        <a href="#updates" class="updates-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="updates-list-content">Updates</a>
+                        <a href="#disclaimer" class="updates-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="updates-disclaimer-content">Disclaimer</a>
+                        <a href="#updater-hub" class="updates-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="updater-hub-content">Updater Hub</a>
                     </div>
                     <div class="w-2/3 p-4 overflow-y-auto">
                         <div id="updates-list-content" class="updates-content">
@@ -257,6 +527,65 @@
                                 <li>**Persistent Usernames:** Upon logout, the user's password is "shut down" (cleared) from storage for security, but their username remains, allowing for easier re-login or account recovery (recovery not implemented).</li>
                             </ul>
                             <p class="mt-4 text-sm font-semibold">Summary: Version 1.0.6 introduces enhanced login security and a more robust multi-user account system for a more personalized and secure experience.</p>
+
+                            <!-- New Update: Desktop Layout Refinement -->
+                            <h3 class="font-bold text-lg mb-2 mt-6">Desktop Layout Refinement</h3>
+                            <p class="text-sm">Version 1.0.7</p>
+                            <p class="mt-2 text-sm">This update introduces a refreshed desktop layout, moving away from a traditional taskbar to a more fluid, modern dock-based system:</p>
+                            <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                <li>**Taskbar Removed:** The fixed full-width taskbar at the bottom of the screen has been removed for a cleaner desktop aesthetic.</li>
+                                <li>**Floating Dock:** Essential system and pinned application icons are now housed in a visually appealing, centrally-located floating dock at the bottom of the screen.</li>
+                                <li>**Relocated Clock & Theme Toggles:** The interactive clock (with its dynamic year display) and the theme toggles have been moved from the former taskbar to the top-right corner of the desktop, integrating them more seamlessly into the background.</li>
+                                <li>**Improved Desktop Cleanliness:** This change aims to provide more screen real estate for open windows and a less cluttered overall appearance.</li>
+                            </ul>
+                            <p class="mt-4 text-sm font-semibold mb-6 pb-4 border-b border-white/20">Summary: Version 1.0.7 reimagines the desktop interface, focusing on minimalist design and intuitive access to applications via a streamlined floating dock.</p>
+
+                            <!-- New Update: Custom Date/Time Display -->
+                            <h3 class="font-bold text-lg mb-2 mt-6">Customizable Date and Time Display</h3>
+                            <p class="text-sm">Version 1.0.8</p>
+                            <p class="mt-2 text-sm">This update refines the desktop clock display, offering more granular control over its appearance:</p>
+                            <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                <li>**Separated Time and Date:** The time and date components of the desktop clock are now rendered in separate custom `div` elements within the clock container. This provides individual styling flexibility for each part.</li>
+                                <li>**Enhanced Styling Control:** Developers and users can now apply distinct CSS classes and styles to the time and date elements independently, allowing for more tailored visual presentation.</li>
+                                <li>**Maintained Functionality:** All existing interactivity, such as clicking the clock to open settings and toggling the year display, remains fully functional with the new structure.</li>
+                            </ul>
+                            <p class="mt-4 text-sm font-semibold mb-6 pb-4 border-b border-white/20">Summary: Version 1.0.8 improves the customizability of the desktop's time and date display by separating these elements into individual, style-friendly `div` containers.</p>
+
+                             <!-- New Update: Calculator App -->
+                            <h3 class="font-bold text-lg mb-2 mt-6">Calculator Application</h3>
+                            <p class="text-sm">Version 1.0.9</p>
+                            <p class="mt-2 text-sm">A new essential utility has been added to the Windows 13 Concept:</p>
+                            <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                <li>**Full-Featured Calculator:** A basic calculator application is now available, supporting addition, subtraction, multiplication, and division.</li>
+                                <li>**Intuitive Interface:** The calculator features a clear display and a standard keypad layout for ease of use.</li>
+                                <li>**Integrated into Dock:** The Calculator app can be quickly launched directly from the floating dock at the bottom of the desktop.</li>
+                                <li>**Window Management:** Like other applications, the Calculator window supports dragging and resizing.</li>
+                            </ul>
+                            <p class="mt-4 text-sm font-semibold mb-6 pb-4 border-b border-white/20">Summary: Version 1.0.9 introduces the Calculator app, enhancing the system's utility and providing a convenient tool for everyday calculations.</p>
+
+                             <!-- New Update: Task Manager / Process Viewer -->
+                            <h3 class="font-bold text-lg mb-2 mt-6">Task Manager / Process Viewer</h3>
+                            <p class="text-sm">Version 1.1.0</p>
+                            <p class="mt-2 text-sm">A new "middle-end" application has been integrated to provide centralized control over running processes:</p>
+                            <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                <li>**Process Monitoring:** The Task Manager lists all currently open application windows, displaying their names and unique IDs.</li>
+                                <li>**End Task Functionality:** Users can select any running application and force it to close using the "End Task" button.</li>
+                                <li>**Real-time Updates:** The process list can be refreshed to show the most current active windows.</li>
+                                <li>**Enhanced System Control:** This feature offers a deeper level of interaction with the simulated operating system, allowing for better resource management and troubleshooting.</li>
+                            </ul>
+                            <p class="mt-4 text-sm font-semibold mb-6 pb-4 border-b border-white/20">Summary: Version 1.1.0 introduces the Task Manager, significantly improving system control and providing a modern, centralized interface for managing running applications.</p>
+
+                             <!-- New Update: Sticky Notes and Updater Hub -->
+                            <h3 class="font-bold text-lg mb-2 mt-6">Sticky Notes & Updater Hub with Installers</h3>
+                            <p class="text-sm">Version 1.2.0</p>
+                            <p class="mt-2 text-sm">This update brings new desktop productivity and a system for installing applications:</p>
+                            <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                <li>**Sticky Notes:** A new desktop application allowing you to create, save, and display multiple sticky notes directly on your desktop. Notes persist across sessions.</li>
+                                <li>**Updater Hub:** A dedicated application for managing software installations. It lists available applications (like Web Browser and Media Player) that can be "installed."</li>
+                                <li>**Simulated Installers:** Clicking 'Install' in the Updater Hub simulates a software installation, making the new applications (Web Browser, Media Player) available in the Start Menu and Dock.</li>
+                                <li>**Refined UI/UX:** Enhanced styling for windows, buttons, and dock icons for a more polished, modern aesthetic with improved transitions.</li>
+                            </ul>
+                            <p class="mt-4 text-sm font-semibold mb-6 pb-4 border-b border-white/20">Summary: Version 1.2.0 introduces desktop sticky notes and a functional Updater Hub, bringing a new layer of interactivity and simulated software management to the system.</p>
                         </div>
                         <div id="updates-disclaimer-content" class="updates-content hidden">
                             <h3 class="font-bold text-lg mb-2">Content Disclaimer</h3>
@@ -264,31 +593,41 @@
                             <p class="mt-2 text-sm">However, all other elements, including the core logic, application functionality, layout designs, and descriptive text (such as this disclaimer and update notes), have been generated by an AI (Gemini).</p>
                             <p class="mt-4 text-sm font-semibold">This project serves as a conceptual prototype to showcase the potential of AI-assisted development in creating interactive user interfaces.</p>
                         </div>
+                        <div id="updater-hub-content" class="updates-content hidden">
+                            <h3 class="font-bold text-lg mb-4">Available Updates</h3>
+                            <div id="available-updates-list" class="space-y-4">
+                                <!-- Available updates dynamically loaded here -->
+                            </div>
+                            <h3 class="font-bold text-lg mt-8 mb-4">Installation Log</h3>
+                            <div id="installation-log" class="bg-black/20 p-3 rounded-lg max-h-48 overflow-y-auto text-sm font-mono">
+                                <!-- Installation log messages here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="resize-handle"></div>
             </div>
             
-            <div id="cpu-monitor-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[600px] glassmorphism rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
-                <div class="title-bar flex items-center justify-between p-2 border-b border-white/30 dark:border-black/30">
+            <div id="cpu-monitor-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[600px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
                     <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-purple-400">developer_board</span><span>CPU Monitor</span></div>
                     <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="cpu-monitor-window"><span class="material-symbols-outlined">close</span></button>
                 </div>
                 <div class="flex flex-grow p-4 space-x-4 overflow-hidden">
-                    <div class="w-1/2 flex flex-col bg-white/10 dark:bg-black/10 rounded-md p-4 overflow-y-auto">
+                    <div class="w-1/2 flex flex-col bg-white/10 dark:bg-black/10 rounded-xl p-4 overflow-y-auto">
                         <h3 class="font-bold text-lg mb-4 text-white">CPU Registers</h3>
                         <div id="cpu-registers" class="grid grid-cols-2 gap-2 text-sm">
                             </div>
                         <h3 class="font-bold text-lg mt-6 mb-4 text-white">Program Editor</h3>
-                        <textarea id="program-editor" class="w-full flex-grow bg-gray-900 text-white font-mono text-sm p-2 rounded-md resize-none" placeholder="Enter CPU program instructions here..."></textarea>
+                        <textarea id="program-editor" class="w-full flex-grow bg-gray-900 text-white font-mono text-sm p-2 rounded-xl resize-none" placeholder="Enter CPU program instructions here..."></textarea>
                         <div class="flex space-x-2 mt-4">
-                            <button id="load-program-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-semibold transition-colors">Load Program</button>
-                            <button id="run-program-btn" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-semibold transition-colors">Run Program</button>
-                            <button id="step-program-btn" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-md text-white font-semibold transition-colors">Step</button>
-                            <button id="reset-cpu-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white font-semibold transition-colors">Reset CPU/Mem</button>
+                            <button id="load-program-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors">Load Program</button>
+                            <button id="run-program-btn" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold transition-colors">Run Program</button>
+                            <button id="step-program-btn" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-white font-semibold transition-colors">Step</button>
+                            <button id="reset-cpu-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors">Reset CPU/Mem</button>
                         </div>
                     </div>
-                    <div class="w-1/2 flex flex-col bg-white/10 dark:bg-black/10 rounded-md p-4 overflow-y-auto">
+                    <div class="w-1/2 flex flex-col bg-white/10 dark:bg-black/10 rounded-xl p-4 overflow-y-auto">
                         <h3 class="font-bold text-lg mb-4 text-white">Memory (RAM)</h3>
                         <div id="memory-display" class="font-mono text-xs grid grid-cols-4 gap-1">
                             </div>
@@ -296,8 +635,113 @@
                 </div>
                 <div class="resize-handle"></div>
             </div>
+
+            <!-- Calculator Window -->
+            <div id="calculator-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-[450px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
+                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-orange-400">calculate</span><span>Calculator</span></div>
+                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="calculator-window"><span class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="flex flex-col flex-grow p-4">
+                    <div id="calculator-display" class="text-white font-orbitron text-4xl text-right mb-4">0</div>
+                    <div id="calculator-keypad" class="grid grid-cols-4 gap-2 flex-grow">
+                        <button class="calculator-btn clear span-2">C</button>
+                        <button class="calculator-btn operator">&larr;</button>
+                        <button class="calculator-btn operator">/</button>
+                        
+                        <button class="calculator-btn">7</button>
+                        <button class="calculator-btn">8</button>
+                        <button class="calculator-btn">9</button>
+                        <button class="calculator-btn operator">*</button>
+
+                        <button class="calculator-btn">4</button>
+                        <button class="calculator-btn">5</button>
+                        <button class="calculator-btn">6</button>
+                        <button class="calculator-btn operator">-</button>
+
+                        <button class="calculator-btn">1</button>
+                        <button class="calculator-btn">2</button>
+                        <button class="calculator-btn">3</button>
+                        <button class="calculator-btn operator">+</button>
+
+                        <button class="calculator-btn span-2">0</button>
+                        <button class="calculator-btn">.</button>
+                        <button class="calculator-btn equals">=</button>
+                    </div>
+                </div>
+                <div class="resize-handle"></div>
+            </div>
+
+            <!-- Task Manager Window -->
+            <div id="task-manager-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-[400px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
+                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-blue-400">task_alt</span><span>Task Manager</span></div>
+                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="task-manager-window"><span class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="flex flex-col flex-grow p-4">
+                    <h3 class="font-bold text-lg mb-4 text-white">Running Applications</h3>
+                    <div id="process-list" class="flex-grow overflow-y-auto space-y-2 pr-2">
+                        <!-- Process items will be injected here by JavaScript -->
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button id="refresh-processes-btn" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-semibold transition-colors">Refresh</button>
+                        <button id="end-task-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors">End Task</button>
+                    </div>
+                </div>
+                <div class="resize-handle"></div>
+            </div>
+
+            <!-- Web Browser Window (Initially hidden) -->
+            <div id="web-browser-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-3xl h-[500px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
+                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-blue-500">public</span><span>Web Browser</span></div>
+                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="web-browser-window"><span class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="flex-grow p-4 text-center flex flex-col items-center justify-center">
+                    <span class="material-symbols-outlined text-9xl text-blue-500 opacity-50">public</span>
+                    <p class="text-xl text-gray-400 mt-4">A simple web browser concept.</p>
+                    <p class="text-sm text-gray-500 mt-2">(Actual web browsing not supported)</p>
+                </div>
+                <div class="resize-handle"></div>
+            </div>
+
+            <!-- Media Player Window (Initially hidden) -->
+            <div id="media-player-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-xl h-[400px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
+                <div class="title-bar flex items-center justify-between p-2">
+                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-green-500">play_circle</span><span>Media Player</span></div>
+                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="media-player-window"><span class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="flex-grow p-4 text-center flex flex-col items-center justify-center">
+                    <span class="material-symbols-outlined text-9xl text-green-500 opacity-50">music_note</span>
+                    <p class="text-xl text-gray-400 mt-4">A simple media player concept.</p>
+                    <p class="text-sm text-gray-500 mt-2">(Actual media playback not supported)</p>
+                </div>
+                <div class="resize-handle"></div>
+            </div>
         </div>
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 p-2 glassmorphism rounded-2xl shadow-lg z-30"><button id="start-menu-btn" class="dock-icon h-14 w-14 flex items-center justify-center bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all transform hover:scale-110"><span class="material-symbols-outlined text-3xl">widgets</span></button><div class="h-10 w-px bg-white/20"></div><button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="file-explorer-window"><span class="material-symbols-outlined text-3xl text-yellow-500">folder</span></button><button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="terminal-window"><span class="material-symbols-outlined text-3xl">terminal</span></button><button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="text-editor-window"><span class="material-symbols-outlined text-3xl text-lime-400">edit_note</span></button><button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="settings-window"><span class="material-symbols-outlined text-3xl">settings</span></button><button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="cpu-monitor-window"><span class="material-symbols-outlined text-3xl text-purple-400">developer_board</span></button><div class="h-10 w-px bg-white/20"></div><div class="flex items-center bg-black/20 rounded-full"><button id="theme-light-btn" class="dock-icon h-12 w-12 flex items-center justify-center rounded-full"><span class="material-symbols-outlined text-yellow-400">light_mode</span></button><button id="theme-dark-btn" class="dock-icon h-12 w-12 flex items-center justify-center rounded-full"><span class="material-symbols-outlined">dark_mode</span></button></div><button id="toggle-scrollbars-btn" class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110"><span class="material-symbols-outlined text-3xl">reorder</span></button></div>
+        <!-- Floating Dock Structure -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 p-2 glassmorphism rounded-2xl shadow-lg z-30">
+            <button id="start-menu-btn" class="dock-icon h-14 w-14 flex items-center justify-center bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all transform hover:scale-110"><span class="material-symbols-outlined text-3xl">widgets</span></button>
+            <div class="h-10 w-px bg-white/20"></div>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="file-explorer-window"><span class="material-symbols-outlined text-3xl text-yellow-500">folder</span></button>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="terminal-window"><span class="material-symbols-outlined text-3xl">terminal</span></button>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="text-editor-window"><span class="material-symbols-outlined text-3xl text-lime-400">edit_note</span></button>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="settings-window"><span class="material-symbols-outlined text-3xl">settings</span></button>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="cpu-monitor-window"><span class="material-symbols-outlined text-3xl text-purple-400">developer_board</span></button>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="calculator-window"><span class="material-symbols-outlined text-3xl text-orange-400">calculate</span></button>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="task-manager-window"><span class="material-symbols-outlined text-3xl text-blue-400">task_alt</span></button>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="sticky-notes-window"><span class="material-symbols-outlined text-3xl text-yellow-300">sticky_note_2</span></button>
+            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="updates-window"><span class="material-symbols-outlined text-3xl text-green-400">cloud_download</span></button>
+            <div id="dock-installable-apps">
+                <!-- Installable apps will be dynamically added here -->
+            </div>
+            <div class="h-10 w-px bg-white/20"></div>
+            <div class="flex items-center bg-black/20 rounded-full">
+                <button id="theme-light-btn" class="dock-icon h-12 w-12 flex items-center justify-center rounded-full"><span class="material-symbols-outlined text-yellow-400">light_mode</span></button>
+                <button id="theme-dark-btn" class="dock-icon h-12 w-12 flex items-center justify-center rounded-full"><span class="material-symbols-outlined">dark_mode</span></button>
+            </div>
+            <button id="toggle-scrollbars-btn" class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110"><span class="material-symbols-outlined text-3xl">reorder</span></button>
+        </div>
     </div>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -355,14 +799,16 @@
         // Context Menu DOM elements
         const desktopContextMenu = document.getElementById('context-menu'); // Renamed for clarity
         const openSettingsContextBtn = document.getElementById('open-settings-context');
+        const newStickyNoteContextBtn = document.getElementById('new-sticky-note-context'); // New sticky note context menu item
         const fileExplorerContextMenu = document.getElementById('file-explorer-context-menu'); // New file explorer context menu
         const feRenameContextBtn = document.getElementById('fe-rename-context');
         const feDeleteContextBtn = document.getElementById('fe-delete-context');
         let activeFileExplorerItem = null; // To store the path of the item right-clicked in FE
 
         // Clock DOM elements
-        const clockElement = document.getElementById('clock');
-        const clockContainer = document.getElementById('clock-container');
+        const timeDisplayElement = document.getElementById('time-display'); // New element for time
+        const dateDisplayElement = document.getElementById('date-display'); // New element for date
+        const yearDisplayElement = document.getElementById('year-display'); // Get the new year display element
 
         // Settings DOM elements
         const settingsTabs = document.querySelectorAll('.settings-tab');
@@ -380,7 +826,49 @@
         const powerOptionsMenu = document.getElementById('power-options-menu');
         const signOutBtn = document.getElementById('sign-out-btn');
         const restartBtn = document.getElementById('restart-btn');
+        const startMenuInstallableApps = document.getElementById('start-menu-installable-apps'); // For dynamically adding apps
 
+        // Calculator DOM elements
+        const calculatorDisplay = document.getElementById('calculator-display');
+        const calculatorKeypad = document.getElementById('calculator-keypad');
+        let currentInput = '0';
+        let operator = null;
+        let firstOperand = null;
+        let waitingForSecondOperand = false;
+
+        // Task Manager DOM elements
+        const taskManagerWindow = document.getElementById('task-manager-window');
+        const processListDiv = document.getElementById('process-list');
+        const refreshProcessesBtn = document.getElementById('refresh-processes-btn');
+        const endTaskBtn = document.getElementById('end-task-btn');
+        let selectedProcessId = null; // To track the currently selected process for "End Task"
+
+        // Sticky Notes DOM elements
+        const stickyNotesContainer = document.getElementById('sticky-notes-container');
+        let stickyNotes = JSON.parse(localStorage.getItem('stickyNotes')) || []; // Load notes
+
+        // Updater Hub DOM elements
+        const availableUpdatesList = document.getElementById('available-updates-list');
+        const installationLog = document.getElementById('installation-log');
+        let installedApps = JSON.parse(localStorage.getItem('installedApps')) || {}; // Track installed apps
+
+        // Installable applications definition
+        const installableApplications = {
+            'web-browser': {
+                name: 'Web Browser',
+                windowId: 'web-browser-window',
+                icon: 'public',
+                color: 'text-blue-500',
+                installed: false // Default state
+            },
+            'media-player': {
+                name: 'Media Player',
+                windowId: 'media-player-window',
+                icon: 'play_circle',
+                color: 'text-green-500',
+                installed: false // Default state
+            }
+        };
 
         // Update Center Tabs
         const updatesTabs = document.querySelectorAll('.updates-tab');
@@ -412,7 +900,7 @@
             // Add a cancel button for confirmation
             const cancelButton = document.createElement('button');
             cancelButton.textContent = 'Cancel';
-            cancelButton.className = 'px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md text-white font-semibold ml-2';
+            cancelButton.className = 'px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-semibold ml-2 transition-colors';
             messageBox.querySelector('.bg-gray-800').appendChild(cancelButton);
 
             messageBoxOkBtn.textContent = 'Confirm'; // Change OK to Confirm
@@ -751,6 +1239,10 @@
         });
 
         document.addEventListener('click', (e) => {
+            if (!desktopContextMenu.contains(e.target)) {
+                desktopContextMenu.classList.add('hidden');
+                // console.log("Desktop context menu hidden."); // Removed non-login/DB log
+            }
             if (!fileExplorerContextMenu.contains(e.target)) {
                 fileExplorerContextMenu.classList.add('hidden');
                 // console.log("File Explorer context menu hidden."); // Removed non-login/DB log
@@ -1174,15 +1666,31 @@
             createPrompt();
         };
         const appendTerminalOutput = (text) => { terminalOutput.innerHTML += `<div>${text.replace(/\n/g, '<br>')}</div>`; terminalOutput.scrollTop = terminalOutput.scrollHeight; };
+        
         // --- Window Management (Drag & Resize) ---
         let activeWindow = null, action = null, startX, startY, startW, startH;
+        let highestZIndex = 45; // Starting Z-index for active windows
+
+        const updateWindowsZIndex = () => {
+            document.querySelectorAll('.window').forEach(w => {
+                if (parseInt(w.style.zIndex) > 40) { // Keep higher z-index for active ones
+                    w.style.zIndex = '40';
+                }
+            });
+            document.querySelectorAll('.sticky-note').forEach(n => {
+                 if (parseInt(n.style.zIndex) > 40) {
+                     n.style.zIndex = '40';
+                 }
+            });
+            if (activeWindow) {
+                activeWindow.style.zIndex = String(++highestZIndex);
+            }
+        };
+
         const startAction = (e, windowEl, currentAction) => {
             action = currentAction;
             activeWindow = windowEl;
-            // Bring the active window to the front by setting a higher z-index
-            document.querySelectorAll('.window').forEach(w => w.style.zIndex = '40'); // Reset others
-            activeWindow.style.zIndex = '45'; // Bring active to front
-            // console.log(`Window '${windowEl.id}' activated for ${currentAction}.`); // Removed non-login/DB log
+            updateWindowsZIndex(); // Bring active window to front
 
             const event = e.type === 'touchstart' ? e.touches[0] : e;
             startX = event.clientX; startY = event.clientY;
@@ -1191,13 +1699,17 @@
             activeWindow.dataset.initialTop = activeWindow.offsetTop;
             startW = parseInt(document.defaultView.getComputedStyle(activeWindow).width, 10);
             startH = parseInt(document.defaultView.getComputedStyle(activeWindow).height, 10);
-            document.addEventListener('mousemove', doAction); document.addEventListener('mouseup', endAction);
+            
+            // Add global event listeners for dragging/resizing
+            document.addEventListener('mousemove', doAction);
+            document.addEventListener('mouseup', endAction);
             document.addEventListener('touchmove', doAction, { passive: false });
             document.addEventListener('touchend', endAction);
         };
+
         const doAction = (e) => {
             if (!activeWindow) return;
-            e.preventDefault();
+            e.preventDefault(); // Prevent scrolling on touch devices during drag/resize
             const event = e.type === 'touchmove' ? e.touches[0] : e;
             const dx = event.clientX - startX;
             const dy = event.clientY - startY;
@@ -1208,21 +1720,22 @@
                 activeWindow.style.left = `${initialLeft + dx}px`;
                 activeWindow.style.top = `${initialTop + dy}px`;
             } else if (action === 'resize') {
-                activeWindow.style.width = `${startW + dx}px`;
-                activeWindow.style.height = `${startH + dy}px`;
+                activeWindow.style.width = `${Math.max(activeWindow.minWidth || 200, startW + dx)}px`; // Ensure minWidth
+                activeWindow.style.height = `${Math.max(activeWindow.minHeight || 150, startH + dy)}px`; // Ensure minHeight
             }
         };
+
         const endAction = () => {
-            if (activeWindow) {
-                // console.log(`Window '${activeWindow.id}' ${action} action ended.`); // Removed non-login/DB log
-            }
             activeWindow = null;
             action = null;
+            // Remove global event listeners
             document.removeEventListener('mousemove', doAction);
             document.removeEventListener('mouseup', endAction);
             document.removeEventListener('touchmove', doAction);
             document.removeEventListener('touchend', endAction);
         };
+
+        // Attach event listeners to all draggable/resizable elements
         document.querySelectorAll('.window').forEach(win => {
             const titleBar = win.querySelector('.title-bar');
             const resizeHandle = win.querySelector('.resize-handle');
@@ -1234,13 +1747,29 @@
                 resizeHandle.addEventListener('mousedown', e => startAction(e, win, 'resize'));
                 resizeHandle.addEventListener('touchstart', e => startAction(e, win, 'resize'));
             }
+            // Add click listener to bring to front
+            win.addEventListener('mousedown', () => {
+                activeWindow = win;
+                updateWindowsZIndex();
+            });
+            win.addEventListener('touchstart', () => {
+                activeWindow = win;
+                updateWindowsZIndex();
+            });
         });
-        // --- Init & Other Listeners ---
+
         const openWindow = (windowId, initialContentId = null) => {
             const windowEl = document.getElementById(windowId);
             if(windowEl) {
                 windowEl.classList.remove('hidden');
-                // console.log(`Window '${windowId}' opened.`); // Removed non-login/DB log
+                // Center the window if it's new or just opened
+                if (!windowEl.dataset.positioned) {
+                    windowEl.style.left = `${(window.innerWidth - windowEl.offsetWidth) / 2}px`;
+                    windowEl.style.top = `${(window.innerHeight - windowEl.offsetHeight) / 2}px`;
+                    windowEl.dataset.positioned = 'true';
+                }
+                activeWindow = windowEl; // Set as active window
+                updateWindowsZIndex(); // Bring to front
             }
             if(windowId === 'terminal-window' && !terminalOutput.hasChildNodes()) createPrompt();
             if(windowId === 'file-explorer-window') renderFileExplorer();
@@ -1251,7 +1780,6 @@
                 const targetContent = document.getElementById(initialContentId);
                 if(targetTab) targetTab.classList.add('bg-white/20', 'dark:bg-black/20');
                 if(targetContent) targetContent.classList.remove('hidden');
-                // console.log(`Settings window opened to tab: '${initialContentId}'.`); // Removed non-login/DB log
             } else if (windowId === 'updates-window') {
                 updatesTabs.forEach(tab => tab.classList.remove('bg-white/20', 'dark:bg-black/20'));
                 updatesContents.forEach(content => content.classList.add('hidden'));
@@ -1259,15 +1787,18 @@
                 const defaultUpdatesContent = document.getElementById('updates-list-content');
                 if (defaultUpdatesTab) defaultUpdatesTab.classList.add('bg-white/20', 'dark:bg-black/20');
                 if (defaultUpdatesContent) defaultUpdatesContent.classList.remove('hidden');
-                // console.log("Updates window opened."); // Removed non-login/DB log
+            }
+            if (windowId === 'updater-hub-window') {
+                renderUpdaterHub();
             }
             if (windowId === 'start-menu') {
                 renderQuickAccess();
-                // console.log("Start Menu opened."); // Removed non-login/DB log
             }
-            document.querySelectorAll('.window').forEach(w => w.style.zIndex = '40');
-            if(windowEl) windowEl.style.zIndex = '45';
+            if (windowId === 'task-manager-window') {
+                renderProcessList();
+            }
         };
+
         document.querySelectorAll('[data-window]').forEach(btn => btn.addEventListener('click', e => { 
             e.stopPropagation(); 
             openWindow(btn.getAttribute('data-window')); 
@@ -1276,7 +1807,7 @@
             e.stopPropagation(); 
             const windowId = btn.getAttribute('data-window');
             document.getElementById(windowId).classList.add('hidden'); 
-            // console.log(`Window '${windowId}' closed.`); // Removed non-login/DB log
+            activeWindow = null; // Clear active window when closed
         }));
 
         // --- CPU and Memory Simulation ---
@@ -1287,31 +1818,31 @@
                 this.data = new Float64Array(this.buffer);
                 this.size = size;
                 this.allocatedPointer = 0;
-                // console.log(`Memory initialized with size ${size}.`); // Removed non-login/DB log
+                // console.log(`Memory initialized with size ${size}.`);
             }
 
             read(address) {
                 if (address < 0 || address >= this.size) {
-                    // console.error(`Memory access violation: Address ${address} out of bounds.`); // Removed non-login/DB log
+                    // console.error(`Memory access violation: Address ${address} out of bounds.`);
                     return NaN;
                 }
                 const value = this.data[address];
-                // console.log(`Memory: Read ${value} from address ${address}.`); // Removed non-login/DB log
+                // console.log(`Memory: Read ${value} from address ${address}.`);
                 return value;
             }
 
             write(address, value) {
                 if (address < 0 || address >= this.size) {
-                    // console.error(`Memory access violation: Address ${address} out of bounds.`); // Removed non-login/DB log
+                    // console.error(`Memory access violation: Address ${address} out of bounds.`);
                     return;
                 }
                 this.data[address] = value;
-                // console.log(`Memory: Written ${value} to address ${address}.`); // Removed non-login/DB log
+                // console.log(`Memory: Written ${value} to address ${address}.`);
             }
 
             allocate(size = 1) {
                 if (this.allocatedPointer + size > this.size) {
-                    // console.error("Memory allocation failed: Not enough space."); // Removed non-login/DB log
+                    // console.error("Memory allocation failed: Not enough space.");
                     return -1;
                 }
                 const address = this.allocatedPointer;
@@ -1319,14 +1850,14 @@
                     this.data[address + i] = 0;
                 }
                 this.allocatedPointer += size;
-                // console.log(`Memory: Allocated ${size} units starting at address ${address}.`); // Removed non-login/DB log
+                // console.log(`Memory: Allocated ${size} units starting at address ${address}.`);
                 return address;
             }
 
             reset() {
                 this.data.fill(0);
                 this.allocatedPointer = 0;
-                // console.log("Memory reset."); // Removed non-login/DB log
+                // console.log("Memory reset.");
             }
         }
 
@@ -1343,7 +1874,7 @@
                 this.program = [];
                 this.programStartAddr = 0;
                 this.speed = 100;
-                // console.log("CPU initialized."); // Removed non-login/DB log
+                // console.log("CPU initialized.");
             }
 
             static Instructions = {
@@ -1359,7 +1890,7 @@
                 this.programStartAddr = 0;
                 this.isRunning = false;
                 this.memory.reset();
-                // console.log("CPU registers and program state reset."); // Removed non-login/DB log
+                // console.log("CPU registers and program state reset.");
             }
 
             loadProgram(program) {
@@ -1367,7 +1898,7 @@
                 this.program = program;
                 let currentAddress = this.memory.allocate(program.length);
                 if (currentAddress === -1) {
-                    // console.error("Failed to allocate space for program."); // Removed non-login/DB log
+                    // console.error("Failed to allocate space for program.");
                     showMessageBox("Error", "Failed to allocate memory for program. Memory full?");
                     return;
                 }
@@ -1376,18 +1907,18 @@
                 }
                 this.programStartAddr = currentAddress;
                 this.registers.PC = currentAddress;
-                // console.log(`Program loaded starting at address ${this.registers.PC}. Program length: ${program.length}`); // Removed non-login/DB log
+                // console.log(`Program loaded starting at address ${this.registers.PC}. Program length: ${program.length}`);
             }
 
             step() {
                 if (this.registers.PC < 0 || this.registers.PC >= this.memory.size) {
-                    // console.log("CPU: Program Counter out of memory bounds. Halting."); // Removed non-login/DB log
+                    // console.log("CPU: Program Counter out of memory bounds. Halting.");
                     this.isRunning = false;
                     return;
                 }
                 if (this.program.length > 0 && 
                     (this.registers.PC < this.programStartAddr || this.registers.PC >= this.programStartAddr + this.program.length)) {
-                    // console.log("CPU: Program Counter outside loaded program's execution bounds. Halting."); // Removed non-login/DB log
+                    // console.log("CPU: Program Counter outside loaded program's execution bounds. Halting.");
                     this.isRunning = false;
                     return;
                 }
@@ -1399,35 +1930,35 @@
                     case CPU.Instructions.LOAD:
                         const loadAddress = this.memory.read(this.registers.PC++);
                         this.registers.ACC = this.memory.read(loadAddress);
-                        // console.log(`CPU: LOAD ${loadAddress} (ACC = ${this.registers.ACC})`); // Removed non-login/DB log
+                        // console.log(`CPU: LOAD ${loadAddress} (ACC = ${this.registers.ACC})`);
                         break;
                     case CPU.Instructions.STORE:
                         const storeAddress = this.memory.read(this.registers.PC++);
                         this.memory.write(storeAddress, this.registers.ACC);
-                        // console.log(`CPU: STORE ${storeAddress} (Value = ${this.registers.ACC})`); // Removed non-login/DB log
+                        // console.log(`CPU: STORE ${storeAddress} (Value = ${this.registers.ACC})`);
                         break;
                     case CPU.Instructions.ADD:
                         const addAddress = this.memory.read(this.registers.PC++);
                         this.registers.ACC += this.memory.read(addAddress);
-                        // console.log(`CPU: ADD ${addAddress} (ACC = ${this.registers.ACC})`); // Removed non-login/DB log
+                        // console.log(`CPU: ADD ${addAddress} (ACC = ${this.registers.ACC})`);
                         break;
                     case CPU.Instructions.SUB:
                         const subAddress = this.memory.read(this.registers.PC++);
                         this.registers.ACC -= this.memory.read(subAddress);
-                        // console.log(`CPU: SUB ${subAddress} (ACC = ${this.registers.ACC})`); // Removed non-login/DB log
+                        // console.log(`CPU: SUB ${subAddress} (ACC = ${this.registers.ACC})`);
                         break;
                     case CPU.Instructions.JUMP:
                         const jumpAddress = this.memory.read(this.registers.PC++);
                         this.registers.PC = jumpAddress;
-                        // console.log(`CPU: JUMP to ${jumpAddress}`); // Removed non-login/DB log
+                        // console.log(`CPU: JUMP to ${jumpAddress}`);
                         break;
                     case CPU.Instructions.JUMPIFZERO:
                         const jumpIfZeroAddress = this.memory.read(this.registers.PC++);
                         if (this.registers.ACC === 0) {
                             this.registers.PC = jumpIfZeroAddress;
-                            // console.log(`CPU: JUMPIFZERO (ACC is 0) to ${jumpIfZeroAddress}`); // Removed non-login/DB log
+                            // console.log(`CPU: JUMPIFZERO (ACC is 0) to ${jumpIfZeroAddress}`);
                         } else {
-                            // console.log(`CPU: JUMPIFZERO (ACC is not 0), skipped jump`); // Removed non-login/DB log
+                            // console.log(`CPU: JUMPIFZERO (ACC is not 0), skipped jump`);
                         }
                         break;
                     case CPU.Instructions.SET:
@@ -1436,14 +1967,14 @@
                         if (registerCode === 0) this.registers.ACC = value;
                         else if (registerCode === 1) this.registers.R1 = value;
                         else if (registerCode === 2) this.registers.R2 = value;
-                        // console.log(`CPU: SET Reg:${registerCode} Value:${value}`); // Removed non-login/DB log
+                        // console.log(`CPU: SET Reg:${registerCode} Value:${value}`);
                         break;
                     case CPU.Instructions.HALT:
-                        // console.log("CPU: HALT instruction encountered. Stopping execution."); // Removed non-login/DB log
+                        // console.log("CPU: HALT instruction encountered. Stopping execution.");
                         this.isRunning = false;
                         break;
                     default:
-                        // console.error(`CPU: Unknown instruction: ${instruction} at PC: ${this.registers.PC - 1}. Halting.`); // Removed non-login/DB log
+                        // console.error(`CPU: Unknown instruction: ${instruction} at PC: ${this.registers.PC - 1}. Halting.`);
                         this.isRunning = false;
                         break;
                 }
@@ -1452,7 +1983,7 @@
 
             async execute() {
                 this.isRunning = true;
-                // console.log("CPU: Starting program execution."); // Removed non-login/DB log
+                // console.log("CPU: Starting program execution.");
                 while (this.isRunning) {
                     this.step();
                     if (!this.isRunning) {
@@ -1460,7 +1991,7 @@
                     }
                     await new Promise(resolve => setTimeout(resolve, this.speed));
                 }
-                // console.log("CPU: Execution finished."); // Removed non-login/DB log
+                // console.log("CPU: Execution finished.");
                 showMessageBox("Program Finished", "CPU program execution has completed.");
             }
         }
@@ -1478,7 +2009,7 @@
                 div.innerHTML = `<span class="font-semibold text-white">${reg}:</span><span class="font-mono text-right text-green-300">${cpu.registers[reg]}</span>`;
                 cpuRegistersDisplay.appendChild(div);
             }
-            // console.log("CPU registers UI updated."); // Removed non-login/DB log
+            // console.log("CPU registers UI updated.");
         };
 
         const updateMemoryDisplayUI = () => {
@@ -1508,14 +2039,14 @@
                 }
                 memoryDisplay.appendChild(row);
             }
-            // console.log("Memory display UI updated."); // Removed non-login/DB log
+            // console.log("Memory display UI updated.");
         };
 
 
         const updateCPUMonitorUI = () => {
             updateCPURegistersUI();
             updateMemoryDisplayUI();
-            // console.log("CPU Monitor UI fully updated."); // Removed non-login/DB log
+            // console.log("CPU Monitor UI fully updated.");
         };
 
         // --- CPU Monitor Event Listeners ---
@@ -1540,13 +2071,13 @@
                             if (!isNaN(arg)) {
                                 parsedProgram.push(arg);
                             } else {
-                                // console.warn(`Skipping non-numeric argument: ${instructionWords[i]} in line: "${line}"`); // Removed non-login/DB log
+                                // console.warn(`Skipping non-numeric argument: ${instructionWords[i]} in line: "${line}"`);
                             }
                         }
                     } else if (!isNaN(parseInt(instructionPart, 10))) {
                         parsedProgram.push(parseInt(instructionPart, 10));
                     } else {
-                        // console.warn(`Unknown instruction or invalid data: "${instructionPart}" in line: "${line}"`); // Removed non-login/DB log
+                        // console.warn(`Unknown instruction or invalid data: "${instructionPart}" in line: "${line}"`);
                         showMessageBox("Program Load Warning", `Unknown instruction or invalid data: "${instructionPart}". Check console for details.`);
                     }
                 });
@@ -1554,9 +2085,9 @@
                 cpu.loadProgram(parsedProgram);
                 updateCPUMonitorUI();
                 showMessageBox("Program Loaded", "Program loaded successfully! PC set to start.");
-                // console.log("Program loaded successfully from editor."); // Removed non-login/DB log
+                // console.log("Program loaded successfully from editor.");
             } catch (error) {
-                // console.error("Error loading program:", error); // Removed non-login/DB log
+                // console.error("Error loading program:", error);
                 showMessageBox("Error", "Failed to load program. Check console for details.");
             }
         });
@@ -1564,20 +2095,20 @@
         runProgramBtn.addEventListener('click', () => {
             if (!cpu.isRunning) {
                 cpu.execute();
-                // console.log("Run program button clicked: CPU execution started."); // Removed non-login/DB log
+                // console.log("Run program button clicked: CPU execution started.");
             } else {
                 showMessageBox("CPU Busy", "CPU is already running. Please wait for it to finish or reset.");
-                // console.warn("Run program button clicked: CPU already running."); // Removed non-login/DB log
+                // console.warn("Run program button clicked: CPU already running.");
             }
         });
 
         stepProgramBtn.addEventListener('click', () => {
             if (!cpu.isRunning) {
                 cpu.step();
-                // console.log("Step program button clicked: Executed one CPU step."); // Removed non-login/DB log
+                // console.log("Step program button clicked: Executed one CPU step.");
             } else {
                 showMessageBox("CPU Busy", "CPU is already running. Stop it before stepping.");
-                // console.warn("Step program button clicked: CPU already running."); // Removed non-login/DB log
+                // console.warn("Step program button clicked: CPU already running.");
             }
         });
 
@@ -1585,7 +2116,7 @@
             cpu.reset();
             updateCPUMonitorUI();
             showMessageBox("CPU Reset", "CPU and Memory have been reset.");
-            // console.log("Reset CPU/Mem button clicked: CPU and memory reset."); // Removed non-login/DB log
+            // console.log("Reset CPU/Mem button clicked: CPU and memory reset.");
         });
 
         const cpuMonitorWindow = document.getElementById('cpu-monitor-window');
@@ -1595,7 +2126,7 @@
                     if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                         if (!cpuMonitorWindow.classList.contains('hidden')) {
                             updateCPUMonitorUI();
-                            // console.log("CPU Monitor window became visible, UI updated."); // Removed non-login/DB log
+                            // console.log("CPU Monitor window became visible, UI updated.");
                         }
                     }
                 }
@@ -1618,17 +2149,42 @@ HALT       ; End program
         // --- Desktop Clock ---
         const updateClock = () => {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+            const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
+            const timeString = now.toLocaleTimeString('en-US', timeOptions);
+            const dateString = now.toLocaleDateString('en-US', dateOptions);
+            
+            // Update time and date displays separately
+            timeDisplayElement.textContent = timeString;
+            dateDisplayElement.textContent = dateString;
+
+            // Update year display
+            const fullYear = now.getFullYear();
+            const shortenedYear = String(fullYear).substring(0, 2); // Get first two digits for "20" or "12"
+            yearDisplayElement.textContent = shortenedYear;
+            yearDisplayElement.dataset.fullYear = fullYear; // Store full year for toggling
         };
         setInterval(updateClock, 1000);
         updateClock();
 
-        clockContainer.addEventListener('click', () => {
+        // The clock is now in the taskbar, and clicking it should open settings/about
+        // Adjusted from clockElement to clockContainer as that's the clickable parent
+        document.getElementById('clock-container').addEventListener('click', () => {
             openWindow('settings-window', 'about-content');
-            // console.log("Clock clicked: Opened settings to About tab."); // Removed non-login/DB log
+            // console.log("Clock clicked: Opened settings to About tab.");
+        });
+
+        // Event listener for year display to toggle full year
+        yearDisplayElement.addEventListener('click', () => {
+            const currentText = yearDisplayElement.textContent;
+            const fullYear = yearDisplayElement.dataset.fullYear;
+            const shortenedYear = String(fullYear).substring(0, 2);
+
+            if (currentText === shortenedYear) {
+                yearDisplayElement.textContent = fullYear;
+            } else {
+                yearDisplayElement.textContent = fullYear;
+            }
         });
 
 
@@ -1638,17 +2194,17 @@ HALT       ; End program
             desktopContextMenu.style.left = `${e.clientX}px`;
             desktopContextMenu.style.top = `${e.clientY}px`;
             desktopContextMenu.classList.remove('hidden');
-            // console.log("Desktop context menu opened."); // Removed non-login/DB log
+            // console.log("Desktop context menu opened.");
         });
 
         document.addEventListener('click', (e) => {
             if (!desktopContextMenu.contains(e.target)) {
                 desktopContextMenu.classList.add('hidden');
-                // console.log("Desktop context menu hidden."); // Removed non-login/DB log
+                // console.log("Desktop context menu hidden.");
             }
             if (!fileExplorerContextMenu.contains(e.target)) {
                 fileExplorerContextMenu.classList.add('hidden');
-                // console.log("File Explorer context menu hidden."); // Removed non-login/DB log
+                // console.log("File Explorer context menu hidden.");
             }
         });
 
@@ -1656,7 +2212,7 @@ HALT       ; End program
             e.preventDefault();
             openWindow('settings-window', 'background-content');
             desktopContextMenu.classList.add('hidden');
-            // console.log("Context menu: Opened settings to Background tab."); // Removed non-login/DB log
+            // console.log("Context menu: Opened settings to Background tab.");
         });
 
         // --- Settings Window Logic ---
@@ -1670,17 +2226,17 @@ HALT       ; End program
                 const targetContentId = tab.getAttribute('data-content-id');
                 const targetContent = document.getElementById(targetContentId);
                 if(targetContent) targetContent.classList.remove('hidden');
-                // console.log(`Settings tab '${targetContentId}' activated.`); // Removed non-login/DB log
+                // console.log(`Settings tab '${targetContentId}' activated.`);
             });
         });
 
         setLightBgBtn.addEventListener('click', () => {
             applyTheme('light');
-            // console.log("Theme set to Light."); // Removed non-login/DB log
+            // console.log("Theme set to Light.");
         });
         setDarkBgBtn.addEventListener('click', () => {
             applyTheme('dark');
-            // console.log("Theme set to Dark."); // Removed non-login/DB log
+            // console.log("Theme set to Dark.");
         });
 
         bgColorPicker.addEventListener('input', (e) => {
@@ -1688,7 +2244,7 @@ HALT       ; End program
             desktop.style.backgroundColor = e.target.value;
             localStorage.setItem('customBgColor', e.target.value);
             localStorage.removeItem('theme');
-            // console.log(`Custom background color set to: ${e.target.value}.`); // Removed non-login/DB log
+            // console.log(`Custom background color set to: ${e.target.value}.`);
         });
 
         const applyTheme = (theme) => {
@@ -1704,7 +2260,7 @@ HALT       ; End program
                 desktop.classList.add('desktop-light');
             }
             localStorage.setItem('theme', theme);
-            // console.log(`Applied theme: ${theme}.`); // Removed non-login/DB log
+            // console.log(`Applied theme: ${theme}.`);
         };
 
         const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -1715,10 +2271,10 @@ HALT       ; End program
             desktop.style.backgroundColor = savedCustomColor;
             bgColorPicker.value = savedCustomColor;
             document.body.classList.remove('dark');
-            // console.log(`Loaded custom background color: ${savedCustomColor}.`); // Removed non-login/DB log
+            // console.log(`Loaded custom background color: ${savedCustomColor}.`);
         } else {
             applyTheme(savedTheme);
-            // console.log(`Loaded theme: ${savedTheme}.`); // Removed non-login/DB log
+            // console.log(`Loaded theme: ${savedTheme}.`);
         }
 
         // --- Quick Access Functions ---
@@ -1739,7 +2295,7 @@ HALT       ; End program
 
             localStorage.setItem('recentFiles', JSON.stringify(recentFiles));
             renderQuickAccess();
-            // console.log(`Added '${fileName}' to recent files. Current recent files:`, recentFiles); // Removed non-login/DB log
+            // console.log(`Added '${fileName}' to recent files. Current recent files:`, recentFiles);
         };
 
         const renderQuickAccess = () => {
@@ -1747,14 +2303,14 @@ HALT       ; End program
 
             if (recentFiles.length === 0) {
                 quickAccessContent.innerHTML = '<p class="text-sm text-gray-400">No recent files.</p>';
-                // console.log("No recent files to display in Quick Access."); // Removed non-login/DB log
+                // console.log("No recent files to display in Quick Access.");
                 return;
             }
 
             recentFiles.forEach(file => {
                 const fileElement = document.createElement('a');
                 fileElement.href = "#";
-                fileElement.className = "flex items-center space-x-2 p-2 rounded-md hover:bg-white/30 dark:hover:bg-black/30 transition-colors";
+                fileElement.className = "flex items-center space-x-2 p-2 rounded-lg hover:bg-white/30 dark:hover:bg-black/30 transition-colors";
                 
                 let materialIcon = '';
                 let iconColor = '';
@@ -1778,7 +2334,7 @@ HALT       ; End program
                 });
                 quickAccessContent.appendChild(fileElement);
             });
-            // console.log("Quick Access UI rendered."); // Removed non-login/DB log
+            // console.log("Quick Access UI rendered.");
         };
 
         startMenuBtn.addEventListener('click', (e) => {
@@ -1787,9 +2343,9 @@ HALT       ; End program
             if (!startMenu.classList.contains('hidden')) {
                 renderQuickAccess();
                 startMenuUsername.textContent = activeUser || 'Guest';
-                // console.log("Start Menu toggled to visible."); // Removed non-login/DB log
+                renderInstallableApps(); // Update installable apps in start menu
             } else {
-                // console.log("Start Menu toggled to hidden."); // Removed non-login/DB log
+                // console.log("Start Menu toggled to hidden.");
             }
         });
 
@@ -1798,7 +2354,7 @@ HALT       ; End program
                 if (!startMenu.classList.contains('hidden')) {
                     startMenu.classList.add('hidden');
                     powerOptionsMenu.classList.add('hidden');
-                    // console.log("Start Menu and Power Options hidden due to outside click."); // Removed non-login/DB log
+                    // console.log("Start Menu and Power Options hidden due to outside click.");
                 }
             }
         });
@@ -1806,7 +2362,7 @@ HALT       ; End program
         powerOptionsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             powerOptionsMenu.classList.toggle('hidden');
-            // console.log("Power options menu toggled."); // Removed non-login/DB log
+            // console.log("Power options menu toggled.");
         });
 
         signOutBtn.addEventListener('click', (e) => {
@@ -1817,10 +2373,10 @@ HALT       ; End program
                     if (users[activeUser]) {
                         users[activeUser].hashedPassword = "";
                         saveUsers(users);
-                        console.log(`[LOGIN/DB] Password for '${activeUser}' cleared upon sign out.`); // Log password cleared
+                        console.log(`[LOGIN/DB] Password for '${activeUser}' cleared upon sign out.`);
                     }
                     localStorage.removeItem('win13_active_user');
-                    console.log(`[LOGIN] User '${activeUser}' signed out.`); // Log user sign out
+                    console.log(`[LOGIN] User '${activeUser}' signed out.`);
                 }
                 window.location.reload();
             });
@@ -1830,7 +2386,7 @@ HALT       ; End program
             e.preventDefault();
             showConfirmBox("Restart System", "Are you sure you want to restart the system?", () => {
                 window.location.reload();
-                // console.log("System restart confirmed and initiated."); // Removed non-login/DB log
+                // console.log("System restart confirmed and initiated.");
             });
         });
 
@@ -1839,17 +2395,448 @@ HALT       ; End program
         const toggleScrollbars = () => {
             const prefersNoScrollbars = document.body.classList.toggle('hide-scrollbars');
             localStorage.setItem('hideScrollbars', prefersNoScrollbars);
-            // console.log(`Scrollbars visibility toggled to: ${!prefersNoScrollbars}.`); // Removed non-login/DB log
+            // console.log(`Scrollbars visibility toggled to: ${!prefersNoScrollbars}.`);
         };
 
         toggleScrollbarsBtn.addEventListener('click', toggleScrollbars);
 
         if (localStorage.getItem('hideScrollbars') === 'true') {
             document.body.classList.add('hide-scrollbars');
-            // console.log("Scrollbars hidden on load based on preference."); // Removed non-login/DB log
+            // console.log("Scrollbars hidden on load based on preference.");
         } else {
-            // console.log("Scrollbars visible on load based on preference."); // Removed non-login/DB log
+            // console.log("Scrollbars visible on load based on preference.");
         }
+
+        // --- Calculator Logic ---
+        function updateCalculatorDisplay() {
+            calculatorDisplay.textContent = currentInput;
+            // console.log(`Calculator display updated to: ${currentInput}`);
+        }
+
+        function resetCalculator() {
+            currentInput = '0';
+            firstOperand = null;
+            operator = null;
+            waitingForSecondOperand = false;
+            updateCalculatorDisplay();
+            // console.log("Calculator reset.");
+        }
+
+        function handleDigitClick(digit) {
+            if (currentInput.length >= 12 && !waitingForSecondOperand) {
+                showMessageBox("Input Limit", "Display limit reached (12 digits).");
+                // console.warn("Calculator input limit reached.");
+                return;
+            }
+            if (waitingForSecondOperand) {
+                currentInput = digit;
+                waitingForSecondOperand = false;
+            } else {
+                currentInput = currentInput === '0' ? digit : currentInput + digit;
+            }
+            updateCalculatorDisplay();
+            // console.log(`Digit clicked: ${digit}. Current input: ${currentInput}`);
+        }
+
+        function handleDecimalClick() {
+            if (waitingForSecondOperand) {
+                currentInput = '0.';
+                waitingForSecondOperand = false;
+                updateCalculatorDisplay();
+                return;
+            }
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateCalculatorDisplay();
+            // console.log(`Decimal clicked. Current input: ${currentInput}`);
+        }
+
+        function handleOperatorClick(nextOperator) {
+            const inputValue = parseFloat(currentInput);
+
+            if (operator && waitingForSecondOperand) {
+                operator = nextOperator;
+                // console.log(`Operator changed to: ${nextOperator}`);
+                return;
+            }
+
+            if (firstOperand === null) {
+                firstOperand = inputValue;
+            } else if (operator) {
+                const result = performCalculation[operator](firstOperand, inputValue);
+                currentInput = String(result);
+                firstOperand = result;
+                // console.log(`Calculation performed: ${firstOperand} ${operator} ${inputValue} = ${result}. Current input: ${currentInput}`);
+            }
+
+            waitingForSecondOperand = true;
+            operator = nextOperator;
+            updateCalculatorDisplay();
+            // console.log(`Operator clicked: ${nextOperator}. First operand: ${firstOperand}. Waiting for second operand.`);
+        }
+
+        const performCalculation = {
+            '/': (firstOperand, secondOperand) => secondOperand === 0 ? NaN : firstOperand / secondOperand,
+            '*': (firstOperand, secondOperand) => firstOperand * secondOperand,
+            '+': (firstOperand, secondOperand) => firstOperand + secondOperand,
+            '-': (firstOperand, secondOperand) => firstOperand - secondOperand,
+            '=': (firstOperand, secondOperand) => secondOperand // For equals, just return the second operand if no previous operator, otherwise handled by handleOperatorClick
+        };
+
+        calculatorKeypad.addEventListener('click', (event) => {
+            const { target } = event;
+            if (!target.matches('button')) {
+                return;
+            }
+
+            if (target.classList.contains('operator')) {
+                if (target.textContent === '←') { // Backspace
+                    currentInput = currentInput.slice(0, -1);
+                    if (currentInput === '') {
+                        currentInput = '0';
+                    }
+                    updateCalculatorDisplay();
+                    // console.log("Backspace clicked. Current input:", currentInput);
+                    return;
+                }
+                handleOperatorClick(target.textContent);
+                return;
+            }
+
+            if (target.classList.contains('equals')) {
+                if (firstOperand !== null && operator) {
+                    handleOperatorClick('='); // Trigger final calculation
+                    operator = null; // Clear operator after calculation
+                    waitingForSecondOperand = false;
+                    // console.log("Equals clicked. Final result:", currentInput);
+                }
+                return;
+            }
+
+            if (target.classList.contains('clear')) {
+                resetCalculator();
+                return;
+            }
+
+            if (target.textContent === '.') {
+                handleDecimalClick();
+                return;
+            }
+
+            handleDigitClick(target.textContent);
+        });
+
+        resetCalculator(); // Initialize calculator display on load
+
+        // --- Task Manager Logic ---
+        const renderProcessList = () => {
+            processListDiv.innerHTML = ''; // Clear existing list
+            selectedProcessId = null; // Reset selection
+
+            const runningWindows = document.querySelectorAll('.window:not(.hidden)');
+            if (runningWindows.length === 0) {
+                processListDiv.innerHTML = '<p class="text-gray-400">No applications running.</p>';
+                return;
+            }
+
+            runningWindows.forEach(win => {
+                const titleBar = win.querySelector('.title-bar > div > span:last-child');
+                const title = titleBar ? titleBar.textContent : 'Unnamed Window';
+                const processId = win.id;
+
+                const processItem = document.createElement('div');
+                processItem.className = 'process-item';
+                processItem.setAttribute('data-process-id', processId);
+                processItem.innerHTML = `
+                    <span>${title}</span>
+                    <span class="text-xs text-gray-400">${processId}</span>
+                `;
+
+                processItem.addEventListener('click', () => {
+                    // Remove highlight from previously selected item
+                    document.querySelectorAll('#process-list > .process-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    // Add highlight to current item
+                    processItem.classList.add('selected');
+                    selectedProcessId = processId;
+                    // console.log(`Process selected: ${processId}`);
+                });
+                processListDiv.appendChild(processItem);
+            });
+            // console.log("Process list rendered.");
+        };
+
+        refreshProcessesBtn.addEventListener('click', renderProcessList);
+
+        endTaskBtn.addEventListener('click', () => {
+            if (selectedProcessId) {
+                showConfirmBox("End Task", `Are you sure you want to end the task for '${selectedProcessId}'? This may cause unsaved data loss.`, () => {
+                    const windowToClose = document.getElementById(selectedProcessId);
+                    if (windowToClose) {
+                        windowToClose.classList.add('hidden');
+                        showMessageBox("Task Ended", `Task '${selectedProcessId}' has been ended.`);
+                        // console.log(`Task '${selectedProcessId}' ended.`);
+                        renderProcessList(); // Refresh list after closing
+                    } else {
+                        showMessageBox("Error", `Could not find window for task '${selectedProcessId}'.`);
+                        // console.error(`Failed to end task: Window '${selectedProcessId}' not found.`);
+                    }
+                });
+            } else {
+                showMessageBox("No Task Selected", "Please select a task from the list to end.");
+                // console.warn("End task clicked without selection.");
+            }
+        });
+
+        // Ensure task manager list is updated when it opens
+        taskManagerWindow.addEventListener('transitionend', (e) => {
+            if (e.propertyName === 'opacity' && !taskManagerWindow.classList.contains('hidden')) {
+                renderProcessList();
+            }
+        });
+
+        // --- Sticky Notes Logic ---
+        const saveStickyNotes = () => {
+            localStorage.setItem('stickyNotes', JSON.stringify(stickyNotes));
+            // console.log("Sticky notes saved:", stickyNotes);
+        };
+
+        const renderStickyNotes = () => {
+            stickyNotesContainer.innerHTML = '';
+            stickyNotes.forEach(noteData => {
+                createStickyNoteElement(noteData);
+            });
+            // console.log("Sticky notes rendered.");
+        };
+
+        const createStickyNoteElement = (noteData) => {
+            const noteEl = document.createElement('div');
+            noteEl.className = 'sticky-note pointer-events-auto';
+            noteEl.id = noteData.id;
+            noteEl.style.left = `${noteData.x}px`;
+            noteEl.style.top = `${noteData.y}px`;
+            noteEl.style.width = `${noteData.width}px`;
+            noteEl.style.height = `${noteData.height}px`;
+
+            noteEl.innerHTML = `
+                <div class="title-bar flex items-center justify-between p-2 cursor-grab">
+                    <span class="material-symbols-outlined text-yellow-500">sticky_note_2</span>
+                    <span class="text-sm font-semibold">Sticky Note</span>
+                    <button class="close-btn-note p-1 rounded-full hover:bg-red-300 transition-colors">
+                        <span class="material-symbols-outlined text-sm">close</span>
+                    </button>
+                </div>
+                <textarea class="sticky-note-textarea flex-grow" placeholder="Write your note here...">${noteData.content}</textarea>
+                <div class="sticky-note-toolbar">
+                    <button class="save-note-btn text-sm">Save</button>
+                    <button class="delete-note-btn text-sm">Delete</button>
+                </div>
+                <div class="resize-handle"></div>
+            `;
+
+            stickyNotesContainer.appendChild(noteEl);
+
+            // Drag and resize for sticky notes
+            const titleBar = noteEl.querySelector('.title-bar');
+            const resizeHandle = noteEl.querySelector('.resize-handle');
+            titleBar.addEventListener('mousedown', e => startAction(e, noteEl, 'drag'));
+            titleBar.addEventListener('touchstart', e => startAction(e, noteEl, 'drag'));
+            resizeHandle.addEventListener('mousedown', e => startAction(e, noteEl, 'resize'));
+            resizeHandle.addEventListener('touchstart', e => startAction(e, noteEl, 'resize'));
+
+            // Bring to front on click
+            noteEl.addEventListener('mousedown', () => {
+                activeWindow = noteEl; // Treat notes as windows for Z-index
+                updateWindowsZIndex();
+            });
+            noteEl.addEventListener('touchstart', () => {
+                activeWindow = noteEl;
+                updateWindowsZIndex();
+            });
+
+            // Save note content on input and button click
+            const textarea = noteEl.querySelector('.sticky-note-textarea');
+            textarea.addEventListener('input', () => {
+                const noteIndex = stickyNotes.findIndex(note => note.id === noteData.id);
+                if (noteIndex !== -1) {
+                    stickyNotes[noteIndex].content = textarea.value;
+                    saveStickyNotes();
+                }
+            });
+
+            noteEl.querySelector('.save-note-btn').addEventListener('click', () => {
+                showMessageBox('Note Saved', 'Your sticky note has been saved.');
+            });
+
+            noteEl.querySelector('.delete-note-btn').addEventListener('click', () => {
+                showConfirmBox('Delete Note', 'Are you sure you want to delete this sticky note?', () => {
+                    stickyNotes = stickyNotes.filter(note => note.id !== noteData.id);
+                    noteEl.remove();
+                    saveStickyNotes();
+                    showMessageBox('Note Deleted', 'Sticky note removed.');
+                });
+            });
+
+            noteEl.querySelector('.close-btn-note').addEventListener('click', () => {
+                noteEl.remove();
+                stickyNotes = stickyNotes.filter(note => note.id !== noteData.id);
+                saveStickyNotes();
+            });
+        };
+
+        newStickyNoteContextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            desktopContextMenu.classList.add('hidden');
+            const newNote = {
+                id: `sticky-note-${Date.now()}`,
+                content: '',
+                x: Math.random() * (window.innerWidth - 300) + 50, // Random position
+                y: Math.random() * (window.innerHeight - 300) + 50,
+                width: 250,
+                height: 250
+            };
+            stickyNotes.push(newNote);
+            createStickyNoteElement(newNote);
+            saveStickyNotes();
+            showMessageBox('New Note', 'A new sticky note has been created on your desktop.');
+        });
+
+        // Initial render of sticky notes
+        renderStickyNotes();
+
+        // --- Updater Hub Logic ---
+
+        const saveInstalledApps = () => {
+            localStorage.setItem('installedApps', JSON.stringify(installedApps));
+            // console.log("Installed apps saved:", installedApps);
+        };
+
+        const updateAppAvailability = () => {
+            // Update the installed state based on localStorage
+            for (const appId in installableApplications) {
+                installableApplications[appId].installed = !!installedApps[appId];
+            }
+            renderInstallableApps(); // Re-render Start Menu and Dock
+            renderUpdaterHub(); // Re-render Updater Hub content
+            // console.log("App availability updated and UI re-rendered.");
+        };
+
+        const renderUpdaterHub = () => {
+            availableUpdatesList.innerHTML = '';
+            installationLog.innerHTML = localStorage.getItem('installationLog') || ''; // Load previous log
+
+            for (const appId in installableApplications) {
+                const app = installableApplications[appId];
+                const updateItem = document.createElement('div');
+                updateItem.className = `update-item ${app.installed ? 'installed' : ''}`;
+                updateItem.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="material-symbols-outlined text-2xl ${app.color}">${app.icon}</span>
+                        <div>
+                            <p class="font-semibold text-white">${app.name}</p>
+                            <p class="text-xs text-gray-400">${app.installed ? 'Installed' : 'Available'}</p>
+                        </div>
+                    </div>
+                    <button class="install-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors ${app.installed ? 'opacity-50 cursor-not-allowed' : ''}" data-app-id="${appId}" ${app.installed ? 'disabled' : ''}>
+                        ${app.installed ? 'Installed' : 'Install'}
+                    </button>
+                `;
+                availableUpdatesList.appendChild(updateItem);
+            }
+
+            document.querySelectorAll('.install-btn').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const appId = e.target.getAttribute('data-app-id');
+                    await installApplication(appId);
+                });
+            });
+        };
+
+        const appendLog = (message, type = 'info') => {
+            const entry = document.createElement('div');
+            entry.className = `update-log-entry text-gray-300`;
+            if (type === 'error') entry.classList.add('text-red-400');
+            if (type === 'success') entry.classList.add('text-green-400');
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            installationLog.appendChild(entry);
+            installationLog.scrollTop = installationLog.scrollHeight;
+            // Save log to local storage
+            localStorage.setItem('installationLog', installationLog.innerHTML);
+            // console.log(`Updater Log: ${message}`);
+        };
+
+        const installApplication = async (appId) => {
+            const app = installableApplications[appId];
+            if (!app || app.installed) {
+                showMessageBox("Installation Failed", `${app.name} is already installed or not found.`);
+                return;
+            }
+
+            appendLog(`Starting installation for ${app.name}...`);
+            e.target.disabled = true; // Disable button immediately
+            e.target.textContent = 'Installing...';
+            e.target.classList.add('opacity-50');
+
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate installation time
+
+            installedApps[appId] = true;
+            saveInstalledApps();
+            updateAppAvailability(); // Re-render UI elements
+            appendLog(`${app.name} installed successfully!`, 'success');
+            showMessageBox("Installation Complete", `${app.name} has been successfully installed!`);
+        };
+
+        const renderInstallableApps = () => {
+            const dockInstallableApps = document.getElementById('dock-installable-apps');
+            dockInstallableApps.innerHTML = '';
+            startMenuInstallableApps.innerHTML = ''; // Clear for Start Menu
+
+            for (const appId in installableApplications) {
+                const app = installableApplications[appId];
+                if (app.installed) {
+                    // Add to Dock
+                    const dockButton = document.createElement('button');
+                    dockButton.className = `dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110`;
+                    dockButton.setAttribute('data-window', app.windowId);
+                    dockButton.innerHTML = `<span class="material-symbols-outlined text-3xl ${app.color}">${app.icon}</span>`;
+                    dockButton.addEventListener('click', e => {
+                        e.stopPropagation();
+                        openWindow(app.windowId);
+                    });
+                    dockInstallableApps.appendChild(dockButton);
+
+                    // Add to Start Menu
+                    const startMenuLink = document.createElement('a');
+                    startMenuLink.href = "#";
+                    startMenuLink.className = "start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors";
+                    startMenuLink.setAttribute('data-window', app.windowId);
+                    startMenuLink.innerHTML = `<span class="material-symbols-outlined ${app.color}">${app.icon}</span><span>${app.name}</span>`;
+                     startMenuLink.addEventListener('click', e => {
+                        e.preventDefault();
+                        openWindow(app.windowId);
+                        startMenu.classList.add('hidden'); // Close start menu on app launch
+                    });
+                    startMenuInstallableApps.appendChild(startMenuLink);
+                }
+            }
+            // console.log("Installable apps rendered in Dock and Start Menu.");
+        };
+
+        // Initial setup calls
+        updateAppAvailability(); // Call on load to reflect previously installed apps
+        renderUpdaterHub(); // Render Updater Hub content
+
+        // Ensure Updater Hub content updates when its tab is clicked in Update Center
+        document.querySelector('.updates-tab[data-content-id="updater-hub-content"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            updatesTabs.forEach(t => t.classList.remove('bg-white/20', 'dark:bg-black/20'));
+            updatesContents.forEach(c => c.classList.add('hidden'));
+            e.target.classList.add('bg-white/20', 'dark:bg-black/20');
+            document.getElementById('updater-hub-content').classList.remove('hidden');
+            renderUpdaterHub(); // Re-render when hub tab is selected
+        });
     });
     </script>
 </body>
