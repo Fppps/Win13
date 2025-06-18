@@ -127,7 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
             windowId: 'windows-defender-window',
             icon: 'security',
             color: 'text-green-500',
-            installed: false // Default state
+            installed: false, // Default state
+            uninstallable: false // This app cannot be uninstalled
         }
     };
 
@@ -1997,6 +1998,18 @@ HALT       ; End program
             const app = installableApplications[appId];
             const updateItem = document.createElement('div');
             updateItem.className = `update-item ${app.installed ? 'installed' : ''}`;
+            
+            let buttonHtml = '';
+            if (app.installed) {
+                if (app.uninstallable === false) { // Specific check for non-uninstallable apps like Windows Defender
+                    buttonHtml = `<span class="text-sm text-gray-500">System App</span>`;
+                } else {
+                    buttonHtml = `<button class="uninstall-btn px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors" data-app-id="${appId}">Uninstall</button>`;
+                }
+            } else {
+                buttonHtml = `<button class="install-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors" data-app-id="${appId}">Install</button>`;
+            }
+
             updateItem.innerHTML = `
                 <div class="flex items-center space-x-3">
                     <span class="material-symbols-outlined text-2xl ${app.color}">${app.icon}</span>
@@ -2005,9 +2018,7 @@ HALT       ; End program
                         <p class="text-xs text-gray-400">${app.installed ? 'Installed' : 'Available'}</p>
                     </div>
                 </div>
-                <button class="install-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors ${app.installed ? 'opacity-50 cursor-not-allowed' : ''}" data-app-id="${appId}" ${app.installed ? 'disabled' : ''}>
-                    ${app.installed ? 'Installed' : 'Install'}
-                </button>
+                ${buttonHtml}
             `;
             availableUpdatesList.appendChild(updateItem);
         }
@@ -2016,6 +2027,13 @@ HALT       ; End program
             button.addEventListener('click', async (e) => {
                 const appId = e.target.getAttribute('data-app-id');
                 await installApplication(appId);
+            });
+        });
+
+        document.querySelectorAll('.uninstall-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const appId = e.target.getAttribute('data-app-id');
+                await uninstallApplication(appId);
             });
         });
     };
@@ -2057,6 +2075,39 @@ HALT       ; End program
         appendLog(`${app.name} installed successfully!`, 'success');
         showMessageBox("Installation Complete", `${app.name} has been successfully installed!`);
     };
+
+    const uninstallApplication = async (appId) => {
+        const app = installableApplications[appId];
+        if (!app || !app.installed) {
+            showMessageBox("Uninstallation Failed", `${app.name} is not installed or not found.`);
+            return;
+        }
+
+        if (app.uninstallable === false) {
+            showMessageBox("Uninstallation Restricted", `${app.name} is a core system application and cannot be uninstalled.`);
+            appendLog(`Attempted uninstallation of unremovable app: ${app.name}.`, 'error');
+            return;
+        }
+
+        showConfirmBox("Confirm Uninstallation", `Are you sure you want to uninstall ${app.name}?`, async () => {
+            appendLog(`Starting uninstallation for ${app.name}...`);
+            const uninstallButton = document.querySelector(`.uninstall-btn[data-app-id="${appId}"]`);
+            if (uninstallButton) {
+                uninstallButton.disabled = true;
+                uninstallButton.textContent = 'Uninstalling...';
+                uninstallButton.classList.add('opacity-50');
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate uninstallation time
+
+            delete installedApps[appId]; // Remove from installed apps
+            saveInstalledApps();
+            updateAppAvailability(); // Re-render UI elements
+            appendLog(`${app.name} uninstalled successfully!`, 'success');
+            showMessageBox("Uninstallation Complete", `${app.name} has been successfully uninstalled.`);
+        });
+    };
+
 
     const renderInstallableApps = () => {
         const dockInstallableApps = document.getElementById('dock-installable-apps');
