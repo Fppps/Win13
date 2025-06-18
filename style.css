@@ -1,0 +1,273 @@
+/* Base styles for body and fonts */
+/* Prioritize Segoe UI for a native Windows feel, with Poppins as a strong fallback */
+body { font-family: 'Segoe UI', 'Poppins', sans-serif; user-select: none; color: #e0e0e0; overflow: hidden; }
+.font-orbitron { font-family: 'Orbitron', sans-serif; } /* Kept for specific elements like calculator */
+.font-poppins { font-family: 'Poppins', sans-serif; } /* Kept for explicit use if needed */
+.font-mono { font-family: 'Fira Code', monospace; } /* For terminal and code editor */
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+/* Desktop background transitions */
+#desktop { transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out, opacity 0.5s ease-in-out; background-size: cover; background-position: center; }
+.desktop-light { background-image: url('Assets/Background/Background_Light.png'); }
+.desktop-dark { background-image: url('Assets/Background/Background_dark.png'); }
+
+/* Modern Glassmorphism Effect */
+.glassmorphism {
+    background: rgba(255, 255, 255, 0.1); /* Lighter transparency */
+    backdrop-filter: blur(20px); /* Stronger blur for more depth */
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Clearer, softer border */
+    border-radius: 1.5rem; /* Even more rounded corners */
+    box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4); /* Deeper shadow */
+    transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
+}
+.dark .glassmorphism {
+    background: rgba(0, 0, 0, 0.25); /* Darker transparency for dark mode */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar hiding (optional, toggled by user) */
+.hide-scrollbars::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+.hide-scrollbars { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+
+/* General animations and window styling */
+@keyframes open-animation { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.animate-open { animation: open-animation 0.3s ease-out forwards; } /* Smoother, slightly longer animation */
+.window {
+    position: absolute;
+    transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Added box-shadow transition */
+    min-width: 300px;
+    min-height: 200px;
+    border-radius: 1.5rem; /* Apply consistent rounded corners */
+    overflow: hidden; /* Ensure content stays within rounded corners */
+    display: flex;
+    flex-direction: column;
+}
+.title-bar {
+    cursor: grab;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25); /* More visible separator */
+    background: rgba(255, 255, 255, 0.1); /* Slight background for title bar */
+    display: flex; /* Ensure flexbox for title bar content */
+    align-items: center;
+    justify-content: space-between;
+}
+.dark .title-bar { border-color: rgba(0, 0, 0, 0.2); background: rgba(0, 0, 0, 0.2); }
+.text-shadow { text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+.resize-handle { position: absolute; bottom: 0; right: 0; width: 20px; height: 20px; cursor: se-resize; background: rgba(255,255,255,0.1); border-top-left-radius: 0.5rem; /* Visual handle */ }
+.close-btn, .min-btn, .max-btn {
+    padding: 0.5rem; /* Larger click area */
+    border-radius: 50%; /* Circular buttons */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.close-btn:hover { background-color: #ef4444; color: white; transform: scale(1.1); }
+.min-btn:hover { background-color: #facc15; color: white; transform: scale(1.1); } /* Yellow for minimize */
+.max-btn:hover { background-color: #34d399; color: white; transform: scale(1.1); } /* Green for maximize */
+
+/* Dock Icon styles */
+.dock-icon {
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.dock-icon:hover {
+    transform: translateY(-8px) scale(1.1); /* Lift and grow */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+.dock-icon:active {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+/* Custom style for text editor textarea to give a "code" hint */
+#text-editor-textarea {
+    background-color: #1a202c; /* Darker background for code feel */
+    border: 1px solid #4a5568; /* Subtle border */
+    border-radius: 0.75rem; /* Slightly more rounded corners */
+    padding: 1rem; /* More padding */
+    line-height: 1.5; /* Better readability for code */
+    font-size: 0.875rem; /* Slightly smaller font */
+}
+
+/* Calculator specific styles */
+#calculator-display {
+    min-height: 60px;
+    font-size: 2.5rem;
+    padding: 1rem 1.25rem; /* Increased padding here */
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 0.75rem; /* More rounded */
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    overflow-x: auto;
+    color: white; /* Ensure text is white */
+}
+#calculator-keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+.calculator-btn {
+    background-color: rgba(75, 85, 99, 0.7); /* Slightly lighter gray */
+    color: white;
+    padding: 1.25rem;
+    border-radius: 1rem; /* Even more rounded */
+    font-size: 1.6rem; /* Slightly larger font */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Subtle shadow */
+}
+.calculator-btn:hover { background-color: rgba(90, 100, 115, 0.8); transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.calculator-btn:active { background-color: rgba(60, 70, 85, 0.9); transform: translateY(0); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.calculator-btn.operator { background-color: rgba(139, 92, 246, 0.7); } /* Lighter purple */
+.calculator-btn.operator:hover { background-color: rgba(154, 107, 255, 0.8); }
+.calculator-btn.operator:active { background-color: rgba(114, 77, 219, 0.9); }
+.calculator-btn.equals { background-color: rgba(52, 211, 153, 0.7); } /* Lighter green */
+.calculator-btn.equals:hover { background-color: rgba(67, 226, 168, 0.8); }
+.calculator-btn.equals:active { background-color: rgba(37, 187, 134, 0.9); }
+.calculator-btn.clear { background-color: rgba(248, 113, 113, 0.7); } /* Lighter red */
+.calculator-btn.clear:hover { background-color: rgba(255, 128, 128, 0.8); }
+.calculator-btn.clear:active { background-color: rgba(213, 98, 98, 0.9); }
+.calculator-btn.span-2 { grid-column: span 2; }
+
+/* Task Manager specific styles */
+.process-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem; /* Rounded corners */
+    background-color: rgba(255,255,255,0.05); /* Very subtle background */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.process-item:hover {
+    background-color: rgba(255,255,255,0.15); /* Lighter on hover */
+}
+.process-item.selected {
+    background-color: rgba(147, 51, 234, 0.7); /* Stronger highlight for selected */
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.process-item span:first-child { /* App Name */
+    font-weight: 500;
+    color: white;
+}
+.process-item span:last-child { /* PID/ID */
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.7);
+}
+
+/* Sticky Note specific styles */
+.sticky-note {
+    background-color: #fef08a; /* Light yellow */
+    color: #4a5568; /* Dark gray text */
+    padding: 1.25rem;
+    border-radius: 1.25rem; /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    resize: both; /* Allow manual resizing */
+    overflow: auto; /* Scroll if content overflows */
+    min-width: 200px;
+    min-height: 200px;
+    max-width: 80vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    position: absolute; /* Needed for dragging */
+    z-index: 50; /* Ensure notes are above desktop but below modals/dock */
+    transition: box-shadow 0.2s ease;
+}
+.sticky-note:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+.sticky-note-textarea {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: #4a5568;
+    line-height: 1.5;
+    padding-right: 20px; /* Space for resize handle */
+}
+.sticky-note .title-bar {
+    cursor: grab;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    margin-bottom: 0.5rem;
+    border-radius: 0.75rem;
+    color: #333;
+}
+.sticky-note .title-bar .material-symbols-outlined {
+    font-size: 1.25rem;
+    color: #333;
+}
+.sticky-note .title-bar button {
+    color: #333;
+    transition: color 0.2s ease;
+}
+.sticky-note .title-bar button:hover {
+    color: #ef4444; /* Red for close */
+}
+.sticky-note-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+.sticky-note-toolbar button {
+    background-color: #8b5cf6; /* Purple */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    transition: background-color 0.2s ease;
+}
+.sticky-note-toolbar button:hover {
+    background-color: #7c3aed;
+}
+.sticky-note .resize-handle {
+    background: none; /* Hide background on sticky notes */
+    border-top-left-radius: 0;
+}
+
+/* Updater Hub styles */
+.update-item {
+    background-color: rgba(255,255,255,0.08);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: background-color 0.2s ease;
+}
+.update-item.installed {
+    background-color: rgba(52, 211, 153, 0.2); /* Light green for installed */
+    border-color: rgba(52, 211, 153, 0.4);
+}
+.update-item:hover:not(.installed) {
+    background-color: rgba(255,255,255,0.15);
+}
+.update-log-entry {
+    padding: 0.5rem;
+    border-bottom: 1px dashed rgba(255,255,255,0.1);
+    font-size: 0.85rem;
+    color: #a0aec0;
+}
+.update-log-entry:last-child {
+    border-bottom: none;
+}
