@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const memoryDisplay = document.getElementById('memory-display');
     const programEditor = document.getElementById('program-editor');
     const loadProgramBtn = document.getElementById('load-program-btn');
-    const runProgramBtn = document.getElementById('run-program-btn');
+    const runProgramBtn = document = document.getElementById('run-program-btn');
     const stepProgramBtn = document.getElementById('step-program-btn');
     const resetCpuBtn = document.getElementById('reset-cpu-btn');
 
@@ -80,6 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const powerOptionsMenu = document.getElementById('power-options-menu');
     const signOutBtn = document.getElementById('sign-out-btn');
     const restartBtn = document.getElementById('restart-btn');
+    const shutdownBtn = document.getElementById('shutdown-btn'); // New shutdown button
+    const powerOffScreen = document.getElementById('power-off-screen'); // Power off screen
+    const powerOffMessage = document.getElementById('power-off-message'); // Power off message
     const startMenuInstallableApps = document.getElementById('start-menu-installable-apps'); // For dynamically adding apps
 
     // Calculator DOM elements
@@ -106,29 +109,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const installationLog = document.getElementById('installation-log');
     let installedApps = JSON.parse(localStorage.getItem('installedApps')) || {}; // Track installed apps
 
+    // Desktop Icons DOM elements
+    const desktopIconsContainer = document.getElementById('desktop-icons-container');
+    const toggleDesktopIconsContextBtn = document.getElementById('toggle-desktop-icons-context');
+    let showDesktopIcons = localStorage.getItem('showDesktopIcons') === 'true'; // State for desktop icon visibility
+
+    // Calendar DOM elements
+    const calendarWindow = document.getElementById('calendar-window');
+    const currentMonthYearDisplay = document.getElementById('current-month-year');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const prevMonthBtn = document.getElementById('prev-month-btn');
+    const nextMonthBtn = document.getElementById('next-month-btn');
+    let currentCalendarDate = new Date(); // State for calendar display
+
     // Installable applications definition
     const installableApplications = {
+        'file-explorer': { name: 'File Explorer', windowId: 'file-explorer-window', icon: 'folder', color: 'text-yellow-500', isCore: true, installed: true, desktopIcon: true },
+        'terminal': { name: 'Terminal', windowId: 'terminal-window', icon: 'terminal', color: '', isCore: true, installed: true, desktopIcon: true },
+        'text-editor': { name: 'Notepad', windowId: 'text-editor-window', icon: 'edit_note', color: 'text-lime-400', isCore: true, installed: true, desktopIcon: true },
+        'settings': { name: 'Settings', windowId: 'settings-window', icon: 'settings', color: '', isCore: true, installed: true, desktopIcon: false },
+        'cpu-monitor': { name: 'CPU Monitor', windowId: 'cpu-monitor-window', icon: 'developer_board', color: 'text-purple-400', isCore: true, installed: true, desktopIcon: true },
+        'calculator': { name: 'Calculator', windowId: 'calculator-window', icon: 'calculate', color: 'text-orange-400', isCore: true, installed: true, desktopIcon: true },
+        'task-manager': { name: 'Task Manager', windowId: 'task-manager-window', icon: 'task_alt', color: 'text-blue-400', isCore: true, installed: true, desktopIcon: true },
+        'sticky-notes': { name: 'Sticky Notes', windowId: 'sticky-notes-window', icon: 'sticky_note_2', color: 'text-yellow-300', isCore: true, installed: true, desktopIcon: true },
+        'updates': { name: 'Update Center', windowId: 'updates-window', icon: 'cloud_download', color: 'text-green-400', isCore: true, installed: true, desktopIcon: false },
         'web-browser': {
             name: 'Web Browser',
             windowId: 'web-browser-window',
             icon: 'public',
             color: 'text-blue-500',
-            installed: false // Default state
+            installed: false, // Default state
+            desktopIcon: true
         },
         'media-player': {
             name: 'Media Player',
             windowId: 'media-player-window',
             icon: 'play_circle',
             color: 'text-green-500',
-            installed: false // Default state
+            installed: false, // Default state
+            desktopIcon: true
         },
-        'windows-defender': { // New Windows Defender app
+        'windows-defender': {
             name: 'Windows Defender',
             windowId: 'windows-defender-window',
             icon: 'security',
             color: 'text-green-500',
             installed: false, // Default state
-            uninstallable: false // This app cannot be uninstalled
+            uninstallable: false, // This app cannot be uninstalled
+            desktopIcon: true
         }
     };
 
@@ -254,10 +282,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     loginContainer.classList.add('hidden');
                     desktop.style.opacity = '1';
-                    if (!localStorage.getItem('win13_disclaimer_seen')) {
-                        disclaimerModal.classList.remove('hidden');
-                        console.log("[LOGIN] Showing disclaimer modal for first-time login.");
-                    }
+                    // Always show disclaimer on desktop load
+                    disclaimerModal.classList.remove('hidden');
+                    console.log("[LOGIN] Showing disclaimer modal on desktop load.");
                 }, 500);
                 console.log(`[LOGIN] User '${user}' logged in successfully.`); // Log login success
             } else if (!storedHashedPassword) {
@@ -276,8 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     disclaimerOkBtn.addEventListener('click', () => {
         disclaimerModal.classList.add('hidden');
-        localStorage.setItem('win13_disclaimer_seen', 'true');
-        // console.log("Disclaimer acknowledged."); // Removed non-login/DB log
+        // We no longer set 'win13_disclaimer_seen' to always show it
     });
 
     // Initial check for active user
@@ -286,7 +312,9 @@ document.addEventListener('DOMContentLoaded', () => {
         desktop.style.opacity = '1';
         document.getElementById('account-username').textContent = activeUser;
         startMenuUsername.textContent = activeUser;
-        console.log(`[LOGIN] Active user '${activeUser}' automatically logged in.`);
+        // Always show disclaimer on desktop load
+        disclaimerModal.classList.remove('hidden');
+        console.log(`[LOGIN] Active user '${activeUser}' automatically logged in. Showing disclaimer.`);
     } else {
         const users = loadUsers();
         if (Object.keys(users).length === 0) {
@@ -330,13 +358,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const { parentObj, name } = getParentAndNameFromPath(fullPath);
         if (!parentObj) {
             showMessageBox("Error", "Could not find parent directory.");
-            // console.error(`Deletion failed: Could not find parent directory for '${fullPath}'.`); // Removed non-login/DB log
             return false;
         }
 
         if (isDirectory && Object.keys(parentObj[name]).length > 0) {
             showMessageBox("Error", `Directory '${name}' is not empty. Cannot delete.`);
-            // console.warn(`Deletion failed: Directory '${name}' is not empty.`); // Removed non-login/DB log
             return false;
         }
 
@@ -346,7 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
             () => {
                 delete parentObj[name];
                 showMessageBox("Deleted", `'${name}' has been deleted.`);
-                // console.log(`'${name}' at '${fullPath}' deleted.`); // Removed non-login/DB log
                 renderFileExplorer();
                 recentFiles = recentFiles.filter(file => file.path !== fullPath);
                 localStorage.setItem('recentFiles', JSON.stringify(recentFiles));
@@ -360,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const { parentObj, parentPath } = getParentAndNameFromPath(fullPath);
         if (!parentObj) {
             showMessageBox("Error", "Could not find parent directory.");
-            // console.error(`Rename failed: Could not find parent directory for '${fullPath}'.`); // Removed non-login/DB log
             return false;
         }
 
@@ -368,7 +392,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newName && newName.trim() !== '' && newName !== oldName) {
             if (parentObj[newName] !== undefined) {
                 showMessageBox("Error", `A file or folder named '${newName}' already exists.`);
-                // console.warn(`Rename failed: A file or folder named '${newName}' already exists.`); // Removed non-login/DB log
                 return false;
             }
 
@@ -386,12 +409,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             showMessageBox("Renamed", `'${oldName}' renamed to '${newName}'.`);
-            // console.log(`'${oldName}' at '${fullPath}' renamed to '${newName}'.`); // Removed non-login/DB log
             renderFileExplorer();
             return true;
         } else if (newName !== null) {
             showMessageBox("Info", "Rename cancelled or new name is invalid/same.");
-            // console.log("Rename cancelled or new name is invalid/same."); // Removed non-login/DB log
         }
         return false;
     };
@@ -402,7 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentDir = getObjectFromPath(currentPath);
         if (!currentDir || typeof currentDir !== 'object') {
             showMessageBox("Error", "Invalid directory path.");
-            // console.error(`File Explorer error: Invalid directory path '${currentPath}'.`); // Removed non-login/DB log
             return;
         }
 
@@ -418,7 +438,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (!currentPath.startsWith('C:') && pathParts.length > 0) currentPath = 'C:/' + currentPath;
                 
                 renderFileExplorer();
-                // console.log(`Navigated up to: ${currentPath}`); // Removed non-login/DB log
             });
             fileExplorerOutput.appendChild(upIcon);
         } else if (pathParts.length === 1 && pathParts[0] !== 'C:') {
@@ -462,7 +481,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isDir) {
                     currentPath = fullPath;
                     renderFileExplorer();
-                    // console.log(`Entered directory: ${currentPath}`); // Removed non-login/DB log
                 } else {
                     openFileInTextEditor(fullPath, key);
                 }
@@ -475,7 +493,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 fileExplorerContextMenu.style.left = `${e.clientX}px`;
                 fileExplorerContextMenu.style.top = `${e.clientY}px`;
                 fileExplorerContextMenu.classList.remove('hidden');
-                // console.log(`File Explorer context menu opened for '${key}'.`); // Removed non-login/DB log
             });
 
             fileExplorerOutput.appendChild(icon);
@@ -486,7 +503,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         fileExplorerContextMenu.classList.add('hidden');
         if (activeFileExplorerItem) {
-            // console.log(`Attempting to rename '${activeFileExplorerItem.name}'.`); // Removed non-login/DB log
             renameFileOrFolder(activeFileExplorerItem.path, activeFileExplorerItem.name, activeFileExplorerItem.isDir);
         }
     });
@@ -495,19 +511,16 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         fileExplorerContextMenu.classList.add('hidden');
         if (activeFileExplorerItem) {
-            // console.log(`Attempting to delete '${activeFileExplorerItem.name}'.`); // Removed non-login/DB log
-            deleteFileOrFolder(activeFileExplorerItem.path, activeFileExplorerItem.isDir);
+            deleteFileOrFolder(activeFileExplorerItem.path, activeFileExplorerItem.name, activeFileExplorerItem.isDir);
         }
     });
 
     document.addEventListener('click', (e) => {
         if (!desktopContextMenu.contains(e.target)) {
             desktopContextMenu.classList.add('hidden');
-            // console.log("Desktop context menu hidden."); // Removed non-login/DB log
         }
         if (!fileExplorerContextMenu.contains(e.target)) {
             fileExplorerContextMenu.classList.add('hidden');
-            // console.log("File Explorer context menu hidden."); // Removed non-login/DB log
         }
     });
 
@@ -538,10 +551,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentOpenFile = { path: filePath, name: fileName };
             addRecentFile(filePath, fileName);
             openWindow('text-editor-window');
-            // console.log(`Opened file '${fileName}' in text editor.`); // Removed non-login/DB log
         } else {
             showMessageBox("Error", "Could not open file: Not a valid file or path.");
-            // console.error(`Failed to open file: '${filePath}' is not a valid file or path.`); // Removed non-login/DB log
         }
     };
 
@@ -555,15 +566,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentDir && typeof currentDir === 'object') {
                 currentDir[fileName] = textEditorTextarea.value;
                 showMessageBox("Saved", `File '${fileName}' saved successfully!`);
-                // console.log(`File '${fileName}' saved successfully.`); // Removed non-login/DB log
                 renderFileExplorer();
             } else {
                 showMessageBox("Error", "Could not determine save location.");
-                // console.error("Save failed: Could not determine save location for current file."); // Removed non-login/DB log
             }
         } else {
             showMessageBox("Error", "No file is currently open to save.");
-            // console.warn("Save failed: No file open in text editor."); // Removed non-login/DB log
         }
     });
 
@@ -576,51 +584,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentDir) {
                     if (currentDir[fileName] !== undefined) {
                         showMessageBox("Error", `File '${fileName}' already exists.`);
-                        // console.warn(`File creation failed: '${fileName}' already exists.`); // Removed non-login/DB log
                         return;
                     }
                     currentDir[fileName] = '';
                     renderFileExplorer();
                     showMessageBox("File Created", `File '${fileName}' created.`);
-                    // console.log(`File '${fileName}' created at '${currentPath}'.`); // Removed non-login/DB log
                     openFileInTextEditor(`${currentPath}/${fileName}`, fileName);
                 } else {
                     showMessageBox("Error", "Could not create file: Invalid current directory.");
-                    // console.error(`File creation failed: Invalid current directory '${currentPath}'.`); // Removed non-login/DB log
                 }
             } else {
                 showMessageBox("Invalid File Type", "Only .txt and .py files are supported for creation.");
-                // console.warn(`File creation failed: Invalid file type for '${fileName}'.`); // Removed non-login/DB log
             }
         } else {
-            // console.log("File creation cancelled by user."); // Removed non-login/DB log
+            // User cancelled
         }
     });
 
     // --- Terminal ---
     const processCommand = (cmd) => {
-        // console.log(`Executing command: ${cmd.split(' ')[0]} with args: ${cmd.split(' ').slice(1).join(' ')}`); // Removed non-login/DB log
         const [command, ...args] = cmd.trim().split(' ');
         if (!command) return;
         const append = (text) => appendTerminalOutput(text);
         switch (command.toLowerCase()) {
             case 'mkdir':
-                if (!args[0]) { append("Usage: mkdir [directory_name]"); /* console.warn("mkdir: Missing directory name."); */ break; }
+                if (!args[0]) { append("Usage: mkdir [directory_name]"); break; }
                 const newDirName = args[0];
                 const currentMkdirDir = getObjectFromPath(currentPath);
                 if (currentMkdirDir && typeof currentMkdirDir === 'object') { 
                     if (currentMkdirDir[newDirName] !== undefined) {
                         append(`Error: Directory '${newDirName}' already exists.`);
-                        // console.warn(`mkdir: Directory '${newDirName}' already exists.`); // Removed non-login/DB log
                         break;
                     }
                     currentMkdirDir[newDirName] = {}; 
                     append(`Directory '${newDirName}' created.`); 
-                    // console.log(`mkdir: Directory '${newDirName}' created.`); // Removed non-login/DB log
                     renderFileExplorer(); 
                 } else { 
                     append(`Error: Path not found or not a directory.`); 
-                    // console.error(`mkdir: Path not found or not a directory for '${currentPath}'.`); // Removed non-login/DB log
                 }
                 break;
             case 'ls':
@@ -630,14 +630,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         const isDir = typeof dirToList[item] === 'object';
                         append(`${isDir ? '[DIR]' : '[FILE]'} ${item}`);
                     });
-                    // console.log(`ls: Listed contents of '${currentPath}'.`); // Removed non-login/DB log
                 } else {
                     append(`Error: Cannot list contents. Path not found or not a directory.`);
-                    // console.error(`ls: Cannot list contents. Path not found or not a directory for '${currentPath}'.`); // Removed non-login/DB log
                 }
                 break;
             case 'cd':
-                if (!args[0]) { append("Usage: cd [directory_name] or cd .. or cd /path/to/dir"); /* console.warn("cd: Missing directory argument."); */ break; }
+                if (!args[0]) { append("Usage: cd [directory_name] or cd .. or cd /path/to/dir"); break; }
                 let targetPath = '';
                 if (args[0] === '..') {
                     const pathParts = currentPath.split('/').filter(p => p !== '');
@@ -648,7 +646,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (pathParts.length === 0) targetPath = 'C:';
                     } else {
                         append("Already at root.");
-                        // console.log("cd: Already at root, cannot go up further."); // Removed non-login/DB log
                         break;
                     }
                 } else if (args[0].startsWith('/')) {
@@ -663,7 +660,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 targetPath = targetPath.replace(/\/\/+/g, '/');
                 if (targetPath === 'C') targetPath = 'C:';
                 else if (targetPath.endsWith(':') && targetPath.length > 1) { /* do nothing */ }
-                else if (!targetPath.startsWith('C:/') && targetPath.includes(':')) { /* do nothing */ }
                 else if (targetPath.includes(':') && !targetPath.includes('/')) { /* do nothing */ }
                 else if (!targetPath.startsWith('C:/') && !targetPath.endsWith(':')) {
                     targetPath = 'C:/' + targetPath;
@@ -674,55 +670,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (newDir && typeof newDir === 'object') {
                     currentPath = targetPath;
                     append(`Changed directory to ${currentPath}`);
-                    // console.log(`cd: Changed directory to '${currentPath}'.`); // Removed non-login/DB log
                     renderFileExplorer();
                 } else {
                     append(`Error: Directory '${args[0]}' not found or is a file.`);
-                    // console.error(`cd: Directory '${args[0]}' not found or is a file.`); // Removed non-login/DB log
                 }
                 break;
             case 'cat':
-                if (!args[0]) { append("Usage: cat [file_name]"); /* console.warn("cat: Missing file name."); */ break; }
+                if (!args[0]) { append("Usage: cat [file_name]"); break; }
                 const filePath = `${currentPath}/${args[0]}`;
                 const fileContent = getObjectFromPath(filePath);
                 if (typeof fileContent === 'string') {
                     append(`--- Content of ${args[0]} ---`);
                     append(fileContent);
                     append(`--- End of file ---`);
-                    // console.log(`cat: Displayed content of '${args[0]}'.`); // Removed non-login/DB log
                 } else {
                     append(`Error: File '${args[0]}' not found or is a directory.`);
-                    // console.error(`cat: File '${args[0]}' not found or is a directory.`); // Removed non-login/DB log
                 }
                 break;
             case 'touch':
-                if (!args[0]) { append("Usage: touch [file_name]"); /* console.warn("touch: Missing file name."); */ break; }
+                if (!args[0]) { append("Usage: touch [file_name]"); break; }
                 const currentTouchDir = getObjectFromPath(currentPath);
                 const touchFileName = args[0];
                 if (currentTouchDir && typeof currentTouchDir === 'object') {
                     if (currentTouchDir[touchFileName] !== undefined) {
                         append(`Error: File '${touchFileName}' already exists.`);
-                        // console.warn(`touch: File '${touchFileName}' already exists.`); // Removed non-login/DB log
                         break;
                     }
                     currentTouchDir[touchFileName] = '';
                     append(`File '${touchFileName}' created.`);
-                    // console.log(`touch: File '${touchFileName}' created.`); // Removed non-login/DB log
                     renderFileExplorer();
                 } else {
                     append(`Error: Path not found.`);
-                    // console.error(`touch: Path not found for '${currentPath}'.`); // Removed non-login/DB log
                 }
                 break;
             case 'rm':
-                if (!args[0]) { append("Usage: rm [file_or_dir_name] or rm -r [directory_name]"); /* console.warn("rm: Missing argument."); */ break; }
+                if (!args[0]) { append("Usage: rm [file_or_dir_name] or rm -r [directory_name]"); break; }
                 const rmOptions = args[0];
                 const rmTarget = args[1] || args[0];
                 const currentRmDir = getObjectFromPath(currentPath);
                 
                 if (!currentRmDir || typeof currentRmDir !== 'object') {
                     append(`Error: Current path not found or not a directory.`);
-                    // console.error(`rm: Current path not found or not a directory.`); // Removed non-login/DB log
                     break;
                 }
 
@@ -732,7 +720,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (!targetObj) {
                         append(`Error: '${rmTarget}' not found.`);
-                        // console.warn(`rm -r: Target '${rmTarget}' not found.`); // Removed non-login/DB log
                         break;
                     }
 
@@ -748,7 +735,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 };
                                 deleteRecursive(currentRmDir, rmTarget);
                                 append(`Recursively removed '${rmTarget}'.`);
-                                // console.log(`rm -r: Recursively removed '${rmTarget}'.`); // Removed non-login/DB log
                                 renderFileExplorer();
                             }
                         );
@@ -759,7 +745,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             () => {
                                 delete currentRmDir[rmTarget];
                                 append(`Removed '${rmTarget}'.`);
-                                // console.log(`rm: Removed file '${rmTarget}'.`); // Removed non-login/DB log
                                 renderFileExplorer();
                                 recentFiles = recentFiles.filter(file => file.path !== targetPath);
                                 localStorage.setItem('recentFiles', JSON.stringify(recentFiles));
@@ -771,7 +756,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (currentRmDir[rmTarget] !== undefined) {
                         if (typeof currentRmDir[rmTarget] === 'object' && Object.keys(currentRmDir[rmTarget]).length > 0) {
                             append(`Error: Directory '${rmTarget}' is not empty. Use 'rm -r ${rmTarget}' to remove recursively.`);
-                            // console.warn(`rm: Directory '${rmTarget}' not empty.`); // Removed non-login/DB log
                         } else {
                             showConfirmBox(
                                 "Confirm Deletion",
@@ -779,7 +763,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 () => {
                                     delete currentRmDir[rmTarget];
                                     append(`Removed '${rmTarget}'.`);
-                                    // console.log(`rm: Removed '${rmTarget}'.`); // Removed non-login/DB log
                                     renderFileExplorer();
                                     const targetPath = `${currentPath}/${rmTarget}`;
                                     recentFiles = recentFiles.filter(file => file.path !== targetPath);
@@ -790,28 +773,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     } else {
                         append(`Error: '${rmTarget}' not found.`);
-                        // console.warn(`rm: Target '${rmTarget}' not found.`); // Removed non-login/DB log
                     }
                 }
                 break;
             case 'rmdir':
-                if (!args[0]) { append("Usage: rmdir [directory_name]"); /* console.warn("rmdir: Missing directory name."); */ break; }
+                if (!args[0]) { append("Usage: rmdir [directory_name]"); break; }
                 const rmdirTarget = args[0];
                 const currentRmdirDir = getObjectFromPath(currentPath);
 
                 if (!currentRmdirDir || typeof currentRmdirDir !== 'object' || currentRmdirDir[rmdirTarget] === undefined) {
                     append(`Error: Directory '${rmdirTarget}' not found.`);
-                    // console.warn(`rmdir: Directory '${rmdirTarget}' not found.`); // Removed non-login/DB log
                     break;
                 }
                 if (typeof currentRmdirDir[rmdirTarget] !== 'object') {
                     append(`Error: '${rmdirTarget}' is a file, not a directory.`);
-                    // console.warn(`rmdir: '${rmdirTarget}' is a file, not a directory.`); // Removed non-login/DB log
                     break;
                 }
                 if (Object.keys(currentRmdirDir[rmdirTarget]).length > 0) {
-                    append(`Error: Directory '${rmdirTarget}' is not empty.`);
-                    // console.warn(`rmdir: Directory '${rmdirTarget}' is not empty.`); // Removed non-login/DB log
+                    append(`Error: Directory '${rmdirTarget}' is not empty. Use 'rm -r ${rmdirTarget}' to remove recursively.`);
                     break;
                 }
 
@@ -821,14 +800,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     () => {
                         delete currentRmdirDir[rmdirTarget];
                         append(`Removed directory '${rmdirTarget}'.`);
-                        // console.log(`rmdir: Removed directory '${rmdirTarget}'.`); // Removed non-login/DB log
                         renderFileExplorer();
                     }
                 );
                 break;
             case 'clear':
                 terminalOutput.innerHTML = '';
-                // console.log("Terminal cleared."); // Removed non-login/DB log
                 break;
             case 'ps':
                 append("PID | Window Title");
@@ -838,22 +815,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const title = titleBar ? titleBar.textContent : 'Unnamed Window';
                     append(`${String(index + 1).padStart(3, '0')} | ${title} (ID: ${win.id})`);
                 });
-                // console.log("Displayed list of active processes/windows."); // Removed non-login/DB log
                 break;
             case 'kill':
-                if (!args[0]) { append("Usage: kill [window_id]"); /* console.warn("kill: Missing window ID."); */ break; }
+                if (!args[0]) { append("Usage: kill [window_id]"); break; }
                 const windowToKill = document.getElementById(args[0]);
                 if (windowToKill && !windowToKill.classList.contains('hidden')) {
                     windowToKill.classList.add('hidden');
                     append(`Window '${args[0]}' killed.`);
-                    // console.log(`Window '${args[0]}' killed.`); // Removed non-login/DB log
                 } else {
                     append(`Error: Window '${args[0]}' not found or already closed.`);
-                    // console.warn(`kill: Window '${args[0]}' not found or already closed.`); // Removed non-login/DB log
                 }
                 break;
             case 'man':
-                if (!args[0]) { append("Usage: man [command]"); /* console.warn("man: Missing command name."); */ break; }
+                if (!args[0]) { append("Usage: man [command]"); break; }
                 const manPage = {
                     'mkdir': 'mkdir [name] - Creates a new directory.',
                     'ls': 'ls - Lists contents of the current directory.',
@@ -874,39 +848,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 if (manPage[args[0].toLowerCase()]) {
                     append(manPage[args[0].toLowerCase()]);
-                    // console.log(`man: Displayed manual for '${args[0]}'.`); // Removed non-login/DB log
                 } else {
                     append(`No manual entry for '${args[0]}'.`);
-                    // console.warn(`man: No manual entry for '${args[0]}'.`); // Removed non-login/DB log
                 }
                 break;
             case 'echo':
                 append(args.join(' '));
-                // console.log(`echo: ${args.join(' ')}`); // Removed non-login/DB log
                 break;
             case 'pwd':
                 append(currentPath);
-                // console.log(`pwd: Current path is '${currentPath}'.`); // Removed non-login/DB log
                 break;
             case 'whoami':
                 append(activeUser || 'Guest');
-                // console.log(`whoami: Current user is '${activeUser || 'Guest'}'.`); // Removed non-login/DB log
                 break;
             case 'date':
                 append(new Date().toLocaleString());
-                // console.log(`date: Current date and time displayed.`); // Removed non-login/DB log
                 break;
             case 'history':
                 append("Command history not implemented yet.");
-                // console.warn("history: Not implemented."); // Removed non-login/DB log
                 break;
             case 'restart':
                 showConfirmBox("Restart System", "Are you sure you want to restart the system?", () => {
                     window.location.reload();
-                    // console.log("System restart initiated."); // Removed non-login/DB log
                 });
                 break;
-            default: append(`'${command}' is not recognized.`); /* console.warn(`Terminal: Unrecognized command '${command}'.`); */
+            default: append(`'${command}' is not recognized.`);
         }
     };
     const createPrompt = () => {
@@ -917,15 +883,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('terminal-input');
         input.focus();
         input.addEventListener('keydown', (e) => { if(e.key === 'Enter') handleTerminalInput(e); });
-        // console.log("Terminal prompt created."); // Removed non-login/DB log
-    };
-    const handleTerminalInput = (e) => {
-        const input = e.target; const cmd = input.value;
-        input.parentElement.remove();
-        appendTerminalOutput(`<span class="text-green-400">${currentPath}>&nbsp;</span>${cmd}`);
-        // console.log(`Terminal input received: '${cmd}'.`); // Removed non-login/DB log
-        processCommand(cmd);
-        createPrompt();
     };
     const appendTerminalOutput = (text) => { terminalOutput.innerHTML += `<div>${text.replace(/\n/g, '<br>')}</div>`; terminalOutput.scrollTop = terminalOutput.scrollHeight; };
     
@@ -1059,6 +1016,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (windowId === 'task-manager-window') {
             renderProcessList();
         }
+        if (windowId === 'calendar-window') {
+            renderCalendar();
+        }
     };
 
     document.querySelectorAll('[data-window]').forEach(btn => btn.addEventListener('click', e => { 
@@ -1080,31 +1040,25 @@ document.addEventListener('DOMContentLoaded', () => {
             this.data = new Float64Array(this.buffer);
             this.size = size;
             this.allocatedPointer = 0;
-            // console.log(`Memory initialized with size ${size}.`);
         }
 
         read(address) {
             if (address < 0 || address >= this.size) {
-                // console.error(`Memory access violation: Address ${address} out of bounds.`);
                 return NaN;
             }
             const value = this.data[address];
-            // console.log(`Memory: Read ${value} from address ${address}.`);
             return value;
         }
 
         write(address, value) {
             if (address < 0 || address >= this.size) {
-                // console.error(`Memory access violation: Address ${address} out of bounds.`);
                 return;
             }
             this.data[address] = value;
-            // console.log(`Memory: Written ${value} to address ${address}.`);
         }
 
         allocate(size = 1) {
             if (this.allocatedPointer + size > this.size) {
-                // console.error("Memory allocation failed: Not enough space.");
                 return -1;
             }
             const address = this.allocatedPointer;
@@ -1112,14 +1066,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.data[address + i] = 0;
             }
             this.allocatedPointer += size;
-            // console.log(`Memory: Allocated ${size} units starting at address ${address}.`);
             return address;
         }
 
         reset() {
             this.data.fill(0);
             this.allocatedPointer = 0;
-            // console.log("Memory reset.");
         }
     }
 
@@ -1136,7 +1088,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.program = [];
             this.programStartAddr = 0;
             this.speed = 100;
-            // console.log("CPU initialized.");
         }
 
         static Instructions = {
@@ -1152,7 +1103,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.programStartAddr = 0;
             this.isRunning = false;
             this.memory.reset();
-            // console.log("CPU registers and program state reset.");
         }
 
         loadProgram(program) {
@@ -1160,7 +1110,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.program = program;
             let currentAddress = this.memory.allocate(program.length);
             if (currentAddress === -1) {
-                // console.error("Failed to allocate space for program.");
                 showMessageBox("Error", "Failed to allocate memory for program. Memory full?");
                 return;
             }
@@ -1169,18 +1118,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             this.programStartAddr = currentAddress;
             this.registers.PC = currentAddress;
-            // console.log(`Program loaded starting at address ${this.registers.PC}. Program length: ${program.length}`);
         }
 
         step() {
             if (this.registers.PC < 0 || this.registers.PC >= this.memory.size) {
-                // console.log("CPU: Program Counter out of memory bounds. Halting.");
                 this.isRunning = false;
                 return;
             }
             if (this.program.length > 0 && 
                 (this.registers.PC < this.programStartAddr || this.registers.PC >= this.programStartAddr + this.program.length)) {
-                // console.log("CPU: Program Counter outside loaded program's execution bounds. Halting.");
                 this.isRunning = false;
                 return;
             }
@@ -1192,35 +1138,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 case CPU.Instructions.LOAD:
                     const loadAddress = this.memory.read(this.registers.PC++);
                     this.registers.ACC = this.memory.read(loadAddress);
-                    // console.log(`CPU: LOAD ${loadAddress} (ACC = ${this.registers.ACC})`);
                     break;
                 case CPU.Instructions.STORE:
                     const storeAddress = this.memory.read(this.registers.PC++);
                     this.memory.write(storeAddress, this.registers.ACC);
-                    // console.log(`CPU: STORE ${storeAddress} (Value = ${this.registers.ACC})`);
                     break;
                 case CPU.Instructions.ADD:
                     const addAddress = this.memory.read(this.registers.PC++);
                     this.registers.ACC += this.memory.read(addAddress);
-                    // console.log(`CPU: ADD ${addAddress} (ACC = ${this.registers.ACC})`);
                     break;
                 case CPU.Instructions.SUB:
                     const subAddress = this.memory.read(this.registers.PC++);
                     this.registers.ACC -= this.memory.read(subAddress);
-                    // console.log(`CPU: SUB ${subAddress} (ACC = ${this.registers.ACC})`);
                     break;
                 case CPU.Instructions.JUMP:
                     const jumpAddress = this.memory.read(this.registers.PC++);
                     this.registers.PC = jumpAddress;
-                    // console.log(`CPU: JUMP to ${jumpAddress}`);
                     break;
                 case CPU.Instructions.JUMPIFZERO:
                     const jumpIfZeroAddress = this.memory.read(this.registers.PC++);
                     if (this.registers.ACC === 0) {
                         this.registers.PC = jumpIfZeroAddress;
-                        // console.log(`CPU: JUMPIFZERO (ACC is 0) to ${jumpIfZeroAddress}`);
                     } else {
-                        // console.log(`CPU: JUMPIFZERO (ACC is not 0), skipped jump`);
+                        //
                     }
                     break;
                 case CPU.Instructions.SET:
@@ -1229,14 +1169,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (registerCode === 0) this.registers.ACC = value;
                     else if (registerCode === 1) this.registers.R1 = value;
                     else if (registerCode === 2) this.registers.R2 = value;
-                    // console.log(`CPU: SET Reg:${registerCode} Value:${value}`);
                     break;
                 case CPU.Instructions.HALT:
-                    // console.log("CPU: HALT instruction encountered. Stopping execution.");
                     this.isRunning = false;
                     break;
                 default:
-                    // console.error(`CPU: Unknown instruction: ${instruction} at PC: ${this.registers.PC - 1}. Halting.`);
                     this.isRunning = false;
                     break;
             }
@@ -1245,7 +1182,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async execute() {
             this.isRunning = true;
-            // console.log("CPU: Starting program execution.");
             while (this.isRunning) {
                 this.step();
                 if (!this.isRunning) {
@@ -1253,7 +1189,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 await new Promise(resolve => setTimeout(resolve, this.speed));
             }
-            // console.log("CPU: Execution finished.");
             showMessageBox("Program Finished", "CPU program execution has completed.");
         }
     }
@@ -1271,7 +1206,6 @@ document.addEventListener('DOMContentLoaded', () => {
             div.innerHTML = `<span class="font-semibold text-white">${reg}:</span><span class="font-mono text-right text-green-300">${cpu.registers[reg]}</span>`;
             cpuRegistersDisplay.appendChild(div);
         }
-        // console.log("CPU registers UI updated.");
     };
 
     const updateMemoryDisplayUI = () => {
@@ -1301,14 +1235,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             memoryDisplay.appendChild(row);
         }
-        // console.log("Memory display UI updated.");
     };
 
 
     const updateCPUMonitorUI = () => {
         updateCPURegistersUI();
         updateMemoryDisplayUI();
-        // console.log("CPU Monitor UI fully updated.");
     };
 
     // --- CPU Monitor Event Listeners ---
@@ -1333,23 +1265,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!isNaN(arg)) {
                             parsedProgram.push(arg);
                         } else {
-                            // console.warn(`Skipping non-numeric argument: ${instructionWords[i]} in line: "${line}"`);
+                            //
                         }
                     }
                 } else if (!isNaN(parseInt(instructionPart, 10))) {
                     parsedProgram.push(parseInt(instructionPart, 10));
                 } else {
-                    // console.warn(`Unknown instruction or invalid data: "${instructionPart}" in line: "${line}"`);
-                    showMessageBox("Program Load Warning", `Unknown instruction or invalid data: "${instructionPart}". Check console for details.`);
+                    showMessageBox("Program Load Warning", `Unknown instruction or invalid data: "${instructionPart}".`);
                 }
             });
 
             cpu.loadProgram(parsedProgram);
             updateCPUMonitorUI();
             showMessageBox("Program Loaded", "Program loaded successfully! PC set to start.");
-            // console.log("Program loaded successfully from editor.");
         } catch (error) {
-            // console.error("Error loading program:", error);
             showMessageBox("Error", "Failed to load program. Check console for details.");
         }
     });
@@ -1357,20 +1286,16 @@ document.addEventListener('DOMContentLoaded', () => {
     runProgramBtn.addEventListener('click', () => {
         if (!cpu.isRunning) {
             cpu.execute();
-            // console.log("Run program button clicked: CPU execution started.");
         } else {
             showMessageBox("CPU Busy", "CPU is already running. Please wait for it to finish or reset.");
-            // console.warn("Run program button clicked: CPU already running.");
         }
     });
 
     stepProgramBtn.addEventListener('click', () => {
         if (!cpu.isRunning) {
             cpu.step();
-            // console.log("Step program button clicked: Executed one CPU step.");
         } else {
             showMessageBox("CPU Busy", "CPU is already running. Stop it before stepping.");
-            // console.warn("Step program button clicked: CPU already running.");
         }
     });
 
@@ -1378,7 +1303,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cpu.reset();
         updateCPUMonitorUI();
         showMessageBox("CPU Reset", "CPU and Memory have been reset.");
-        // console.log("Reset CPU/Mem button clicked: CPU and memory reset.");
     });
 
     const cpuMonitorWindow = document.getElementById('cpu-monitor-window');
@@ -1388,7 +1312,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                     if (!cpuMonitorWindow.classList.contains('hidden')) {
                         updateCPUMonitorUI();
-                        // console.log("CPU Monitor window became visible, UI updated.");
                     }
                 }
             }
@@ -1429,11 +1352,9 @@ HALT       ; End program
     setInterval(updateClock, 1000);
     updateClock();
 
-    // The clock is now in the taskbar, and clicking it should open settings/about
-    // Adjusted from clockElement to clockContainer as that's the clickable parent
+    // The clock is now in the taskbar, and clicking it should open calendar
     document.getElementById('clock-container').addEventListener('click', () => {
-        openWindow('settings-window', 'about-content');
-        // console.log("Clock clicked: Opened settings to About tab.");
+        openWindow('calendar-window'); // Open calendar window instead of settings
     });
 
     // Event listener for year display to toggle full year
@@ -1456,17 +1377,14 @@ HALT       ; End program
         desktopContextMenu.style.left = `${e.clientX}px`;
         desktopContextMenu.style.top = `${e.clientY}px`;
         desktopContextMenu.classList.remove('hidden');
-        // console.log("Desktop context menu opened.");
     });
 
     document.addEventListener('click', (e) => {
         if (!desktopContextMenu.contains(e.target)) {
             desktopContextMenu.classList.add('hidden');
-            // console.log("Desktop context menu hidden.");
         }
         if (!fileExplorerContextMenu.contains(e.target)) {
             fileExplorerContextMenu.classList.add('hidden');
-            // console.log("File Explorer context menu hidden.");
         }
     });
 
@@ -1474,7 +1392,15 @@ HALT       ; End program
         e.preventDefault();
         openWindow('settings-window', 'background-content');
         desktopContextMenu.classList.add('hidden');
-        // console.log("Context menu: Opened settings to Background tab.");
+    });
+
+    toggleDesktopIconsContextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showDesktopIcons = !showDesktopIcons;
+        localStorage.setItem('showDesktopIcons', showDesktopIcons);
+        renderDesktopIcons();
+        desktopContextMenu.classList.add('hidden');
+        showMessageBox("Desktop Icons", `Desktop icons are now ${showDesktopIcons ? 'shown' : 'hidden'}.`);
     });
 
     // --- Settings Window Logic ---
@@ -1488,17 +1414,14 @@ HALT       ; End program
             const targetContentId = tab.getAttribute('data-content-id');
             const targetContent = document.getElementById(targetContentId);
             if(targetContent) targetContent.classList.remove('hidden');
-            // console.log(`Settings tab '${targetContentId}' activated.`);
         });
     });
 
     setLightBgBtn.addEventListener('click', () => {
         applyTheme('light');
-        // console.log("Theme set to Light.");
     });
     setDarkBgBtn.addEventListener('click', () => {
         applyTheme('dark');
-        // console.log("Theme set to Dark.");
     });
 
     bgColorPicker.addEventListener('input', (e) => {
@@ -1506,7 +1429,6 @@ HALT       ; End program
         desktop.style.backgroundColor = e.target.value;
         localStorage.setItem('customBgColor', e.target.value);
         localStorage.removeItem('theme');
-        // console.log(`Custom background color set to: ${e.target.value}.`);
     });
 
     const applyTheme = (theme) => {
@@ -1522,7 +1444,6 @@ HALT       ; End program
             desktop.classList.add('desktop-light');
         }
         localStorage.setItem('theme', theme);
-        // console.log(`Applied theme: ${theme}.`);
     };
 
     const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -1533,10 +1454,8 @@ HALT       ; End program
         desktop.style.backgroundColor = savedCustomColor;
         bgColorPicker.value = savedCustomColor;
         document.body.classList.remove('dark');
-        // console.log(`Loaded custom background color: ${savedCustomColor}.`);
     } else {
         applyTheme(savedTheme);
-        // console.log(`Loaded theme: ${savedTheme}.`);
     }
 
     // --- Quick Access Functions ---
@@ -1557,7 +1476,6 @@ HALT       ; End program
 
         localStorage.setItem('recentFiles', JSON.stringify(recentFiles));
         renderQuickAccess();
-        // console.log(`Added '${fileName}' to recent files. Current recent files:`, recentFiles);
     };
 
     const renderQuickAccess = () => {
@@ -1565,7 +1483,6 @@ HALT       ; End program
 
         if (recentFiles.length === 0) {
             quickAccessContent.innerHTML = '<p class="text-sm text-gray-400">No recent files.</p>';
-            // console.log("No recent files to display in Quick Access.");
             return;
         }
 
@@ -1596,7 +1513,6 @@ HALT       ; End program
             });
             quickAccessContent.appendChild(fileElement);
         });
-        // console.log("Quick Access UI rendered.");
     };
 
     startMenuBtn.addEventListener('click', (e) => {
@@ -1607,7 +1523,7 @@ HALT       ; End program
             startMenuUsername.textContent = activeUser || 'Guest';
             renderInstallableApps(); // Update installable apps in start menu
         } else {
-            // console.log("Start Menu toggled to hidden.");
+            //
         }
     });
 
@@ -1616,7 +1532,6 @@ HALT       ; End program
             if (!startMenu.classList.contains('hidden')) {
                 startMenu.classList.add('hidden');
                 powerOptionsMenu.classList.add('hidden');
-                // console.log("Start Menu and Power Options hidden due to outside click.");
             }
         }
     });
@@ -1624,7 +1539,6 @@ HALT       ; End program
     powerOptionsBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         powerOptionsMenu.classList.toggle('hidden');
-        // console.log("Power options menu toggled.");
     });
 
     signOutBtn.addEventListener('click', (e) => {
@@ -1638,7 +1552,6 @@ HALT       ; End program
                     console.log(`[LOGIN/DB] Password for '${activeUser}' cleared upon sign out.`);
                 }
                 localStorage.removeItem('win13_active_user');
-                console.log(`[LOGIN] User '${activeUser}' signed out.`);
             }
             window.location.reload();
         });
@@ -1648,31 +1561,62 @@ HALT       ; End program
         e.preventDefault();
         showConfirmBox("Restart System", "Are you sure you want to restart the system?", () => {
             window.location.reload();
-            // console.log("System restart confirmed and initiated.");
         });
     });
+
+    // New: Shutdown functionality
+    shutdownBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showConfirmBox("Shut Down System", "Are you sure you want to shut down the system?", () => {
+            // Hide all windows
+            document.querySelectorAll('.window').forEach(win => win.classList.add('hidden'));
+            document.querySelectorAll('.sticky-note').forEach(note => note.classList.add('hidden'));
+            desktopIconsContainer.classList.add('hidden');
+            document.getElementById('dock').classList.add('hidden'); // Assuming the dock element has id="dock" or similar if needed
+
+            // Show power-off screen
+            powerOffScreen.classList.remove('hidden');
+            powerOffScreen.classList.add('active'); // Start fade in effect
+
+            // Simulate shutdown process
+            powerOffMessage.textContent = "Shutting down...";
+            setTimeout(() => {
+                powerOffMessage.textContent = "Saving user data...";
+            }, 1500);
+            setTimeout(() => {
+                powerOffMessage.textContent = "Powering off...";
+            }, 3000);
+            setTimeout(() => {
+                powerOffScreen.classList.add('fade-out'); // Start fade out effect
+                setTimeout(() => {
+                    powerOffScreen.classList.add('hidden'); // Fully hide after fade out
+                    // Optionally, redirect or show a blank screen/login
+                    // For now, we'll just leave it black and inactive.
+                    document.body.innerHTML = '<div class="absolute inset-0 bg-black flex items-center justify-center text-white text-3xl font-bold">System Off</div>';
+                }, 1000); // Wait for fade-out transition
+            }, 4000); // Total duration before full power off
+        });
+    });
+
 
     renderQuickAccess();
 
     const toggleScrollbars = () => {
         const prefersNoScrollbars = document.body.classList.toggle('hide-scrollbars');
         localStorage.setItem('hideScrollbars', prefersNoScrollbars);
-        // console.log(`Scrollbars visibility toggled to: ${!prefersNoScrollbars}.`);
     };
 
     toggleScrollbarsBtn.addEventListener('click', toggleScrollbars);
 
     if (localStorage.getItem('hideScrollbars') === 'true') {
         document.body.classList.add('hide-scrollbars');
-        // console.log("Scrollbars hidden on load based on preference.");
     } else {
-        // console.log("Scrollbars visible on load based on preference.");
+        //
     }
 
     // --- Calculator Logic ---
     function updateCalculatorDisplay() {
         calculatorDisplay.textContent = currentInput;
-        // console.log(`Calculator display updated to: ${currentInput}`);
     }
 
     function resetCalculator() {
@@ -1681,13 +1625,11 @@ HALT       ; End program
         operator = null;
         waitingForSecondOperand = false;
         updateCalculatorDisplay();
-        // console.log("Calculator reset.");
     }
 
     function handleDigitClick(digit) {
         if (currentInput.length >= 12 && !waitingForSecondOperand) {
             showMessageBox("Input Limit", "Display limit reached (12 digits).");
-            // console.warn("Calculator input limit reached.");
             return;
         }
         if (waitingForSecondOperand) {
@@ -1697,7 +1639,6 @@ HALT       ; End program
             currentInput = currentInput === '0' ? digit : currentInput + digit;
         }
         updateCalculatorDisplay();
-        // console.log(`Digit clicked: ${digit}. Current input: ${currentInput}`);
     }
 
     function handleDecimalClick() {
@@ -1711,7 +1652,6 @@ HALT       ; End program
             currentInput += '.';
         }
         updateCalculatorDisplay();
-        // console.log(`Decimal clicked. Current input: ${currentInput}`);
     }
 
     function handleOperatorClick(nextOperator) {
@@ -1719,7 +1659,6 @@ HALT       ; End program
 
         if (operator && waitingForSecondOperand) {
             operator = nextOperator;
-            // console.log(`Operator changed to: ${nextOperator}`);
             return;
         }
 
@@ -1729,13 +1668,11 @@ HALT       ; End program
             const result = performCalculation[operator](firstOperand, inputValue);
             currentInput = String(result);
             firstOperand = result;
-            // console.log(`Calculation performed: ${firstOperand} ${operator} ${inputValue} = ${result}. Current input: ${currentInput}`);
         }
 
         waitingForSecondOperand = true;
         operator = nextOperator;
         updateCalculatorDisplay();
-        // console.log(`Operator clicked: ${nextOperator}. First operand: ${firstOperand}. Waiting for second operand.`);
     }
 
     const performCalculation = {
@@ -1764,7 +1701,6 @@ HALT       ; End program
                     currentInput = '0';
                 }
                 updateCalculatorDisplay();
-                // console.log("Backspace clicked. Current input:", currentInput);
                 return;
             }
             handleOperatorClick(target.textContent);
@@ -1776,7 +1712,6 @@ HALT       ; End program
                 handleOperatorClick('='); // Trigger final calculation
                 operator = null; // Clear operator after calculation
                 waitingForSecondOperand = false;
-                // console.log("Equals clicked. Final result:", currentInput);
             }
             return;
         }
@@ -1828,11 +1763,9 @@ HALT       ; End program
                 // Add highlight to current item
                 processItem.classList.add('selected');
                 selectedProcessId = processId;
-                // console.log(`Process selected: ${processId}`);
             });
             processListDiv.appendChild(processItem);
         });
-        // console.log("Process list rendered.");
     };
 
     refreshProcessesBtn.addEventListener('click', renderProcessList);
@@ -1844,16 +1777,13 @@ HALT       ; End program
                 if (windowToClose) {
                     windowToClose.classList.add('hidden');
                     showMessageBox("Task Ended", `Task '${selectedProcessId}' has been ended.`);
-                    // console.log(`Task '${selectedProcessId}' ended.`);
                     renderProcessList(); // Refresh list after closing
                 } else {
                     showMessageBox("Error", `Could not find window for task '${selectedProcessId}'.`);
-                    // console.error(`Failed to end task: Window '${selectedProcessId}' not found.`);
                 }
             });
         } else {
             showMessageBox("No Task Selected", "Please select a task from the list to end.");
-            // console.warn("End task clicked without selection.");
         }
     });
 
@@ -1867,7 +1797,6 @@ HALT       ; End program
     // --- Sticky Notes Logic ---
     const saveStickyNotes = () => {
         localStorage.setItem('stickyNotes', JSON.stringify(stickyNotes));
-        // console.log("Sticky notes saved:", stickyNotes);
     };
 
     const renderStickyNotes = () => {
@@ -1875,7 +1804,6 @@ HALT       ; End program
         stickyNotes.forEach(noteData => {
             createStickyNoteElement(noteData);
         });
-        // console.log("Sticky notes rendered.");
     };
 
     const createStickyNoteElement = (noteData) => {
@@ -1977,17 +1905,18 @@ HALT       ; End program
 
     const saveInstalledApps = () => {
         localStorage.setItem('installedApps', JSON.stringify(installedApps));
-        // console.log("Installed apps saved:", installedApps);
     };
 
     const updateAppAvailability = () => {
-        // Update the installed state based on localStorage
+        // Update the installed state based on localStorage for installable apps
         for (const appId in installableApplications) {
-            installableApplications[appId].installed = !!installedApps[appId];
+            if (!installableApplications[appId].isCore) { // Only update non-core apps from localStorage
+                installableApplications[appId].installed = !!installedApps[appId];
+            }
         }
         renderInstallableApps(); // Re-render Start Menu and Dock
         renderUpdaterHub(); // Re-render Updater Hub content
-        // console.log("App availability updated and UI re-rendered.");
+        renderDesktopIcons(); // Re-render desktop icons
     };
 
     const renderUpdaterHub = () => {
@@ -1996,6 +1925,9 @@ HALT       ; End program
 
         for (const appId in installableApplications) {
             const app = installableApplications[appId];
+            // Don't show core apps in the updater hub unless explicitly needed for updates
+            if (app.isCore && appId !== 'updates') continue; 
+
             const updateItem = document.createElement('div');
             updateItem.className = `update-item ${app.installed ? 'installed' : ''}`;
             
@@ -2048,7 +1980,6 @@ HALT       ; End program
         installationLog.scrollTop = installationLog.scrollHeight;
         // Save log to local storage
         localStorage.setItem('installationLog', installationLog.innerHTML);
-        // console.log(`Updater Log: ${message}`);
     };
 
     const installApplication = async (appId) => {
@@ -2118,15 +2049,19 @@ HALT       ; End program
             const app = installableApplications[appId];
             if (app.installed) {
                 // Add to Dock
-                const dockButton = document.createElement('button');
-                dockButton.className = `dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110`;
-                dockButton.setAttribute('data-window', app.windowId);
-                dockButton.innerHTML = `<span class="material-symbols-outlined text-3xl ${app.color}">${app.icon}</span>`;
-                dockButton.addEventListener('click', e => {
-                    e.stopPropagation();
-                    openWindow(app.windowId);
-                });
-                dockInstallableApps.appendChild(dockButton);
+                // Check if the app is a core app, if so, it's already in the HTML.
+                // Otherwise, add it dynamically if it's installed.
+                if (!app.isCore) {
+                    const dockButton = document.createElement('button');
+                    dockButton.className = `dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110`;
+                    dockButton.setAttribute('data-window', app.windowId);
+                    dockButton.innerHTML = `<span class="material-symbols-outlined text-3xl ${app.color}">${app.icon}</span>`;
+                    dockButton.addEventListener('click', e => {
+                        e.stopPropagation();
+                        openWindow(app.windowId);
+                    });
+                    dockInstallableApps.appendChild(dockButton);
+                }
 
                 // Add to Start Menu
                 const startMenuLink = document.createElement('a');
@@ -2142,8 +2077,38 @@ HALT       ; End program
                 startMenuInstallableApps.appendChild(startMenuLink);
             }
         }
-        // console.log("Installable apps rendered in Dock and Start Menu.");
     };
+
+    // --- Desktop Icons Logic ---
+    const renderDesktopIcons = () => {
+        desktopIconsContainer.innerHTML = ''; // Clear existing icons
+        if (!showDesktopIcons) {
+            desktopIconsContainer.classList.add('hidden');
+            return;
+        } else {
+            desktopIconsContainer.classList.remove('hidden');
+        }
+
+        for (const appId in installableApplications) {
+            const app = installableApplications[appId];
+            // Only render desktop icons for apps that are marked for desktop display AND are installed (or are core apps)
+            if (app.desktopIcon && (app.installed || app.isCore)) {
+                const iconElement = document.createElement('div');
+                iconElement.className = 'flex flex-col items-center p-2 w-24 rounded-lg hover:bg-white/20 cursor-pointer text-white';
+                iconElement.setAttribute('data-window', app.windowId);
+                iconElement.innerHTML = `
+                    <span class="material-symbols-outlined text-5xl ${app.color}">${app.icon}</span>
+                    <span class="text-xs text-center mt-1">${app.name}</span>
+                `;
+
+                iconElement.addEventListener('click', () => {
+                    openWindow(app.windowId);
+                });
+                desktopIconsContainer.appendChild(iconElement);
+            }
+        }
+    };
+
 
     // --- Windows Defender Logic ---
     const defenderStatusDisplay = document.getElementById('defender-status');
@@ -2197,10 +2162,56 @@ HALT       ; End program
         });
     }
 
+    // --- Calendar Logic ---
+    const renderCalendar = () => {
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth(); // 0-indexed
+
+        currentMonthYearDisplay.textContent = `${currentCalendarDate.toLocaleString('en-US', { month: 'long' })} ${year}`;
+        calendarGrid.innerHTML = '';
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        const numDays = lastDayOfMonth.getDate();
+        const startDayOfWeek = firstDayOfMonth.getDay(); // 0 for Sunday, 6 for Saturday
+
+        // Add empty cells for days before the 1st
+        for (let i = 0; i < startDayOfWeek; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'p-2 text-center text-gray-500';
+            calendarGrid.appendChild(emptyCell);
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= numDays; day++) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'p-2 text-center rounded-md cursor-pointer hover:bg-purple-700 transition-colors text-white';
+            dayCell.textContent = day;
+
+            // Highlight today's date
+            const today = new Date();
+            if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                dayCell.classList.add('bg-blue-600', 'font-bold');
+            }
+            calendarGrid.appendChild(dayCell);
+        }
+    };
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        renderCalendar();
+    });
 
     // Initial setup calls
     updateAppAvailability(); // Call on load to reflect previously installed apps
     renderUpdaterHub(); // Render Updater Hub content
+    renderDesktopIcons(); // Render desktop icons on load
+    renderCalendar(); // Initial render of the calendar when script loads
 
     // Ensure Updater Hub content updates when its tab is clicked in Update Center
     document.querySelector('.updates-tab[data-content-id="updater-hub-content"]').addEventListener('click', (e) => {

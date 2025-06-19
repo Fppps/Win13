@@ -1,273 +1,523 @@
-/* Base styles for body and fonts */
-/* Prioritize Segoe UI for a native Windows feel, with Poppins as a strong fallback */
-body { font-family: 'Segoe UI', 'Poppins', sans-serif; user-select: none; color: #e0e0e0; overflow: hidden; }
-.font-orbitron { font-family: 'Orbitron', sans-serif; } /* Kept for specific elements like calculator */
-.font-poppins { font-family: 'Poppins', sans-serif; } /* Kept for explicit use if needed */
-.font-mono { font-family: 'Fira Code', monospace; } /* For terminal and code editor */
-.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+/* Base Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    user-select: none;
+    color: #e0e0e0; /* Default text color */
+    background-color: #0d1117; /* Dark background for the system */
+    transition: background-color 0.5s ease-in-out;
+}
 
-/* Desktop background transitions */
-#desktop { transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out, opacity 0.5s ease-in-out; background-size: cover; background-position: center; }
-.desktop-light { background-image: url('Assets/Background/Background_Light.png'); }
-.desktop-dark { background-image: url('Assets/Background/Background_dark.png'); }
+/* Typography */
+.font-orbitron {
+    font-family: 'Orbitron', sans-serif;
+}
 
-/* Modern Glassmorphism Effect */
+.font-mono {
+    font-family: 'Fira Code', monospace; /* Fira Code for a more modern terminal feel */
+}
+
+/* Material Symbols Adjustments */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    transition: transform 0.2s ease-in-out; /* Smooth icon transitions */
+}
+
+/* Desktop Background Themes */
+#desktop {
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.desktop-light {
+    /* Updated to local path */
+    background-image: url('Assets/Background/Light.png'); /* Assuming a light.jpg is available or desired */
+    background-color: #f0f2f5; /* Light background color fallback */
+}
+
+.desktop-dark {
+    /* Updated to local path */
+    background-image: url('Assets/Background/dark.png');
+    background-color: #1a202c; /* Dark background color fallback */
+}
+
+/* Glassmorphism Effect */
 .glassmorphism {
-    background: rgba(255, 255, 255, 0.1); /* Lighter transparency */
-    backdrop-filter: blur(20px); /* Stronger blur for more depth */
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Clearer, softer border */
-    border-radius: 1.5rem; /* Even more rounded corners */
-    box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4); /* Deeper shadow */
-    transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
-}
-.dark .glassmorphism {
-    background: rgba(0, 0, 0, 0.25); /* Darker transparency for dark mode */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(30, 41, 59, 0.7); /* Darker blue-gray with transparency */
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle white border */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Stronger shadow */
+    border-radius: 15px; /* More rounded corners */
+    transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-/* Scrollbar hiding (optional, toggled by user) */
-.hide-scrollbars::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
-.hide-scrollbars { -ms-overflow-style: none !important; scrollbar-width: none !important; }
-
-/* General animations and window styling */
-@keyframes open-animation { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.animate-open { animation: open-animation 0.3s ease-out forwards; } /* Smoother, slightly longer animation */
+/* Window Styling */
 .window {
-    position: absolute;
-    transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Added box-shadow transition */
-    min-width: 300px;
-    min-height: 200px;
-    border-radius: 1.5rem; /* Apply consistent rounded corners */
-    overflow: hidden; /* Ensure content stays within rounded corners */
+    min-width: 280px; /* Adjusted min-width for mobile */
+    min-height: 200px; /* Adjusted min-height for mobile */
+    border-radius: 15px; /* Consistent rounded corners */
+    overflow: hidden; /* Ensures content and handles stay within bounds */
     display: flex;
     flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); /* Deeper shadow for windows */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; /* Smooth transition for active state */
+    position: absolute; /* Crucial for absolute positioning */
 }
-.title-bar {
+
+.window:active {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7); /* Even deeper shadow when active */
+    transform: scale(1.005); /* Slight scale to indicate active */
+}
+
+.window .title-bar {
+    background-color: rgba(45, 55, 72, 0.8); /* Darker, slightly transparent title bar */
+    padding: 0.75rem 1rem; /* More padding */
+    font-weight: 600;
+    color: #cbd5e0; /* Light gray text */
     cursor: grab;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25); /* More visible separator */
-    background: rgba(255, 255, 255, 0.1); /* Slight background for title bar */
-    display: flex; /* Ensure flexbox for title bar content */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    display: flex;
     align-items: center;
     justify-content: space-between;
 }
-.dark .title-bar { border-color: rgba(0, 0, 0, 0.2); background: rgba(0, 0, 0, 0.2); }
-.text-shadow { text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
-.resize-handle { position: absolute; bottom: 0; right: 0; width: 20px; height: 20px; cursor: se-resize; background: rgba(255,255,255,0.1); border-top-left-radius: 0.5rem; /* Visual handle */ }
-.close-btn, .min-btn, .max-btn {
-    padding: 0.5rem; /* Larger click area */
-    border-radius: 50%; /* Circular buttons */
-    transition: background-color 0.2s ease, transform 0.1s ease;
+
+.window .title-bar .material-symbols-outlined {
+    font-size: 1.25rem; /* Larger icon in title bar */
+    margin-right: 0.5rem;
+}
+
+.window .title-bar .close-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #e0e0e0;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
 }
-.close-btn:hover { background-color: #ef4444; color: white; transform: scale(1.1); }
-.min-btn:hover { background-color: #facc15; color: white; transform: scale(1.1); } /* Yellow for minimize */
-.max-btn:hover { background-color: #34d399; color: white; transform: scale(1.1); } /* Green for maximize */
 
-/* Dock Icon styles */
+.window .title-bar .close-btn:hover {
+    background-color: #ef4444; /* Red-500 */
+    color: white;
+    transform: scale(1.1); /* Pop effect on hover */
+}
+
+.window .resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: transparent; /* Invisible handle */
+    cursor: nwse-resize;
+    z-index: 10;
+}
+
+/* Dock Styling */
 .dock-icon {
-    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-.dock-icon:hover {
-    transform: translateY(-8px) scale(1.1); /* Lift and grow */
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-.dock-icon:active {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    position: relative;
+    padding: 0.5rem;
+    border-radius: 0.75rem; /* More rounded */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease-out, background-color 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for icons */
 }
 
-/* Custom style for text editor textarea to give a "code" hint */
-#text-editor-textarea {
-    background-color: #1a202c; /* Darker background for code feel */
-    border: 1px solid #4a5568; /* Subtle border */
-    border-radius: 0.75rem; /* Slightly more rounded corners */
-    padding: 1rem; /* More padding */
-    line-height: 1.5; /* Better readability for code */
-    font-size: 0.875rem; /* Slightly smaller font */
+.dock-icon:hover {
+    transform: translateY(-8px) scale(1.2); /* Lift and grow on hover */
+    background-color: rgba(255, 255, 255, 0.2); /* Lighter hover background */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+.dock-icon .material-symbols-outlined {
+    font-size: 2.2rem; /* Slightly larger icons */
+}
+
+/* Start Menu Styling */
+#start-menu {
+    border-radius: 20px; /* More pronounced rounded corners */
+    padding: 1.5rem; /* Increased padding */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6); /* Deeper shadow */
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Slightly stronger border */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+#start-menu.animate-open {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#start-menu .start-menu-app-icon {
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+}
+
+#power-options-menu {
+    border-radius: 15px; /* Consistent rounding */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+#power-options-menu.animate-open {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Context Menu */
+#context-menu, #file-explorer-context-menu {
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+#context-menu.animate-open, #file-explorer-context-menu.animate-open {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#context-menu a, #file-explorer-context-menu a {
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
 /* Calculator specific styles */
 #calculator-display {
-    min-height: 60px;
-    font-size: 2.5rem;
-    padding: 1rem 1.25rem; /* Increased padding here */
-    background-color: rgba(0,0,0,0.3);
-    border-radius: 0.75rem; /* More rounded */
+    background-color: rgba(0, 0, 0, 0.4); /* Darker display */
+    border-radius: 8px;
+    padding: 1rem;
     margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    overflow-x: auto;
-    color: white; /* Ensure text is white */
+    word-wrap: break-word; /* Ensure long numbers wrap */
+    overflow-x: auto; /* Allow horizontal scrolling for very long numbers */
 }
-#calculator-keypad {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
-}
+
 .calculator-btn {
-    background-color: rgba(75, 85, 99, 0.7); /* Slightly lighter gray */
+    background-color: rgba(55, 65, 81, 0.7); /* Dark gray, slightly transparent */
     color: white;
-    padding: 1.25rem;
-    border-radius: 1rem; /* Even more rounded */
-    font-size: 1.6rem; /* Slightly larger font */
-    font-weight: 600;
+    font-size: 1.5rem;
+    border-radius: 10px; /* More rounded buttons */
+    transition: background-color 0.2s ease, transform 0.1s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Subtle shadow */
+    aspect-ratio: 1 / 1; /* Make buttons square */
 }
-.calculator-btn:hover { background-color: rgba(90, 100, 115, 0.8); transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-.calculator-btn:active { background-color: rgba(60, 70, 85, 0.9); transform: translateY(0); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-.calculator-btn.operator { background-color: rgba(139, 92, 246, 0.7); } /* Lighter purple */
-.calculator-btn.operator:hover { background-color: rgba(154, 107, 255, 0.8); }
-.calculator-btn.operator:active { background-color: rgba(114, 77, 219, 0.9); }
-.calculator-btn.equals { background-color: rgba(52, 211, 153, 0.7); } /* Lighter green */
-.calculator-btn.equals:hover { background-color: rgba(67, 226, 168, 0.8); }
-.calculator-btn.equals:active { background-color: rgba(37, 187, 134, 0.9); }
-.calculator-btn.clear { background-color: rgba(248, 113, 113, 0.7); } /* Lighter red */
-.calculator-btn.clear:hover { background-color: rgba(255, 128, 128, 0.8); }
-.calculator-btn.clear:active { background-color: rgba(213, 98, 98, 0.9); }
-.calculator-btn.span-2 { grid-column: span 2; }
 
-/* Task Manager specific styles */
+.calculator-btn:hover {
+    background-color: rgba(75, 85, 99, 0.8);
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.calculator-btn.operator {
+    background-color: rgba(139, 92, 246, 0.8); /* Purple-600 */
+}
+
+.calculator-btn.operator:hover {
+    background-color: rgba(167, 139, 250, 0.9); /* Purple-500 hover */
+}
+
+.calculator-btn.equals {
+    background-color: rgba(234, 88, 12, 0.8); /* Orange-600 */
+}
+
+.calculator-btn.equals:hover {
+    background-color: rgba(251, 146, 60, 0.9); /* Orange-500 hover */
+}
+
+.calculator-btn.clear {
+    background-color: rgba(239, 68, 68, 0.8); /* Red-600 */
+}
+
+.calculator-btn.clear:hover {
+    background-color: rgba(252, 165, 165, 0.9); /* Red-500 hover */
+}
+
+/* Task Manager */
 .process-item {
+    background-color: rgba(45, 55, 72, 0.5); /* Darker item background */
+    padding: 0.75rem;
+    border-radius: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem; /* Rounded corners */
-    background-color: rgba(255,255,255,0.05); /* Very subtle background */
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-.process-item:hover {
-    background-color: rgba(255,255,255,0.15); /* Lighter on hover */
-}
-.process-item.selected {
-    background-color: rgba(147, 51, 234, 0.7); /* Stronger highlight for selected */
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-.process-item span:first-child { /* App Name */
-    font-weight: 500;
-    color: white;
-}
-.process-item span:last-child { /* PID/ID */
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: 1px solid transparent;
 }
 
-/* Sticky Note specific styles */
+.process-item:hover {
+    background-color: rgba(60, 70, 85, 0.6);
+}
+
+.process-item.selected {
+    background-color: rgba(99, 102, 241, 0.7); /* Indigo-500 */
+    border: 1px solid rgba(129, 140, 248, 0.8); /* Lighter border for selection */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Sticky Notes */
 .sticky-note {
-    background-color: #fef08a; /* Light yellow */
-    color: #4a5568; /* Dark gray text */
-    padding: 1.25rem;
-    border-radius: 1.25rem; /* Rounded corners */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    resize: both; /* Allow manual resizing */
-    overflow: auto; /* Scroll if content overflows */
+    position: absolute;
+    background-color: rgba(253, 224, 71, 0.7); /* Yellow-300 with transparency */
+    color: #333;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     min-width: 200px;
     min-height: 200px;
-    max-width: 80vw;
-    max-height: 80vh;
     display: flex;
     flex-direction: column;
-    position: absolute; /* Needed for dragging */
-    z-index: 50; /* Ensure notes are above desktop but below modals/dock */
-    transition: box-shadow 0.2s ease;
+    overflow: hidden;
+    z-index: 40; /* Ensure notes appear above desktop but below active windows */
+    resize: both; /* Allow resizing */
+    overflow: auto; /* Add scrollbars if content overflows */
+    transition: box-shadow 0.2s ease-out;
 }
-.sticky-note:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+
+.sticky-note .title-bar {
+    background-color: rgba(252, 211, 77, 0.8); /* Slightly darker yellow for title bar */
+    color: #333;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    cursor: grab;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
+
+.sticky-note .title-bar .material-symbols-outlined {
+    color: #333;
+    font-size: 1rem;
+}
+
+.sticky-note .title-bar .close-btn-note {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #333;
+}
+.sticky-note .title-bar .close-btn-note:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
 .sticky-note-textarea {
+    flex-grow: 1;
     width: 100%;
-    height: 100%;
+    padding: 0.75rem;
     background-color: transparent;
     border: none;
     outline: none;
-    resize: none;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    color: #4a5568;
-    line-height: 1.5;
-    padding-right: 20px; /* Space for resize handle */
-}
-.sticky-note .title-bar {
-    cursor: grab;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    background-color: rgba(0,0,0,0.05);
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    margin-bottom: 0.5rem;
-    border-radius: 0.75rem;
+    resize: none; /* Disable default textarea resize handle */
+    font-size: 0.9rem;
+    line-height: 1.4;
     color: #333;
+    -webkit-appearance: none; /* Remove default styling on WebKit browsers */
+    -moz-appearance: none;    /* Remove default styling on Mozilla Firefox */
+    appearance: none;
 }
-.sticky-note .title-bar .material-symbols-outlined {
-    font-size: 1.25rem;
-    color: #333;
-}
-.sticky-note .title-bar button {
-    color: #333;
-    transition: color 0.2s ease;
-}
-.sticky-note .title-bar button:hover {
-    color: #ef4444; /* Red for close */
-}
+
 .sticky-note-toolbar {
+    padding: 0.5rem;
+    background-color: rgba(252, 211, 77, 0.8);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
-    margin-top: 0.5rem;
-}
-.sticky-note-toolbar button {
-    background-color: #8b5cf6; /* Purple */
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.75rem;
-    transition: background-color 0.2s ease;
-}
-.sticky-note-toolbar button:hover {
-    background-color: #7c3aed;
-}
-.sticky-note .resize-handle {
-    background: none; /* Hide background on sticky notes */
-    border-top-left-radius: 0;
 }
 
-/* Updater Hub styles */
+.sticky-note-toolbar button {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+    padding: 0.25rem 0.75rem;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.sticky-note-toolbar button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.sticky-note .resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 15px; /* Smaller handle for notes */
+    height: 15px;
+    background: transparent;
+    cursor: nwse-resize;
+    z-index: 10;
+}
+
+
+/* Updater Hub */
 .update-item {
-    background-color: rgba(255,255,255,0.08);
-    padding: 1rem;
-    border-radius: 0.75rem;
-    margin-bottom: 0.75rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    border: 1px solid rgba(255,255,255,0.1);
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: rgba(45, 55, 72, 0.5);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: background-color 0.2s ease;
 }
+
 .update-item.installed {
-    background-color: rgba(52, 211, 153, 0.2); /* Light green for installed */
-    border-color: rgba(52, 211, 153, 0.4);
+    opacity: 0.8; /* Slightly dim installed items */
 }
-.update-item:hover:not(.installed) {
-    background-color: rgba(255,255,255,0.15);
-}
+
 .update-log-entry {
-    padding: 0.5rem;
-    border-bottom: 1px dashed rgba(255,255,255,0.1);
-    font-size: 0.85rem;
-    color: #a0aec0;
+    padding: 0.25rem 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
 }
+
 .update-log-entry:last-child {
     border-bottom: none;
+}
+
+/* Scrollbar Hiding */
+body.hide-scrollbars::-webkit-scrollbar {
+    display: none;
+}
+body.hide-scrollbars {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+/* Individual scrollable elements */
+.hide-scrollbars .overflow-y-auto::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbars .overflow-y-auto {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Power Off Screen Animation */
+#power-off-screen {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+
+#power-off-screen.active {
+    opacity: 1;
+}
+
+#power-off-screen.fade-out {
+    opacity: 0;
+}
+
+/* General Animations */
+.animate-open {
+    animation: fadeInScale 0.3s ease-out forwards;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Text Shadow for Clock */
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #start-menu {
+        max-width: 95%; /* Adjust for smaller screens */
+        bottom: 80px; /* Move up to accommodate dock */
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+
+    #start-menu .flex-grow.grid {
+        grid-template-columns: 1fr; /* Stack columns on small screens */
+    }
+
+    .dock-icon {
+        height: 60px; /* Slightly smaller dock icons */
+        width: 60px;
+    }
+
+    .dock-icon .material-symbols-outlined {
+        font-size: 1.8rem;
+    }
+
+    .window {
+        width: 95% !important; /* Force windows to be almost full width */
+        height: 80vh !important; /* Limit height */
+        left: 2.5% !important; /* Center horizontally */
+        top: 10vh !important; /* Center vertically */
+        transform: none !important; /* Remove any previous transforms */
+    }
+
+    #cpu-monitor-window .flex-grow {
+        flex-direction: column; /* Stack CPU monitor panels */
+    }
+
+    #cpu-monitor-window .w-1/2 {
+        width: 100%; /* Full width for stacked panels */
+    }
+
+    #calculator-window {
+        width: 90% !important;
+        max-width: 350px !important;
+        height: auto !important;
+    }
+
+    #task-manager-window {
+        width: 90% !important;
+        max-width: 400px !important;
+    }
+
+    .sticky-note {
+        width: 90% !important;
+        max-width: 300px;
+        height: auto !important;
+        left: 5% !important; /* Center */
+        top: auto !important;
+        bottom: 20px; /* Stack from bottom for mobile */
+    }
+
+    #desktop-icons-container {
+        grid-template-columns: repeat(3, 1fr); /* More columns for icons on mobile */
+        left: 1rem;
+        top: 1rem;
+        right: 1rem;
+        bottom: 1rem; /* Adjust positioning to fill screen better */
+        overflow-y: auto; /* Allow scrolling if many icons */
+    }
+
+    #clock-container {
+        top: 1rem;
+        right: 1rem;
+    }
+}
+
+/* Ensure images scale correctly */
+img {
+    max-width: 100%;
+    height: auto;
 }
