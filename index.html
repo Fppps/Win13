@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 13 Concept</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body { font-family: 'Inter', sans-serif; user-select: none; color: #e0e0e0; background-color: #1a1a2e; }
+        body.light { color: #1a1a2e; background-color: #e0e0e0; } /* Light mode body colors */
+        .font-mono { font-family: 'monospace'; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        
+        #desktop-container {
+            background-image: url('Assets/Background/dark.png');
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        body.light #desktop-container {
+            background-image: url('Assets/Background/light.png'); /* Light mode background */
+        }
+
+        #login-container {
+            /* Ensure the login container covers the whole screen */
+            background-color: transparent; /* Make it transparent to see the blurred background */
+        }
+
+        #login-background-blur {
+            position: absolute;
+            inset: 0;
+            background-image: url('Assets/Background/dark.png'); /* Same background as desktop */
+            background-size: cover;
+            background-position: center;
+            filter: blur(10px); /* Apply blur effect */
+            transition: filter 0.5s ease-in-out;
+            z-index: -1; /* Ensure it stays behind login content */
+        }
+
+        body.light #login-background-blur {
+            background-image: url('Assets/Background/light.png'); /* Light mode background */
+        }
+
+        .panel {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light .panel {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1a1a2e;
+        }
+
+        body.light .panel input {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-color: rgba(0, 0, 0, 0.3);
+            color: #1a1a2e;
+        }
+        body.light .panel input::placeholder {
+            color: rgba(0, 0, 0, 0.6);
+        }
+        body.light .panel button {
+            background-color: #6d28d9;
+            color: white;
+        }
+        body.light .panel button:hover {
+            background-color: #5b21aa;
+        }
+        body.light .panel p {
+            color: #333;
+        }
+        body.light .panel a {
+            color: #5b21aa;
+        }
+
+        body.light .bg-gray-800\/50 {
+            background-color: rgba(200, 200, 200, 0.5); /* Lighter background for light mode window content */
+        }
+        body.light .bg-black\/80 {
+            background-color: rgba(255, 255, 255, 0.8); /* Lighter background for terminal */
+            color: #1a1a2e; /* Darker text for terminal */
+        }
+        body.light .text-green-400 {
+            color: #1e88e5; /* Different color for terminal prompt in light mode */
+        }
+
+        body.light .top-app-icon {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        body.light .top-app-icon:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes open-animation { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .animate-open { animation: open-animation 0.2s ease-out; }
+
+        .window { transition: opacity 0.2s, transform 0.2s, top 0.2s, left 0.2s, width 0.2s, height 0.2s; min-width: 300px; min-height: 200px; }
+        .title-bar { cursor: move; }
+        
+        .resize-handle { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: se-resize; }
+        .calculator-btn {
+            @apply bg-gray-700/50 hover:bg-gray-600/50 rounded-lg text-2xl font-semibold transition-colors flex items-center justify-center;
+        }
+        body.light .calculator-btn {
+            background-color: rgba(150, 150, 150, 0.5);
+            color: #1a1a2e;
+        }
+        body.light .calculator-btn:hover {
+            background-color: rgba(120, 120, 150, 0.5);
+        }
+        body.light .calculator-btn.operator {
+             background-color: #7c3aed;
+             color: white;
+        }
+        body.light .calculator-btn.operator:hover {
+             background-color: #6d28d9;
+        }
+        body.light #calc-display {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+        }
+
+        /* Code Editor Specific Styles */
+        .code-editor-content {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden; /* Important for scroll sync */
+            background-color: #1e1e1e; /* Dark background for code */
+            color: #d4d4d4; /* Light text for code */
+            font-family: 'monospace';
+            font-size: 0.875rem; /* text-sm */
+        }
+
+        .line-numbers {
+            width: 40px; /* Fixed width for line numbers */
+            padding: 8px 4px;
+            text-align: right;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #252526; /* Slightly lighter than code background */
+            color: #858585; /* Grayed out line numbers */
+            overflow-y: hidden; /* Hide scrollbar for line numbers */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        body.light .line-numbers {
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: #f0f0f0;
+            color: #555;
+        }
+
+
+        #code-editor-textarea {
+            flex-grow: 1;
+            padding: 8px;
+            resize: none;
+            outline: none;
+            border: none;
+            background-color: transparent; /* Textarea background handled by parent */
+            color: inherit; /* Inherit text color from parent */
+            line-height: 1.5; /* Match line height with line numbers */
+            caret-color: #d4d4d4; /* Cursor color */
+            white-space: pre; /* Preserve whitespace for better code display */
+            overflow-y: scroll; /* Allow textarea to scroll */
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <audio id="boot-sound" src="bootup/boot.mp3" preload="auto"></audio>
+    <div id="power-off-screen" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-500"><h2 id="power-off-message" class="text-2xl font-bold text-white mb-6"></h2></div>
+
+    <!-- Login/Register Screen -->
+    <div id="login-container" class="absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div id="login-background-blur"></div>
+        <div id="login-view" class="relative z-10 flex flex-col items-center justify-center p-8 rounded-lg panel">
+            <img src="https://placehold.co/128x128/7c3aed/ffffff?text=U" alt="User Avatar" class="rounded-full w-32 h-32 border-4 border-purple-500 mb-4 mx-auto">
+            <h2 id="current-username-display" class="text-2xl font-bold text-white mb-2 text-center cursor-pointer hover:underline">User</h2>
+            <input id="login-username" type="text" placeholder="Username" class="hidden w-full max-w-xs px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4 text-center">
+            <div class="w-full max-w-xs space-y-4">
+                <input id="login-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <button id="sign-in-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold transition-colors">Sign In</button>
+                <p class="text-center text-sm text-gray-400">No account? <button id="show-create-account-btn" class="text-purple-400 hover:underline">Create one</button></p>
+            </div>
+        </div>
+        <div id="create-account-view" class="hidden relative z-10 flex flex-col items-center justify-center p-8 rounded-lg panel">
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">Create Account</h2>
+            <div class="w-full max-w-xs space-y-4">
+                <input id="create-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <input id="create-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <button id="create-account-btn" class="w-full py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-semibold transition-colors">Create Account</button>
+                <p class="text-center text-sm text-gray-400">Already have an account? <button id="show-login-btn" class="text-purple-400 hover:underline">Sign In</button></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Disclaimer Modal -->
+    <div id="disclaimer-modal" class="hidden absolute inset-0 z-[60] flex items-center justify-center bg-black/50">
+        <div class="panel p-6 rounded-lg shadow-lg max-w-sm text-center animate-open">
+            <h3 class="font-bold text-lg text-white mb-2">Disclaimer</h3>
+            <p class="text-sm text-gray-300 mb-4">The background image is a placeholder. All other elements, logic, and designs are generated by an AI. This is a conceptual demonstration and not a final product.</p>
+            <button id="disclaimer-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold">Got it</button>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal Structure -->
+    <div id="custom-alert-modal" class="custom-modal hidden">
+        <div class="custom-modal-content">
+            <p id="custom-alert-message"></p>
+            <button id="custom-alert-ok-btn">OK</button>
+        </div>
+    </div>
+
+    <!-- Desktop Container -->
+    <div id="desktop-container" class="h-screen w-screen relative flex flex-col">
+        
+        <!-- Top Bar -->
+        <header class="h-20 w-full p-4 flex items-center space-x-4 panel">
+            <span class="text-xl font-bold text-white">Apps</span>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="file-explorer-window" title="File Explorer"><span class="material-symbols-outlined text-yellow-400">folder</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="terminal-window" title="Terminal"><span class="material-symbols-outlined">terminal</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="code-editor-window" title="Code Editor"><span class="material-symbols-outlined text-blue-400">data_object</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="calculator-window" title="Calculator"><span class="material-symbols-outlined text-orange-400">calculate</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="weather-window" title="Weather"><span class="material-symbols-outlined text-cyan-400">cloudy</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="music-window" title="Music"><span class="material-symbols-outlined text-pink-400">music_note</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="settings-window" title="Settings"><span class="material-symbols-outlined">settings</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="support-window" title="Support Lifecycle"><span class="material-symbols-outlined text-red-400">support_agent</span></button>
+            <!-- Dark/Light Mode Toggle Button -->
+            <button id="theme-toggle-btn" class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" title="Toggle Theme">
+                <span class="material-symbols-outlined" id="theme-toggle-icon">light_mode</span>
+            </button>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="flex-grow p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 panel rounded-lg p-6">
+                 <h2 class="text-3xl font-bold text-white mb-4">Version 1.5.0</h2>
+                 <p class="text-gray-300">This update includes a new teaser for what's next in the Windows concept, along with continued improvements to stability and features.</p>
+            </div>
+            <div class="lg:col-span-1 flex flex-col space-y-8">
+                <!-- Windows 14 Teaser Block -->
+                <div class="panel rounded-lg p-6 text-center">
+                    <h3 class="text-xl font-bold text-white mb-4">A Glimpse into the Future: Windows 14 Concept</h3>
+                    <img src="Assets/Windows14/Windows14.png" alt="Windows 14 Concept Teaser" class="w-full h-auto rounded-lg mb-4 object-cover">
+                    <p class="text-sm text-gray-300">This is an early idea for the next generation of Windows, focusing on a more fluid and integrated user experience. More details to come!</p>
+                </div>
+                <div class="panel rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Date</h3>
+                    <p id="sidebar-date" class="text-2xl text-white"></p>
+                </div>
+                 <div class="panel rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Version</h3>
+                    <p class="text-2xl text-white">1.5.0</p>
+                </div>
+                 <div class="panel rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Time</h3>
+                    <p id="sidebar-time" class="text-2xl text-white"></p>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Windows Container (overlays everything) -->
+        <div id="windows-container" class="absolute inset-0 w-full h-full pointer-events-none">
+             <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button></div><div class="flex flex-grow bg-gray-800/50"><div class="w-1/3 p-4 border-r border-white/10 no-scrollbar overflow-y-auto"><h4 class="font-semibold mb-2">System</h4><a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20">About</a><h4 class="font-semibold mb-2 mt-4">Account</h4><a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20">Your Info</a></div><div class="w-2/3 p-4 no-scrollbar overflow-y-auto"><div id="about-content" class="settings-content hidden"><h4 class="font-semibold mb-2">About this PC</h4><div class="space-y-2 text-sm"><div><strong>Device Name:</strong> Win13-Concept</div><div><strong>OS Build:</strong> 1.5.0</div></div></div><div id="account-content" class="settings-content"><h4 class="font-semibold mb-2">Account</h4><div class="flex items-center space-x-4"><img src="https://placehold.co/64x64/7c3aed/ffffff?text=U" class="rounded-full w-16 h-16"><div id="account-username" class="font-semibold">User</div></div></div></div></div><div class="resize-handle"></div></div>
+            <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-yellow-500">folder</span><span id="file-explorer-path">File Explorer</span></div><div class="flex items-center"><button id="new-file-btn" class="p-1 rounded-full hover:bg-white/20" title="New File"><span class="material-symbols-outlined">note_add</span></button><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined">close</span></button></div></div><div id="file-explorer-output" class="p-4 flex-grow overflow-y-auto no-scrollbar grid grid-cols-4 gap-4 content-start bg-gray-800/50"></div><div class="resize-handle"></div></div>
+            <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">close</span></button></div><div id="terminal-output" class="p-4 flex-grow bg-black/80 font-mono text-white text-sm overflow-y-auto no-scrollbar" onclick="document.getElementById('terminal-input')?.focus()"></div><div class="resize-handle"></div></div>
+            <div id="code-editor-window" class="window hidden absolute top-1/4 left-1/4 w-1/2 h-1/2 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
+                <div class="title-bar flex items-center justify-between p-2 border-b border-white/10">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-blue-400">data_object</span>
+                        <span id="code-editor-title">Code Editor</span>
+                    </div>
+                    <div>
+                        <button id="run-code-btn" class="p-1 rounded-full hover:bg-white/20" title="Run Code"><span class="material-symbols-outlined">play_arrow</span></button>
+                        <button id="save-file-btn" class="p-1 rounded-full hover:bg-white/20" title="Save File"><span class="material-symbols-outlined">save</span></button>
+                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="code-editor-window"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                </div>
+                <div class="code-editor-content">
+                    <div class="line-numbers no-scrollbar" id="line-numbers"></div>
+                    <textarea id="code-editor-textarea" class="no-scrollbar" spellcheck="false" wrap="off"></textarea>
+                </div>
+                <div class="resize-handle"></div>
+            </div>
+            <div id="calculator-window" class="window hidden absolute top-1/4 left-1/4 w-80 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-orange-400">calculate</span><span>Calculator</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="calculator-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-4 bg-gray-800/50 flex flex-col space-y-4"><div id="calc-display" class="w-full bg-black/50 rounded-lg p-4 text-right text-4xl font-mono truncate">0</div><div class="grid grid-cols-4 gap-2"><button class="calculator-btn" data-key="clear">C</button><button class="calculator-btn" data-key="backspace">⌫</button><button class="calculator-btn" data-key="%">%</button><button class="calculator-btn operator" data-key="/">÷</button><button class="calculator-btn" data-key="7">7</button><button class="calculator-btn" data-key="8">8</button><button class="calculator-btn" data-key="9">9</button><button class="calculator-btn operator" data-key="*">×</button><button class="calculator-btn" data-key="4">4</button><button class="calculator-btn" data-key="5">5</button><button class="calculator-btn" data-key="6">6</button><button class="calculator-btn operator" data-key="-">−</button><button class="calculator-btn" data-key="1">1</button><button class="calculator-btn" data-key="2">2</button><button class="calculator-btn" data-key="3">3</button><button class="calculator-btn operator" data-key="+">+</button><button class="calculator-btn col-span-2" data-key="0">0</button><button class="calculator-btn" data-key=".">.</button><button class="calculator-btn operator" data-key="=">=</button></div></div></div>
+            <div id="weather-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-cyan-400">cloudy</span><span>Weather</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="weather-window"><span class="material-symbols-outlined">close</span></button></div><div id="weather-content" class="p-6 bg-gray-800/50 text-center flex flex-col items-center justify-center h-48"><p>Loading weather...</p></div></div>
+            <div id="music-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-pink-400">music_note</span><span>Music</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="music-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 flex flex-col items-center"><p class="font-semibold">Cyberpunk Dreams</p><p class="text-sm text-gray-400">Synthwave AI</p><div class="w-full h-2 bg-gray-600 rounded-full my-4"><div class="h-2 bg-pink-400 rounded-full w-1/2"></div></div><div class="flex items-center space-x-6 text-4xl"><span class="material-symbols-outlined">skip_previous</span><span class="material-symbols-outlined text-5xl">pause_circle</span><span class="material-symbols-outlined">skip_next</span></div></div></div>
+            <div id="support-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-md h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-red-400">support_agent</span><span>Support Lifecycle</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="support-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 text-center"><h4 class="text-lg font-bold">End of Support for Windows 13</h4><p class="text-sm text-gray-400">October 26, 2027</p><div id="support-countdown" class="mt-4 text-2xl font-mono"></div></div></div>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- VFS & State ---
+        let vfs = { 'C:': { Users: { You: { Desktop: { 'welcome.txt': 'Welcome to Windows 13!' }, Documents: {} } } } };
+        let currentPath = "C:/Users/You/Desktop";
+        // --- Simulated Python Environment ---
+        const installedPythonPackages = new Set();
+        
+        // --- DOM Elements ---
+        const loginContainer = document.getElementById('login-container');
+        const desktopContainer = document.getElementById('desktop-container');
+        const disclaimerModal = document.getElementById('disclaimer-modal');
+        const fileExplorerOutput = document.getElementById('file-explorer-output');
+        const fileExplorerPathEl = document.getElementById('file-explorer-path');
+        const terminalOutput = document.getElementById('terminal-output');
+        const sidebarTime = document.getElementById('sidebar-time');
+        const sidebarDate = document.getElementById('sidebar-date');
+        const codeEditorTextarea = document.getElementById('code-editor-textarea');
+        const codeEditorTitle = document.getElementById('code-editor-title');
+        const supportCountdownEl = document.getElementById('support-countdown');
+        const currentUsernameDisplay = document.getElementById('current-username-display');
+        const loginUsernameInput = document.getElementById('login-username');
+        const customAlertModal = document.getElementById('custom-alert-modal');
+        const customAlertMessage = document.getElementById('custom-alert-message');
+        const customAlertOkBtn = document.getElementById('custom-alert-ok-btn');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+        const body = document.body;
+        const lineNumbersElement = document.getElementById('line-numbers');
+        const runCodeBtn = document.getElementById('run-code-btn');
+
+
+        // Custom Alert function
+        const showAlert = (message) => {
+            customAlertMessage.textContent = message;
+            customAlertModal.classList.remove('hidden');
+        };
+
+        customAlertOkBtn.addEventListener('click', () => {
+            customAlertModal.classList.add('hidden');
+        });
+
+        // --- Theme Management ---
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                desktopContainer.style.backgroundImage = "url('Assets/Background/dark.png')";
+                document.getElementById('login-background-blur').style.backgroundImage = "url('Assets/Background/dark.png')";
+                themeToggleIcon.textContent = 'light_mode'; // Icon for dark mode
+                localStorage.setItem('win13_theme', 'dark');
+            } else {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                desktopContainer.style.backgroundImage = "url('Assets/Background/light.png')";
+                document.getElementById('login-background-blur').style.backgroundImage = "url('Assets/Background/light.png')";
+                themeToggleIcon.textContent = 'dark_mode'; // Icon for light mode
+                localStorage.setItem('win13_theme', 'light');
+            }
+        };
+
+        // Load theme from localStorage or default to dark
+        const savedTheme = localStorage.getItem('win13_theme') || 'dark';
+        applyTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = body.classList.contains('dark') ? 'dark' : 'light';
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+        
+        // --- Account & Login ---
+        let currentLoggedInUser = ''; // To store the logged-in username
+
+        // Initialize username display based on last logged-in user or default
+        const lastUser = localStorage.getItem('win13_last_user');
+        if (lastUser) {
+            currentUsernameDisplay.textContent = lastUser;
+            loginUsernameInput.value = lastUser;
+        }
+
+        // Toggle username display and input
+        currentUsernameDisplay.addEventListener('click', () => {
+            currentUsernameDisplay.classList.add('hidden');
+            loginUsernameInput.classList.remove('hidden');
+            loginUsernameInput.focus();
+        });
+
+        loginUsernameInput.addEventListener('blur', () => {
+            if (loginUsernameInput.value === '') {
+                // If input is empty, revert to default display
+                currentUsernameDisplay.textContent = 'User';
+                loginUsernameInput.value = ''; // Clear input value
+            } else {
+                currentUsernameDisplay.textContent = loginUsernameInput.value;
+            }
+            currentUsernameDisplay.classList.remove('hidden');
+            loginUsernameInput.classList.add('hidden');
+        });
+
+        document.getElementById('show-create-account-btn').addEventListener('click', () => { 
+            document.getElementById('login-view').classList.add('hidden'); 
+            document.getElementById('create-account-view').classList.remove('hidden'); 
+        });
+
+        document.getElementById('show-login-btn').addEventListener('click', () => { 
+            document.getElementById('create-account-view').classList.add('hidden'); 
+            document.getElementById('login-view').classList.remove('hidden'); 
+        });
+
+        document.getElementById('create-account-btn').addEventListener('click', () => {
+            const user = document.getElementById('create-username').value;
+            const pass = document.getElementById('create-password').value;
+            console.log("Attempting to create account:", user);
+            if (user && pass) { 
+                localStorage.setItem(`win13_account_${user}`, pass); 
+                console.log(`Account '${user}' created with password: ${pass}`);
+                showAlert('Account created successfully!'); 
+                // Update the displayed username immediately after creating an account
+                currentUsernameDisplay.textContent = user;
+                loginUsernameInput.value = user;
+                document.getElementById('show-login-btn').click(); 
+            } else { 
+                showAlert('Please enter a username and password.'); 
+                console.log("Account creation failed: Missing username or password.");
+            }
+        });
+
+        document.getElementById('sign-in-btn').addEventListener('click', () => {
+            const user = loginUsernameInput.value;
+            const pass = document.getElementById('login-password').value;
+            console.log("Attempting to sign in with user:", user, "and password:", pass);
+            const storedPass = localStorage.getItem(`win13_account_${user}`);
+            console.log("Stored password for user:", user, "is:", storedPass);
+
+            if (storedPass && pass === storedPass) {
+                currentLoggedInUser = user; // Set the logged-in user
+                localStorage.setItem('win13_last_user', user); // Store last logged-in user
+                document.getElementById('account-username').textContent = user;
+                document.getElementById('boot-sound').play().catch(e => {});
+                
+                loginContainer.style.opacity = '0';
+                document.getElementById('login-background-blur').style.filter = 'blur(0px)'; // Remove blur on desktop
+
+                setTimeout(() => {
+                    loginContainer.classList.add('hidden');
+                    desktopContainer.style.opacity = '1';
+                    fetchWeather();
+                    if (!localStorage.getItem('win13_disclaimer_seen')) { disclaimerModal.classList.remove('hidden'); }
+                }, 500);
+            } else { 
+                showAlert('Invalid credentials. Please check your username and password, or create an account.'); 
+                console.log("Login failed: Invalid credentials.");
+            }
+        });
+
+        document.getElementById('disclaimer-ok-btn').addEventListener('click', () => {
+            disclaimerModal.classList.add('hidden');
+            localStorage.setItem('win13_disclaimer_seen', 'true');
+        });
+
+        // --- Weather Logic ---
+        const fetchWeather = async () => {
+            const apiKey = ""; // Use a real API key for production
+            const city = "Louisville";
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
+            const weatherContentEl = document.getElementById('weather-content');
+            
+            // This is a fallback since we cannot use a real API key here.
+            const displayMockWeather = () => {
+                 const weather = { temp: 75, description: "Clear", icon: "sunny" };
+                 weatherContentEl.innerHTML = `
+                    <span class="material-symbols-outlined text-9xl text-yellow-300">${weather.icon}</span>
+                    <p class="text-5xl font-bold">${Math.round(weather.temp)}°F</p>
+                    <p class="text-lg">${weather.description}</p>`;
+            }
+
+            try {
+                if(!apiKey) {
+                    displayMockWeather();
+                    return;
+                }
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Weather data not available.');
+                const data = await response.json();
+                
+                let icon = 'cloudy';
+                if (data.weather[0].main.includes('Clear')) icon = 'sunny';
+                if (data.weather[0].main.includes('Rain')) icon = 'rainy';
+                if (data.weather[0].main.includes('Thunderstorm')) icon = 'thunderstorm';
+
+                weatherContentEl.innerHTML = `
+                    <span class="material-symbols-outlined text-9xl text-yellow-300">${icon}</span>
+                    <p class="text-5xl font-bold">${Math.round(data.main.temp)}°F</p>
+                    <p class="text-lg">${data.weather[0].description}</p>`;
+
+            } catch (error) {
+                console.error(error);
+                weatherContentEl.innerHTML = `<p>Could not fetch weather data.</p>`;
+                 displayMockWeather(); // Display mock data on error
+            }
+        };
+
+        // --- Date, Clock & Countdown ---
+        const updateClock = () => {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            sidebarTime.textContent = `${String(hours % 12 || 12)}:${minutes} ${ampm}`;
+            sidebarDate.textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        };
+        const updateCountdown = () => {
+            const endDate = new Date('October 26, 2027 00:00:00');
+            const now = new Date();
+            const diff = endDate - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            if(supportCountdownEl) {
+                supportCountdownEl.textContent = `${days}d ${hours}h ${minutes}m`;
+            }
+        };
+        setInterval(updateClock, 1000);
+        setInterval(updateCountdown, 1000 * 60);
+        updateClock();
+        updateCountdown();
+
+        // --- Calculator Logic ---
+        const calcDisplay = document.getElementById('calc-display');
+        let firstValue = '';
+        let operator = '';
+        let shouldResetDisplay = false;
+        
+        document.querySelectorAll('.calculator-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const key = e.target.dataset.key;
+                const isOperator = e.target.classList.contains('operator');
+                
+                if(!isNaN(key) || key === '.') {
+                    if (shouldResetDisplay) { calcDisplay.textContent = ''; shouldResetDisplay = false; }
+                    calcDisplay.textContent = calcDisplay.textContent === '0' ? key : calcDisplay.textContent + key;
+                } else if(isOperator && key !== '=') {
+                    firstValue = calcDisplay.textContent;
+                    operator = key;
+                    shouldResetDisplay = true;
+                } else if (key === '=') {
+                    if(operator && firstValue) {
+                        const result = eval(`${parseFloat(firstValue)} ${operator} ${parseFloat(calcDisplay.textContent)}`);
+                        calcDisplay.textContent = result;
+                        firstValue = ''; operator = ''; shouldResetDisplay = true;
+                    }
+                } else if (key === 'clear') {
+                    calcDisplay.textContent = '0'; firstValue = ''; operator = '';
+                } else if (key === 'backspace') {
+                    calcDisplay.textContent = calcDisplay.textContent.slice(0, -1) || '0';
+                }
+            });
+        });
+        
+        // --- File System & Explorer ---
+        const getObjectFromPath = (path) => path.split('/').filter(p => p).reduce((o, k) => o && o[k] ? o[k] : null, vfs);
+        const renderFileExplorer = () => {
+            fileExplorerOutput.innerHTML = '';
+            fileExplorerPathEl.textContent = currentPath;
+            const currentDir = getObjectFromPath(currentPath);
+            if (!currentDir) { console.error("Could not find path:", currentPath); return; }
+            if (currentPath !== 'C:') {
+                const upIcon = document.createElement('div');
+                upIcon.className = 'flex flex-col items-center p-2 rounded-lg hover:bg-white/20 cursor-pointer';
+                upIcon.innerHTML = `<span class="material-symbols-outlined text-5xl text-yellow-500">subdirectory_arrow_left</span><span class="text-xs text-center truncate w-full">..</span>`;
+                upIcon.addEventListener('dblclick', () => {
+                    let parts = currentPath.split('/').filter(p => p); parts.pop();
+                    currentPath = parts.length > 0 ? parts.join('/') : 'C:';
+                    renderFileExplorer();
+                });
+                fileExplorerOutput.appendChild(upIcon);
+            }
+            Object.keys(currentDir).forEach(key => {
+                const isDir = typeof currentDir[key] === 'object' && currentDir[key] !== null;
+                const icon = document.createElement('div');
+                icon.className = 'flex flex-col items-center p-2 rounded-lg hover:bg-white/20 cursor-pointer';
+                icon.innerHTML = `<span class="material-symbols-outlined text-5xl ${isDir ? 'text-yellow-500' : 'text-gray-300'}">${isDir ? 'folder' : 'draft'}</span><span class="text-xs text-center truncate w-full">${key}</span>`;
+                icon.addEventListener('dblclick', () => handleFileExplorerClick(key, isDir));
+                fileExplorerOutput.appendChild(icon);
+            });
+        };
+        const handleFileExplorerClick = (name, isDir) => {
+            if (isDir) {
+                currentPath = `${currentPath}/${name}`.replace('//', '/'); renderFileExplorer();
+            } else {
+                const fileContent = getObjectFromPath(currentPath)[name];
+                openWindow('code-editor-window');
+                codeEditorTextarea.value = fileContent; 
+                codeEditorTitle.textContent = name;
+                codeEditorTextarea.dataset.filePath = `${currentPath}/${name}`.replace('//', '/');
+                updateLineNumbers(); // Update line numbers when a file is opened
+            }
+        };
+        document.getElementById('save-file-btn').addEventListener('click', () => {
+            const path = codeEditorTextarea.dataset.filePath;
+            if (!path) return;
+            const parts = path.split('/'); const fileName = parts.pop();
+            const dir = getObjectFromPath(parts.join('/'));
+            if(dir) { 
+                dir[fileName] = codeEditorTextarea.value; 
+                showAlert(`File "${fileName}" saved successfully!`);
+            } else {
+                showAlert(`Error: Could not save file "${fileName}".`);
+            }
+        });
+        document.getElementById('new-file-btn').addEventListener('click', () => {
+            showAlert("Enter file name:", "new_file.txt"); // Using custom alert for now
+            // To implement this fully, a custom prompt modal would be needed.
+            // For now, this will simply show the alert without prompting for input.
+            // Example:
+            // showCustomPrompt("Enter file name:", "new_file.txt", (fileName) => {
+            //     if (fileName) { const currentDir = getObjectFromPath(currentPath); if (currentDir) { currentDir[fileName] = ''; renderFileExplorer(); } }
+            // });
+        });
+
+        // --- Terminal ---
+        const processCommand = (cmd) => {
+            const [command, ...args] = cmd.trim().split(' '); if (!command) return;
+            const append = (text) => appendTerminalOutput(text);
+            switch (command.toLowerCase()) {
+                case 'ls':
+                    const dirContent = getObjectFromPath(currentPath);
+                    if (dirContent) append(Object.keys(dirContent).join('  ')); else append('Error: Invalid path');
+                    break;
+                case 'cd':
+                    let newPath = args[0]; if (!newPath) { append('Usage: cd [path]'); break; }
+                    if (newPath === '..') {
+                        let parts = currentPath.split('/').filter(p => p);
+                        if (parts.length > 1) { currentPath = parts.slice(0, -1).join('/'); } 
+                        else { currentPath = 'C:'; }
+                    } else {
+                        const targetPath = `${currentPath}/${newPath}`.replace('//', '/');
+                        if (getObjectFromPath(targetPath) && typeof getObjectFromPath(targetPath) === 'object') { 
+                            currentPath = targetPath; 
+                        } else { 
+                            append(`Error: Directory not found: ${newPath}`); 
+                        }
+                    }
+                    renderFileExplorer();
+                    break;
+                case 'mkdir':
+                    if (!args[0]) { append("Usage: mkdir [directory_name]"); break; }
+                    const currentDir = getObjectFromPath(currentPath);
+                    if (currentDir && typeof currentDir === 'object') { 
+                        if (!currentDir[args[0]]) {
+                            currentDir[args[0]] = {}; 
+                            append(`Directory '${args[0]}' created.`); 
+                            renderFileExplorer(); 
+                        } else {
+                            append(`Error: Directory '${args[0]}' already exists.`);
+                        }
+                    } else { append(`Error: Path not found.`); }
+                    break;
+                case 'rm': // Simulated remove command for files
+                    if (!args[0]) { append("Usage: rm [file_name]"); break; }
+                    const parentDirParts = currentPath.split('/').filter(p => p);
+                    const parentDir = getObjectFromPath(parentDirParts.join('/'));
+                    if (parentDir && parentDir[args[0]] !== undefined && typeof parentDir[args[0]] !== 'object') {
+                        delete parentDir[args[0]];
+                        append(`File '${args[0]}' removed.`);
+                        renderFileExplorer();
+                    } else {
+                        append(`Error: File '${args[0]}' not found or is a directory.`);
+                    }
+                    break;
+                case 'help':
+                    append("Available commands:");
+                    append("  ls - List contents of current directory");
+                    append("  cd [path] - Change directory (use '..' to go up)");
+                    append("  mkdir [name] - Create a new directory");
+                    append("  rm [file_name] - Remove a file");
+                    append("  pip install [package] - Simulate installing a Python package");
+                    append("  pip list - List simulated installed Python packages");
+                    append("  restart - Restart the OS simulation");
+                    break;
+                case 'pip':
+                    if (args[0] === 'install') {
+                        const packageName = args[1];
+                        if (packageName) {
+                            if (!installedPythonPackages.has(packageName)) {
+                                installedPythonPackages.add(packageName);
+                                append(`Successfully installed package '${packageName}'.`);
+                            } else {
+                                append(`Package '${packageName}' is already installed.`);
+                            }
+                        } else {
+                            append('Usage: pip install [package_name]');
+                        }
+                    } else if (args[0] === 'list') {
+                        if (installedPythonPackages.size > 0) {
+                            append('Simulated Installed Python Packages:');
+                            installedPythonPackages.forEach(pkg => append(`- ${pkg}`));
+                        } else {
+                            append('No Python packages installed yet.');
+                        }
+                    } else {
+                        append('Usage: pip [install|list]');
+                    }
+                    break;
+                case 'restart': append('Restarting...'); setTimeout(() => window.location.reload(), 1000); break;
+                default: append(`'${command}' is not recognized. Type 'help' for available commands.`);
+            }
+        };
+        const createPrompt = () => {
+            const promptContainer = document.createElement('div');
+            promptContainer.className = 'flex';
+            promptContainer.innerHTML = `<span class="text-green-400">${currentPath}>&nbsp;</span><input type="text" id="terminal-input" class="flex-grow bg-transparent border-none outline-none font-mono text-white">`;
+            terminalOutput.appendChild(promptContainer);
+            const input = document.getElementById('terminal-input');
+            input.focus();
+            input.addEventListener('keydown', (e) => { if(e.key === 'Enter') handleTerminalInput(e); });
+        };
+        const handleTerminalInput = (e) => {
+            const input = e.target; const cmd = input.value;
+            input.parentElement.remove();
+            appendTerminalOutput(`<span class="text-green-400">${currentPath}>&nbsp;</span>${cmd}`);
+            processCommand(cmd);
+            createPrompt();
+        };
+        const appendTerminalOutput = (text) => { terminalOutput.innerHTML += `<div>${text.replace(/\n/g, '<br>')}</div>`; terminalOutput.scrollTop = terminalOutput.scrollHeight; };
+
+        // --- Code Editor Functionality ---
+        const updateLineNumbers = () => {
+            const lines = codeEditorTextarea.value.split('\n');
+            const lineCount = lines.length;
+            let numbersHtml = '';
+            for (let i = 1; i <= lineCount; i++) {
+                numbersHtml += `<div>${i}</div>`;
+            }
+            lineNumbersElement.innerHTML = numbersHtml;
+            // Ensure line numbers scroll with the textarea
+            lineNumbersElement.scrollTop = codeEditorTextarea.scrollTop;
+        };
+
+        codeEditorTextarea.addEventListener('input', updateLineNumbers);
+        codeEditorTextarea.addEventListener('scroll', () => {
+            lineNumbersElement.scrollTop = codeEditorTextarea.scrollTop;
+        });
+
+        // Initial update of line numbers when the editor is opened
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    if (!codeEditorTextarea.closest('.window').classList.contains('hidden')) {
+                        updateLineNumbers();
+                    }
+                }
+            }
+        });
+        // Observe the code editor window for class changes (like hidden/shown)
+        observer.observe(document.getElementById('code-editor-window'), { attributes: true });
+
+
+        // Simulate running Python code
+        runCodeBtn.addEventListener('click', () => {
+            const code = codeEditorTextarea.value;
+            appendTerminalOutput(`Running code from ${codeEditorTitle.textContent}:`);
+            
+            // Very basic simulation of Python print statements
+            const printRegex = /print\s*\(([^)]*)\)/g;
+            let match;
+            let hasOutput = false;
+
+            // Redirect console.log within the eval context
+            const originalConsoleLog = console.log;
+            let capturedOutput = '';
+            console.log = (...args) => {
+                capturedOutput += args.map(String).join(' ') + '\n';
+            };
+
+            try {
+                // Use Function constructor for isolated scope, similar to eval but safer than direct eval in global scope.
+                // Note: This is still not a true sandbox and can have security implications with untrusted code.
+                new Function('print', 'variables', code)(
+                    // Mock print function
+                    (message) => { appendTerminalOutput(`Output: ${message}`); hasOutput = true; },
+                    // Pass variables object for simple assignment tracking
+                    {} // Variables are just for conceptual display, not actual manipulation within simulated Python
+                );
+            } catch (e) {
+                appendTerminalOutput(`Error: ${e.message}`);
+                hasOutput = true;
+            } finally {
+                // Restore original console.log
+                console.log = originalConsoleLog;
+                if (capturedOutput) {
+                    appendTerminalOutput(`Console Output:\n${capturedOutput.trim()}`);
+                    hasOutput = true;
+                }
+            }
+
+            // Fallback for simple patterns if Function execution didn't produce output
+            if (!hasOutput) {
+                while ((match = printRegex.exec(code)) !== null) {
+                    let content = match[1].trim();
+                    // Remove quotes from string literals
+                    if (content.startsWith("'") && content.endsWith("'")) {
+                        content = content.slice(1, -1);
+                    } else if (content.startsWith('"') && content.endsWith('"')) {
+                        content = content.slice(1, -1);
+                    }
+                    appendTerminalOutput(`Output: ${content}`);
+                    hasOutput = true;
+                }
+
+                // Simulate simple variable assignments and arithmetic
+                const varAssignmentRegex = /(\w+)\s*=\s*([\s\S]*?)(?=\n|$)/g;
+                const variables = {}; // Reset variables for this simulation pass
+                while ((match = varAssignmentRegex.exec(code)) !== null) {
+                    const varName = match[1];
+                    let varValueString = match[2].trim();
+                    let varValue;
+
+                    try {
+                        // Attempt to evaluate as JSON, number, or boolean
+                        varValue = JSON.parse(varValueString);
+                    } catch (e) {
+                        // If not JSON, check for numbers, then string or reference to existing var
+                        if (!isNaN(parseFloat(varValueString)) && isFinite(varValueString)) {
+                            varValue = parseFloat(varValueString);
+                        } else if (variables[varValueString] !== undefined) {
+                            varValue = variables[varValueString];
+                        } else {
+                            // Default to string, remove quotes if present
+                            varValue = varValueString.replace(/^['"]|['"]$/g, '');
+                        }
+                    }
+                    variables[varName] = varValue;
+                    appendTerminalOutput(`Variable '${varName}' set to: ${variables[varName]}`);
+                    hasOutput = true;
+                }
+            }
+
+
+            if (!hasOutput) {
+                appendTerminalOutput('No discernible output or operations found.');
+            }
+            appendTerminalOutput('Code execution simulated.');
+        });
+
+
+        // --- Window Management ---
+        let activeWindow = null, actionType = null, startX, startY, startW, startH, startLeft, startTop;
+        const startAction = (e, windowEl, currentAction) => {
+            actionType = currentAction; activeWindow = windowEl;
+            document.querySelectorAll('.window').forEach(w => w.style.zIndex = '40');
+            activeWindow.style.zIndex = '45';
+            const event = e.type === 'touchstart' ? e.touches[0] : e;
+            startX = event.clientX; startY = event.clientY;
+            startW = parseInt(document.defaultView.getComputedStyle(activeWindow).width, 10);
+            startH = parseInt(document.defaultView.getComputedStyle(activeWindow).height, 10);
+            startLeft = activeWindow.offsetLeft; startTop = activeWindow.offsetTop;
+            document.addEventListener('mousemove', doAction); document.addEventListener('mouseup', endAction);
+            document.addEventListener('touchmove', doAction, { passive: false }); document.addEventListener('touchend', endAction);
+        };
+        const doAction = (e) => {
+            if (!activeWindow) return; e.preventDefault();
+            const event = e.type === 'touchmove' ? e.touches[0] : e;
+            const dx = event.clientX - startX; const dy = event.clientY - startY;
+            if (actionType === 'drag') {
+                activeWindow.style.left = `${startLeft + dx}px`;
+                activeWindow.style.top = `${startTop + dy}px`;
+            } else if (actionType === 'resize') {
+                activeWindow.style.width = `${startW + dx}px`;
+                activeWindow.style.height = `${startH + dy}px`;
+            }
+        };
+        const endAction = () => {
+            activeWindow = null; actionType = null;
+            document.removeEventListener('mousemove', doAction); document.removeEventListener('mouseup', endAction);
+            document.removeEventListener('touchmove', doAction); document.removeEventListener('touchend', endAction);
+        };
+        document.querySelectorAll('.window').forEach(win => {
+            const titleBar = win.querySelector('.title-bar');
+            const resizeHandle = win.querySelector('.resize-handle');
+            if (titleBar) { titleBar.addEventListener('mousedown', e => startAction(e, win, 'drag')); titleBar.addEventListener('touchstart', e => startAction(e, win, 'drag')); }
+            if (resizeHandle) { resizeHandle.addEventListener('mousedown', e => startAction(e, win, 'resize')); resizeHandle.addEventListener('touchstart', e => startAction(e, win, 'resize')); }
+        });
+        
+        // --- Init & Other Listeners ---
+        const openWindow = (windowId) => {
+            const windowEl = document.getElementById(windowId);
+            if(windowEl) windowEl.classList.remove('hidden');
+            if(windowId === 'terminal-window' && !terminalOutput.hasChildNodes()) createPrompt();
+            if(windowId === 'file-explorer-window') renderFileExplorer();
+            if(windowId === 'code-editor-window') {
+                // Ensure line numbers are updated when code editor is opened
+                updateLineNumbers();
+            }
+        };
+        document.querySelectorAll('[data-window]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); openWindow(btn.getAttribute('data-window')); }));
+        document.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); document.getElementById(btn.getAttribute('data-window')).classList.add('hidden'); }));
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const settingsContents = document.querySelectorAll('.settings-content');
+        settingsTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                settingsTabs.forEach(t => t.classList.remove('bg-white/20'));
+                tab.classList.add('bg-white/20');
+                settingsContents.forEach(content => content.classList.add('hidden'));
+                const targetId = tab.getAttribute('href').substring(1) + '-content';
+                document.getElementById(targetId).classList.remove('hidden');
+            });
+        });
+        document.querySelector('.settings-tab[href="#about"]')?.click();
+    });
+    </script>
+</body>
+</html>
