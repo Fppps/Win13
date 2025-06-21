@@ -13,9 +13,27 @@
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
         
         #desktop-container {
-            background-image: radial-gradient(circle at top left, rgba(23, 42, 70, 0.8), transparent 40%), radial-gradient(circle at bottom right, rgba(67, 56, 202, 0.5), transparent 50%);
+            background-image: url('Assets/Background/dark.png');
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        #login-container {
+            /* Ensure the login container covers the whole screen */
+            background-color: transparent; /* Make it transparent to see the blurred background */
+        }
+
+        #login-background-blur {
+            position: absolute;
+            inset: 0;
+            background-image: url('Assets/Background/dark.png'); /* Same background as desktop */
+            background-size: cover;
+            background-position: center;
+            filter: blur(10px); /* Apply blur effect */
+            transition: filter 0.5s ease-in-out;
+            z-index: -1; /* Ensure it stays behind login content */
         }
 
         .panel {
@@ -38,6 +56,41 @@
         .calculator-btn {
             @apply bg-gray-700/50 hover:bg-gray-600/50 rounded-lg text-2xl font-semibold transition-colors flex items-center justify-center;
         }
+
+        /* Custom Modal Styling */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .custom-modal-content {
+            background-color: #2a2a3e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            color: #e0e0e0;
+            max-width: 300px;
+        }
+        .custom-modal-content button {
+            background-color: #7c3aed;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .custom-modal-content button:hover {
+            background-color: #6d28d9;
+        }
     </style>
 </head>
 <body class="overflow-hidden">
@@ -46,15 +99,26 @@
     <div id="power-off-screen" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-500"><h2 id="power-off-message" class="text-2xl font-bold text-white mb-6"></h2></div>
 
     <!-- Login/Register Screen -->
-    <div id="login-container" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-900 transition-opacity duration-500">
-        <div id="login-view">
+    <div id="login-container" class="absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div id="login-background-blur"></div>
+        <div id="login-view" class="relative z-10 flex flex-col items-center justify-center p-8 rounded-lg panel">
             <img src="https://placehold.co/128x128/7c3aed/ffffff?text=U" alt="User Avatar" class="rounded-full w-32 h-32 border-4 border-purple-500 mb-4 mx-auto">
-            <h2 class="text-2xl font-bold text-white mb-6 text-center">Welcome Back</h2>
-            <div class="w-full max-w-xs space-y-4"><input id="login-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><input id="login-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><button id="sign-in-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold transition-colors">Sign In</button><p class="text-center text-sm text-gray-400">No account? <button id="show-create-account-btn" class="text-purple-400 hover:underline">Create one</button></p></div>
+            <h2 id="current-username-display" class="text-2xl font-bold text-white mb-2 text-center cursor-pointer hover:underline">User</h2>
+            <input id="login-username" type="text" placeholder="Username" class="hidden w-full max-w-xs px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4 text-center">
+            <div class="w-full max-w-xs space-y-4">
+                <input id="login-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <button id="sign-in-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold transition-colors">Sign In</button>
+                <p class="text-center text-sm text-gray-400">No account? <button id="show-create-account-btn" class="text-purple-400 hover:underline">Create one</button></p>
+            </div>
         </div>
-        <div id="create-account-view" class="hidden">
+        <div id="create-account-view" class="hidden relative z-10 flex flex-col items-center justify-center p-8 rounded-lg panel">
             <h2 class="text-2xl font-bold text-white mb-6 text-center">Create Account</h2>
-            <div class="w-full max-w-xs space-y-4"><input id="create-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><input id="create-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><button id="create-account-btn" class="w-full py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-semibold transition-colors">Create Account</button><p class="text-center text-sm text-gray-400">Already have an account? <button id="show-login-btn" class="text-purple-400 hover:underline">Sign In</button></p></div>
+            <div class="w-full max-w-xs space-y-4">
+                <input id="create-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <input id="create-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <button id="create-account-btn" class="w-full py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-semibold transition-colors">Create Account</button>
+                <p class="text-center text-sm text-gray-400">Already have an account? <button id="show-login-btn" class="text-purple-400 hover:underline">Sign In</button></p>
+            </div>
         </div>
     </div>
     
@@ -64,6 +128,14 @@
             <h3 class="font-bold text-lg text-white mb-2">Disclaimer</h3>
             <p class="text-sm text-gray-300 mb-4">The background image is a placeholder. All other elements, logic, and designs are generated by an AI. This is a conceptual demonstration and not a final product.</p>
             <button id="disclaimer-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold">Got it</button>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal Structure -->
+    <div id="custom-alert-modal" class="custom-modal hidden">
+        <div class="custom-modal-content">
+            <p id="custom-alert-message"></p>
+            <button id="custom-alert-ok-btn">OK</button>
         </div>
     </div>
 
@@ -86,8 +158,8 @@
         <!-- Main Content Grid -->
         <main class="flex-grow p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 panel rounded-lg p-6">
-                 <h2 class="text-3xl font-bold text-white mb-4">Version 1.0.9</h2>
-                 <p class="text-gray-300">This update adds the Weather, Music, and Support Lifecycle apps. The system font has also been unified to 'Inter' for a cleaner UI experience.</p>
+                 <h2 class="text-3xl font-bold text-white mb-4">Version 1.2.1</h2>
+                 <p class="text-gray-300">This mini-update fixes a login issue and ensures the displayed username updates immediately upon account creation. Enjoy a smoother experience!</p>
             </div>
             <div class="lg:col-span-1 flex flex-col space-y-8">
                 <div class="panel rounded-lg p-4 text-center">
@@ -96,7 +168,7 @@
                 </div>
                  <div class="panel rounded-lg p-4 text-center">
                     <h3 class="text-lg font-semibold text-gray-400 mb-2">Version</h3>
-                    <p class="text-2xl text-white">1.0.9</p>
+                    <p class="text-2xl text-white">1.2.1</p>
                 </div>
                  <div class="panel rounded-lg p-4 text-center">
                     <h3 class="text-lg font-semibold text-gray-400 mb-2">Time</h3>
@@ -107,12 +179,12 @@
         
         <!-- Windows Container (overlays everything) -->
         <div id="windows-container" class="absolute inset-0 w-full h-full pointer-events-none">
-             <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button></div><div class="flex flex-grow bg-gray-800/50"><div class="w-1/3 p-4 border-r border-white/10 no-scrollbar overflow-y-auto"><h4 class="font-semibold mb-2">System</h4><a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20">About</a><h4 class="font-semibold mb-2 mt-4">Account</h4><a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20">Your Info</a></div><div class="w-2/3 p-4 no-scrollbar overflow-y-auto"><div id="about-content" class="settings-content hidden"><h4 class="font-semibold mb-2">About this PC</h4><div class="space-y-2 text-sm"><div><strong>Device Name:</strong> Win13-Concept</div><div><strong>OS Build:</strong> 1.0.9</div></div></div><div id="account-content" class="settings-content"><h4 class="font-semibold mb-2">Account</h4><div class="flex items-center space-x-4"><img src="https://placehold.co/64x64/7c3aed/ffffff?text=U" class="rounded-full w-16 h-16"><div id="account-username" class="font-semibold">User</div></div></div></div></div><div class="resize-handle"></div></div>
+             <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button></div><div class="flex flex-grow bg-gray-800/50"><div class="w-1/3 p-4 border-r border-white/10 no-scrollbar overflow-y-auto"><h4 class="font-semibold mb-2">System</h4><a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20">About</a><h4 class="font-semibold mb-2 mt-4">Account</h4><a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20">Your Info</a></div><div class="w-2/3 p-4 no-scrollbar overflow-y-auto"><div id="about-content" class="settings-content hidden"><h4 class="font-semibold mb-2">About this PC</h4><div class="space-y-2 text-sm"><div><strong>Device Name:</strong> Win13-Concept</div><div><strong>OS Build:</strong> 1.2.1</div></div></div><div id="account-content" class="settings-content"><h4 class="font-semibold mb-2">Account</h4><div class="flex items-center space-x-4"><img src="https://placehold.co/64x64/7c3aed/ffffff?text=U" class="rounded-full w-16 h-16"><div id="account-username" class="font-semibold">User</div></div></div></div></div><div class="resize-handle"></div></div>
             <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-yellow-500">folder</span><span id="file-explorer-path">File Explorer</span></div><div class="flex items-center"><button id="new-file-btn" class="p-1 rounded-full hover:bg-white/20" title="New File"><span class="material-symbols-outlined">note_add</span></button><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined">close</span></button></div></div><div id="file-explorer-output" class="p-4 flex-grow overflow-y-auto no-scrollbar grid grid-cols-4 gap-4 content-start bg-gray-800/50"></div><div class="resize-handle"></div></div>
             <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">close</span></button></div><div id="terminal-output" class="p-4 flex-grow bg-black/80 font-mono text-white text-sm overflow-y-auto no-scrollbar" onclick="document.getElementById('terminal-input')?.focus()"></div><div class="resize-handle"></div></div>
             <div id="code-editor-window" class="window hidden absolute top-1/4 left-1/4 w-1/2 h-1/2 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-blue-400">data_object</span><span id="code-editor-title">Code Editor</span></div><div><button id="save-file-btn" class="p-1 rounded-full hover:bg-white/20" title="Save File"><span class="material-symbols-outlined">save</span></button><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="code-editor-window"><span class="material-symbols-outlined">close</span></button></div></div><textarea id="code-editor-textarea" class="w-full h-full p-2 bg-gray-900 text-white font-mono outline-none resize-none"></textarea><div class="resize-handle"></div></div>
             <div id="calculator-window" class="window hidden absolute top-1/4 left-1/4 w-80 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-orange-400">calculate</span><span>Calculator</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="calculator-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-4 bg-gray-800/50 flex flex-col space-y-4"><div id="calc-display" class="w-full bg-black/50 rounded-lg p-4 text-right text-4xl font-mono truncate">0</div><div class="grid grid-cols-4 gap-2"><button class="calculator-btn" data-key="clear">C</button><button class="calculator-btn" data-key="backspace">⌫</button><button class="calculator-btn" data-key="%">%</button><button class="calculator-btn operator" data-key="/">÷</button><button class="calculator-btn" data-key="7">7</button><button class="calculator-btn" data-key="8">8</button><button class="calculator-btn" data-key="9">9</button><button class="calculator-btn operator" data-key="*">×</button><button class="calculator-btn" data-key="4">4</button><button class="calculator-btn" data-key="5">5</button><button class="calculator-btn" data-key="6">6</button><button class="calculator-btn operator" data-key="-">−</button><button class="calculator-btn" data-key="1">1</button><button class="calculator-btn" data-key="2">2</button><button class="calculator-btn" data-key="3">3</button><button class="calculator-btn operator" data-key="+">+</button><button class="calculator-btn col-span-2" data-key="0">0</button><button class="calculator-btn" data-key=".">.</button><button class="calculator-btn operator" data-key="=">=</button></div></div></div>
-            <div id="weather-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-cyan-400">cloudy</span><span>Weather</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="weather-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 text-center"><span class="material-symbols-outlined text-9xl text-yellow-300">sunny</span><p class="text-5xl font-bold">75°F</p><p class="text-lg">Clear Skies</p></div></div>
+            <div id="weather-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-cyan-400">cloudy</span><span>Weather</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="weather-window"><span class="material-symbols-outlined">close</span></button></div><div id="weather-content" class="p-6 bg-gray-800/50 text-center flex flex-col items-center justify-center h-48"><p>Loading weather...</p></div></div>
             <div id="music-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-pink-400">music_note</span><span>Music</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="music-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 flex flex-col items-center"><p class="font-semibold">Cyberpunk Dreams</p><p class="text-sm text-gray-400">Synthwave AI</p><div class="w-full h-2 bg-gray-600 rounded-full my-4"><div class="h-2 bg-pink-400 rounded-full w-1/2"></div></div><div class="flex items-center space-x-6 text-4xl"><span class="material-symbols-outlined">skip_previous</span><span class="material-symbols-outlined text-5xl">pause_circle</span><span class="material-symbols-outlined">skip_next</span></div></div></div>
             <div id="support-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-md h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-red-400">support_agent</span><span>Support Lifecycle</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="support-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 text-center"><h4 class="text-lg font-bold">End of Support for Windows 13</h4><p class="text-sm text-gray-400">October 26, 2027</p><div id="support-countdown" class="mt-4 text-2xl font-mono"></div></div></div>
         </div>
@@ -134,35 +206,153 @@
         const codeEditorTextarea = document.getElementById('code-editor-textarea');
         const codeEditorTitle = document.getElementById('code-editor-title');
         const supportCountdownEl = document.getElementById('support-countdown');
+        const currentUsernameDisplay = document.getElementById('current-username-display');
+        const loginUsernameInput = document.getElementById('login-username');
+        const customAlertModal = document.getElementById('custom-alert-modal');
+        const customAlertMessage = document.getElementById('custom-alert-message');
+        const customAlertOkBtn = document.getElementById('custom-alert-ok-btn');
+
+        // Custom Alert function
+        const showAlert = (message) => {
+            customAlertMessage.textContent = message;
+            customAlertModal.classList.remove('hidden');
+        };
+
+        customAlertOkBtn.addEventListener('click', () => {
+            customAlertModal.classList.add('hidden');
+        });
         
         // --- Account & Login ---
-        document.getElementById('show-create-account-btn').addEventListener('click', () => { document.getElementById('login-view').classList.add('hidden'); document.getElementById('create-account-view').classList.remove('hidden'); });
-        document.getElementById('show-login-btn').addEventListener('click', () => { document.getElementById('create-account-view').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden'); });
+        let currentLoggedInUser = ''; // To store the logged-in username
+
+        // Initialize username display based on last logged-in user or default
+        const lastUser = localStorage.getItem('win13_last_user');
+        if (lastUser) {
+            currentUsernameDisplay.textContent = lastUser;
+            loginUsernameInput.value = lastUser;
+        }
+
+        // Toggle username display and input
+        currentUsernameDisplay.addEventListener('click', () => {
+            currentUsernameDisplay.classList.add('hidden');
+            loginUsernameInput.classList.remove('hidden');
+            loginUsernameInput.focus();
+        });
+
+        loginUsernameInput.addEventListener('blur', () => {
+            if (loginUsernameInput.value === '') {
+                // If input is empty, revert to default display
+                currentUsernameDisplay.textContent = 'User';
+                loginUsernameInput.value = ''; // Clear input value
+            } else {
+                currentUsernameDisplay.textContent = loginUsernameInput.value;
+            }
+            currentUsernameDisplay.classList.remove('hidden');
+            loginUsernameInput.classList.add('hidden');
+        });
+
+        document.getElementById('show-create-account-btn').addEventListener('click', () => { 
+            document.getElementById('login-view').classList.add('hidden'); 
+            document.getElementById('create-account-view').classList.remove('hidden'); 
+        });
+
+        document.getElementById('show-login-btn').addEventListener('click', () => { 
+            document.getElementById('create-account-view').classList.add('hidden'); 
+            document.getElementById('login-view').classList.remove('hidden'); 
+        });
+
         document.getElementById('create-account-btn').addEventListener('click', () => {
             const user = document.getElementById('create-username').value;
             const pass = document.getElementById('create-password').value;
-            if (user && pass) { localStorage.setItem(`win13_account_${user}`, pass); alert('Account created!'); document.getElementById('show-login-btn').click(); } 
-            else { alert('Please enter a username and password.'); }
+            console.log("Attempting to create account:", user);
+            if (user && pass) { 
+                localStorage.setItem(`win13_account_${user}`, pass); 
+                console.log(`Account '${user}' created with password: ${pass}`);
+                showAlert('Account created successfully!'); 
+                // Update the displayed username immediately after creating an account
+                currentUsernameDisplay.textContent = user;
+                loginUsernameInput.value = user;
+                document.getElementById('show-login-btn').click(); 
+            } else { 
+                showAlert('Please enter a username and password.'); 
+                console.log("Account creation failed: Missing username or password.");
+            }
         });
+
         document.getElementById('sign-in-btn').addEventListener('click', () => {
-            const user = document.getElementById('login-username').value;
+            const user = loginUsernameInput.value;
             const pass = document.getElementById('login-password').value;
+            console.log("Attempting to sign in with user:", user, "and password:", pass);
             const storedPass = localStorage.getItem(`win13_account_${user}`);
+            console.log("Stored password for user:", user, "is:", storedPass);
+
             if (storedPass && pass === storedPass) {
+                currentLoggedInUser = user; // Set the logged-in user
+                localStorage.setItem('win13_last_user', user); // Store last logged-in user
                 document.getElementById('account-username').textContent = user;
                 document.getElementById('boot-sound').play().catch(e => {});
+                
                 loginContainer.style.opacity = '0';
+                document.getElementById('login-background-blur').style.filter = 'blur(0px)'; // Remove blur on desktop
+
                 setTimeout(() => {
                     loginContainer.classList.add('hidden');
                     desktopContainer.style.opacity = '1';
+                    fetchWeather();
                     if (!localStorage.getItem('win13_disclaimer_seen')) { disclaimerModal.classList.remove('hidden'); }
                 }, 500);
-            } else { alert('Invalid credentials. Create an account if you haven\'t.'); }
+            } else { 
+                showAlert('Invalid credentials. Please check your username and password, or create an account.'); 
+                console.log("Login failed: Invalid credentials.");
+            }
         });
+
         document.getElementById('disclaimer-ok-btn').addEventListener('click', () => {
             disclaimerModal.classList.add('hidden');
             localStorage.setItem('win13_disclaimer_seen', 'true');
         });
+
+        // --- Weather Logic ---
+        const fetchWeather = async () => {
+            const apiKey = ""; // Use a real API key for production
+            const city = "Louisville";
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
+            const weatherContentEl = document.getElementById('weather-content');
+            
+            // This is a fallback since we cannot use a real API key here.
+            const displayMockWeather = () => {
+                 const weather = { temp: 75, description: "Clear", icon: "sunny" };
+                 weatherContentEl.innerHTML = `
+                    <span class="material-symbols-outlined text-9xl text-yellow-300">${weather.icon}</span>
+                    <p class="text-5xl font-bold">${Math.round(weather.temp)}°F</p>
+                    <p class="text-lg">${weather.description}</p>`;
+            }
+
+            try {
+                if(!apiKey) {
+                    displayMockWeather();
+                    return;
+                }
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Weather data not available.');
+                const data = await response.json();
+                
+                let icon = 'cloudy';
+                if (data.weather[0].main.includes('Clear')) icon = 'sunny';
+                if (data.weather[0].main.includes('Rain')) icon = 'rainy';
+                if (data.weather[0].main.includes('Thunderstorm')) icon = 'thunderstorm';
+
+                weatherContentEl.innerHTML = `
+                    <span class="material-symbols-outlined text-9xl text-yellow-300">${icon}</span>
+                    <p class="text-5xl font-bold">${Math.round(data.main.temp)}°F</p>
+                    <p class="text-lg">${data.weather[0].description}</p>`;
+
+            } catch (error) {
+                console.error(error);
+                weatherContentEl.innerHTML = `<p>Could not fetch weather data.</p>`;
+                 displayMockWeather(); // Display mock data on error
+            }
+        };
 
         // --- Date, Clock & Countdown ---
         const updateClock = () => {
@@ -266,8 +456,13 @@
             if(dir) { dir[fileName] = codeEditorTextarea.value; }
         });
         document.getElementById('new-file-btn').addEventListener('click', () => {
-            const fileName = prompt("Enter file name:", "new_file.txt");
-            if (fileName) { const currentDir = getObjectFromPath(currentPath); if (currentDir) { currentDir[fileName] = ''; renderFileExplorer(); } }
+            showAlert("Enter file name:", "new_file.txt"); // Using custom alert for now
+            // To implement this fully, a custom prompt modal would be needed.
+            // For now, this will simply show the alert without prompting for input.
+            // Example:
+            // showCustomPrompt("Enter file name:", "new_file.txt", (fileName) => {
+            //     if (fileName) { const currentDir = getObjectFromPath(currentPath); if (currentDir) { currentDir[fileName] = ''; renderFileExplorer(); } }
+            // });
         });
 
         // --- Terminal ---
