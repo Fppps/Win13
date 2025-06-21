@@ -1,637 +1,386 @@
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows 13 Concept</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Link to external CSS file -->
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body { font-family: 'Inter', sans-serif; user-select: none; color: #e0e0e0; background-color: #1a1a2e; }
+        .font-mono { font-family: 'monospace'; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        
+        #desktop-container {
+            background-image: radial-gradient(circle at top left, rgba(23, 42, 70, 0.8), transparent 40%), radial-gradient(circle at bottom right, rgba(67, 56, 202, 0.5), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .panel {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes open-animation { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .animate-open { animation: open-animation 0.2s ease-out; }
+
+        .window { transition: opacity 0.2s, transform 0.2s, top 0.2s, left 0.2s, width 0.2s, height 0.2s; min-width: 300px; min-height: 200px; }
+        .title-bar { cursor: move; }
+        
+        .resize-handle { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: se-resize; }
+        .calculator-btn {
+            @apply bg-gray-700/50 hover:bg-gray-600/50 rounded-lg text-2xl font-semibold transition-colors flex items-center justify-center;
+        }
+    </style>
 </head>
-<body class="overflow-hidden bg-black text-gray-800 dark:text-gray-200">
+<body class="overflow-hidden">
 
     <audio id="boot-sound" src="bootup/boot.mp3" preload="auto"></audio>
-    <!-- Power off screen added for visual effect -->
-    <div id="power-off-screen" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-500">
-        <h2 id="power-off-message" class="text-2xl font-bold text-white mb-6">Shutting down...</h2>
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-t-4 border-blue-500"></div>
-    </div>
+    <div id="power-off-screen" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-500"><h2 id="power-off-message" class="text-2xl font-bold text-white mb-6"></h2></div>
 
-    <div id="message-box" class="hidden absolute inset-0 z-[60] flex items-center justify-center bg-black/50">
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg max-w-sm text-center animate-open">
-            <h3 id="message-box-title" class="font-bold text-lg text-white mb-2"></h3>
-            <p id="message-box-content" class="text-sm text-gray-300 mb-4"></p>
-            <button id="message-box-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition-colors">OK</button>
-        </div>
-    </div>
-    
+    <!-- Login/Register Screen -->
     <div id="login-container" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-900 transition-opacity duration-500">
         <div id="login-view">
-            <img src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png" alt="User Avatar" class="rounded-full w-32 h-32 border-4 border-purple-500 mb-4 mx-auto">
+            <img src="https://placehold.co/128x128/7c3aed/ffffff?text=U" alt="User Avatar" class="rounded-full w-32 h-32 border-4 border-purple-500 mb-4 mx-auto">
             <h2 class="text-2xl font-bold text-white mb-6 text-center">Welcome Back</h2>
-            <div class="w-full max-w-xs space-y-4">
-                <input id="login-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                <input id="login-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                <button id="sign-in-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-semibold transition-colors">Sign In</button>
-                <p class="text-center text-sm text-gray-400">No account? <button id="show-create-account-btn" class="text-purple-400 hover:underline">Create one</button></p>
-            </div>
+            <div class="w-full max-w-xs space-y-4"><input id="login-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><input id="login-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><button id="sign-in-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold transition-colors">Sign In</button><p class="text-center text-sm text-gray-400">No account? <button id="show-create-account-btn" class="text-purple-400 hover:underline">Create one</button></p></div>
         </div>
         <div id="create-account-view" class="hidden">
             <h2 class="text-2xl font-bold text-white mb-6 text-center">Create Account</h2>
-            <div class="w-full max-w-xs space-y-4">
-                <input id="create-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                <input id="create-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                <button id="create-account-btn" class="w-full py-2 bg-green-600 hover:bg-green-700 rounded-xl text-white font-semibold transition-colors">Create Account</button>
-                <p class="text-center text-sm text-gray-400">Already have an account? <button id="show-login-btn" class="text-purple-400 hover:underline">Sign In</button></p>
-            </div>
+            <div class="w-full max-w-xs space-y-4"><input id="create-username" type="text" placeholder="Username" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><input id="create-password" type="password" placeholder="Password" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><button id="create-account-btn" class="w-full py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-semibold transition-colors">Create Account</button><p class="text-center text-sm text-gray-400">Already have an account? <button id="show-login-btn" class="text-purple-400 hover:underline">Sign In</button></p></div>
         </div>
     </div>
     
+    <!-- Disclaimer Modal -->
     <div id="disclaimer-modal" class="hidden absolute inset-0 z-[60] flex items-center justify-center bg-black/50">
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg max-w-sm text-center animate-open">
-            <h3 class="font-bold text-lg text-white mb-2">Disclaimer: Experimental Concept</h3>
-            <p class="text-sm text-gray-300 mb-4">
-                This is an experimental Windows 13 concept. It's a prototype demonstrating potential UI/UX
-                and core functionalities, largely generated by an AI. All images and graphical assets
-                were created by the original developer. Functionality may be limited or conceptual.
-            </p>
-            <button id="disclaimer-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold">Got it</button>
+        <div class="panel p-6 rounded-lg shadow-lg max-w-sm text-center animate-open">
+            <h3 class="font-bold text-lg text-white mb-2">Disclaimer</h3>
+            <p class="text-sm text-gray-300 mb-4">The background image is a placeholder. All other elements, logic, and designs are generated by an AI. This is a conceptual demonstration and not a final product.</p>
+            <button id="disclaimer-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold">Got it</button>
         </div>
     </div>
 
-    <div id="desktop" class="h-screen w-screen relative overflow-hidden opacity-0">
-        <main class="p-6">
-            <div id="clock-container" class="absolute top-6 right-6 inline-block cursor-pointer" tabindex="0" role="button" aria-label="Open time settings">
-                <div id="time-display" class="text-5xl font-bold text-white text-shadow text-right"></div>
-                <div id="date-display" class="text-xs opacity-75 text-white text-shadow text-right mb-2"></div>
-                <div id="year-display" class="text-3xl font-bold text-white text-shadow text-right"></div>
+    <!-- Desktop Container -->
+    <div id="desktop-container" class="h-screen w-screen relative flex flex-col">
+        
+        <!-- Top Bar -->
+        <header class="h-20 w-full p-4 flex items-center space-x-4 panel">
+            <span class="text-xl font-bold text-white">Apps</span>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="file-explorer-window" title="File Explorer"><span class="material-symbols-outlined text-yellow-400">folder</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="terminal-window" title="Terminal"><span class="material-symbols-outlined">terminal</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="code-editor-window" title="Code Editor"><span class="material-symbols-outlined text-blue-400">data_object</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="calculator-window" title="Calculator"><span class="material-symbols-outlined text-orange-400">calculate</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="weather-window" title="Weather"><span class="material-symbols-outlined text-cyan-400">cloudy</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="music-window" title="Music"><span class="material-symbols-outlined text-pink-400">music_note</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="settings-window" title="Settings"><span class="material-symbols-outlined">settings</span></button>
+            <button class="top-app-icon h-12 w-12 flex items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-colors" data-window="support-window" title="Support Lifecycle"><span class="material-symbols-outlined text-red-400">support_agent</span></button>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="flex-grow p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 panel rounded-lg p-6">
+                 <h2 class="text-3xl font-bold text-white mb-4">Version 1.0.9</h2>
+                 <p class="text-gray-300">This update adds the Weather, Music, and Support Lifecycle apps. The system font has also been unified to 'Inter' for a cleaner UI experience.</p>
+            </div>
+            <div class="lg:col-span-1 flex flex-col space-y-8">
+                <div class="panel rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Date</h3>
+                    <p id="sidebar-date" class="text-2xl text-white"></p>
+                </div>
+                 <div class="panel rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Version</h3>
+                    <p class="text-2xl text-white">1.0.9</p>
+                </div>
+                 <div class="panel rounded-lg p-4 text-center">
+                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Time</h3>
+                    <p id="sidebar-time" class="text-2xl text-white"></p>
+                </div>
             </div>
         </main>
-        <!-- Desktop Icons Container -->
-        <div id="desktop-icons-container" class="absolute top-8 left-8 p-4 grid grid-cols-1 gap-4 z-10 h-full overflow-y-auto">
-            <!-- Desktop icons will be dynamically appended here by JavaScript -->
-        </div>
-        <!-- Sticky Notes Container -->
-        <div id="sticky-notes-container" class="absolute inset-0 pointer-events-none">
-            <!-- Sticky notes will be appended here by JavaScript -->
-        </div>
-
-        <div id="context-menu" class="hidden absolute w-56 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-xl shadow-2xl border border-white/30 dark:border-black/30 p-2 z-50 text-sm animate-open">
-            <a href="#" id="open-settings-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">tune</span><span>Personalize</span></a>
-            <a href="#" id="toggle-desktop-icons-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">desktop_windows</span><span>Show/Hide Desktop Icons</span></a>
-            <hr class="my-1 border-white/20 dark:border-black/20">
-            <a href="#" id="new-sticky-note-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">note_add</span><span>New Sticky Note</span></a>
-        </div>
-        <div id="file-explorer-context-menu" class="hidden absolute w-56 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-xl shadow-2xl border border-white/30 dark:border-black/30 p-2 z-50 text-sm animate-open">
-            <a href="#" id="fe-rename-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">edit</span><span>Rename</span></a>
-            <a href="#" id="fe-delete-context" class="flex items-center space-x-2 px-2 py-2 hover:bg-red-500/50 dark:hover:bg-red-500/50 rounded-lg cursor-pointer text-red-400"><span class="material-symbols-outlined">delete</span><span>Delete</span></a>
-        </div>
-        <div id="start-menu" class="hidden absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 glassmorphism rounded-2xl shadow-2xl animate-open z-40 flex flex-col">
-             <div class="flex-grow grid grid-cols-3 gap-4">
-                 <div class="text-center flex flex-col justify-between"><h4 class="font-bold text-lg mb-4">Updates</h4><a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="updates-window"><span class="material-symbols-outlined text-green-400">update</span><span>Update Center</span></a></div>
-                 <div class="text-center"><h4 class="font-bold text-lg mb-4">Quick Access</h4>
-                    <div id="quick-access-content" class="space-y-2 text-left px-2">
-                        <p class="text-sm text-gray-400">No recent files.</p>
-                    </div>
-                 </div>
-                 <div><h4 class="font-bold text-lg mb-4">Pinned Apps</h4><div class="space-y-2">
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined text-yellow-500">folder</span><span>File Explorer</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="text-editor-window"><span class="material-symbols-outlined text-lime-400">edit_note</span><span>Notepad</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="settings-window"><span class="material-symbols-outlined">settings</span><span>Settings</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="cpu-monitor-window"><span class="material-symbols-outlined text-purple-400">developer_board</span><span>CPU Monitor</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="task-manager-window"><span class="material-symbols-outlined text-blue-400">task_alt</span><span>Task Manager</span></a>
-                    <a href="#" class="start-menu-app-icon flex items-center space-x-3 p-2 rounded-xl hover:bg-white/30 dark:hover:bg-black/30 transition-colors" data-window="sticky-notes-window"><span class="material-symbols-outlined text-yellow-300">sticky_note_2</span><span>Sticky Notes</span></a>
-                    <div id="start-menu-installable-apps">
-                        <!-- Installable apps will be dynamically added here -->
-                    </div>
-                </div></div>
-            </div>
-            <div class="flex items-center justify-between p-2 mt-4 border-t border-white/20 dark:border-black/20">
-                <div class="flex items-center space-x-3">
-                    <img src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png" class="rounded-full w-10 h-10 border border-purple-500">
-                    <span id="start-menu-username" class="font-semibold text-white">User</span>
-                </div>
-                <div class="relative">
-                    <button id="power-options-btn" class="p-2 rounded-full hover:bg-white/20 dark:hover:bg-black/20 transition-colors">
-                        <span class="material-symbols-outlined">power_settings_new</span>
-                    </button>
-                    <div id="power-options-menu" class="hidden absolute bottom-12 right-0 w-32 bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-xl shadow-xl p-2 text-sm">
-                        <a href="#" id="sign-out-btn" class="flex items-center space-x-2 px-2 py-1 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">logout</span><span>Sign Out</span></a>
-                        <a href="#" id="shutdown-btn" class="flex items-center space-x-2 px-2 py-1 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">power_off</span><span>Shut Down</span></a>
-                        <a href="#" id="restart-btn" class="flex items-center space-x-2 px-2 py-1 hover:bg-white/50 dark:hover:bg-black/50 rounded-lg cursor-pointer"><span class="material-symbols-outlined">refresh</span><span>Restart</span></a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
+        <!-- Windows Container (overlays everything) -->
         <div id="windows-container" class="absolute inset-0 w-full h-full pointer-events-none">
-            <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex flex-grow">
-                    <div class="w-1/3 p-4 border-r border-white/20 dark:border-black/20 overflow-y-auto">
-                        <h4 class="font-semibold mb-2">System</h4>
-                        <a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="about-content">About</a>
-                        <h4 class="font-semibold mb-2 mt-4">Personalization</h4>
-                        <a href="#background" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="background-content">Background</a>
-                        <h4 class="font-semibold mb-2 mt-4">Account</h4>
-                        <a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="account-content">Your Info</a>
-                    </div>
-                    <div class="w-2/3 p-4 overflow-y-auto">
-                        <div id="about-content" class="settings-content">
-                            <h4 class="font-semibold mb-2">About this PC</h4>
-                            <div class="space-y-2 text-sm">
-                                <div><strong>Device Name:</strong> Win13-Concept</div>
-                                <div><strong>Processor:</strong> Virtual Core Gen 1</div>
-                                <div><strong>Installed RAM:</strong> 16.0 GB</div>
-                                <div><strong>OS Build:</strong> 23456.1</div>
-                            </div>
-                        </div>
-                        <div id="background-content" class="settings-content hidden">
-                            <h4 class="font-semibold mb-2">Background</h4>
-                            <div class="flex flex-col space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Desktop Background Image:</label>
-                                    <div class="flex space-x-4">
-                                        <button id="set-light-bg" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-colors">Light Theme</button>
-                                        <button id="set-dark-bg" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-colors">Dark Theme</button>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <label for="bgColorPicker" class="block text-sm font-medium">Custom Color (overrides image)</label>
-                                    <input type="color" id="bgColorPicker" class="w-10 h-10 rounded-md cursor-pointer border-none bg-transparent">
-                                </div>
-                            </div>
-                        </div>
-                        <div id="account-content" class="settings-content hidden">
-                            <h4 class="font-semibold mb-2">Account</h4>
-                            <div class="flex items-center space-x-4">
-                                <img src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png" class="rounded-full w-16 h-16">
-                                <div id="account-username" class="font-semibold">User</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-            <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-yellow-500">folder</span><span>File Explorer</span></div>
-                    <div class="flex items-center">
-                        <button id="new-file-btn" class="p-1 rounded-full hover:bg-white/20 transition-colors"><span class="material-symbols-outlined">note_add</span></button>
-                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined">close</span></button>
-                    </div>
-                </div>
-                <div id="file-explorer-output" class="p-4 flex-grow overflow-y-auto grid grid-cols-4 gap-4 content-start"></div>
-                <div class="resize-handle"></div>
-            </div>
-            <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div id="terminal-output" class="p-4 flex-grow bg-black/80 font-mono text-white text-sm overflow-y-auto" onclick="document.getElementById('terminal-input')?.focus()"></div>
-                <div class="resize-handle"></div>
-            </div>
-            
-            <div id="text-editor-window" class="window hidden absolute top-1/4 left-1/4 w-1/2 h-1/2 glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2">
-                        <span class="material-symbols-outlined" id="text-editor-icon"></span>
-                        <span id="text-editor-title"></span>
-                    </div>
-                    <div class="flex items-center">
-                        <button id="save-file-btn" class="p-1 rounded-full hover:bg-white/20 hover:text-green-400 transition-colors mr-2">
-                            <span class="material-symbols-outlined">save</span>
-                        </button>
-                        <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="text-editor-window">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                </div>
-                <textarea id="text-editor-textarea" class="w-full h-full p-2 bg-gray-900 text-white font-mono outline-none resize-none"></textarea>
-                <div class="resize-handle"></div>
-            </div>
-
-            <div id="updates-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-lg max-h-[90vh] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-green-400">update</span><span>Update Center</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="updates-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex flex-grow">
-                    <div class="w-1/3 p-4 border-r border-white/20 dark:border-black/20 overflow-y-auto">
-                        <a href="#updates" class="updates-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="updates-list-content">Updates</a>
-                        <a href="#disclaimer" class="updates-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="updates-disclaimer-content">Disclaimer</a>
-                        <a href="#updater-hub" class="updates-tab block p-2 rounded-lg hover:bg-white/20 dark:hover:bg-black/20 transition-colors" data-content-id="updater-hub-content">Updater Hub</a>
-                    </div>
-                    <div class="w-2/3 p-4 overflow-y-auto">
-                        <div id="updates-list-content" class="updates-content">
-                            <!-- New Update: Windows layout design and more -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Windows Layout Design and More</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.1.0</p>
-                                    <p class="mt-2 text-sm">This update brings a significant overhaul to the visual layout and user experience, along with new features and refinements:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Enhanced Visual Design:** Refined glassmorphism effects, improved window styling, and dynamic dock icon animations for a more modern and responsive feel.</li>
-                                        <li>**"Power Off" Functionality:** A new "Shut Down" option in the power menu simulates a system shutdown with a visual animation.</li>
-                                        <li>**Calendar Pop-up:** Clicking the desktop clock now opens a sleek calendar pop-up, allowing quick month navigation.</li>
-                                        <li>**Improved Responsiveness:** Further adjustments to ensure the interface adapts seamlessly across various screen sizes and orientations.</li>
-                                        <li>**Code Organization:** CSS rules have been externalized into a dedicated `style.css` file for better project structure and maintainability.</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 6/18/25</p>
-                                    <p class="text-sm"><strong>Time:</strong> 09:00 AM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: Version 1.1.0 delivers a significant visual and functional upgrade, making the Windows 13 concept more interactive, aesthetically pleasing, and robust.</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Update 1.0.0 -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Windows 13 Restore Realized</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.0.0</p>
-                                    <p class="mt-2 text-sm">Welcome to the first major feature update for the Windows 13 Concept. This release focuses on fundamental system improvements and new core applications:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Window Resizing:** Windows are now resizable, offering greater flexibility in workspace management.</li>
-                                        <li>**Interactive File System:** A fully functional File Explorer allows for intuitive navigation and basic file operations (create files).</li>
-                                        <li>**Text Editor (Notepad):** Introduction of a versatile text editor supporting both `.txt` and `.py` file types.</li>
-                                        <li>**CPU Monitor & Simulator:** A new application to monitor virtual CPU registers and memory, with the ability to load and execute simple assembly-like programs.</li>
-                                        <li>**Enhanced Dock & Start Menu:** Improved accessibility for key applications directly from the dock and an updated Start Menu.</li>
-                                        <li>**Theming Options:** Easily switch between light and dark desktop themes.</li>
-                                        <li>**Basic Terminal Functionality:** Expanded commands for system interaction.</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 5/9/2025</p>
-                                    <p class="text-sm"><strong>Time:</strong> 09:00 AM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: This update lays the groundwork for a more interactive and feature-rich operating system concept, bringing essential tools and improved user experience.</p>
-                                </div>
-                            </div>
-                            
-                            <!-- New Update 1.0.5 -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Windows + Linux Functionality & Supported Files</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.0.5</p>
-                                    <p class="mt-2 text-sm">This update further enhances the hybrid OS experience by integrating more command-line tools and improving file handling, offering a powerful blend of Windows and Linux features:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Expanded Terminal Commands:** Added common Linux commands like `pwd` (print working directory), `echo`, `whoami`, and `date` to the terminal for greater versatility.</li>
-                                        <li>**Improved File System Navigation:** The `cd` command in the terminal now supports absolute paths (e.g., `/C:/Users/You/Documents`) and more robust relative path handling.</li>
-                                        <li>**Enhanced File Operations:** Terminal `rm` command now includes a basic check for non-empty directories (though it only supports removing empty ones for simplicity).</li>
-                                        <li>**Unified Text Editor:** The "Notepad" app now intelligently adapts its title and icon based on the file extension (.txt for Notepad, .py for Code Editor), providing a more cohesive experience. The editor styling also includes a subtle "Linux" hint through its dark background and monospace font, reminiscent of popular Linux text editors.</li>
-                                        <li>**Context Menu Integration:** Right-clicking on the desktop now brings up a context menu with quick links to personalization settings, mirroring a classic desktop experience.</li>
-                                        <li>**Interactive Clock:** The desktop clock is now clickable, directly opening the "About" section in the Settings application.</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 5/15/2025</p>
-                                    <p class="text-sm"><strong>Time:</strong> 10:00 AM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: Version 1.0.5 deepens the hybrid OS feel by bringing more Linux-like command-line power and enhancing core application usability, making the system more flexible and powerful.</p>
-                                </div>
-                            </div>
-
-                            <!-- New Update: Login Functionality -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Updated Login and Account Management</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.0.6</p>
-                                    <p class="mt-2 text-sm">This update significantly enhances user account security and management:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Password Encryption:** User passwords are now securely hashed using SHA-256 before being stored, providing improved data protection.</li>
-                                        <li>**Multi-User Support:** The system now supports multiple user accounts stored in a client-side database (`localStorage`).</li>
-                                        <li>**Persistent Usernames:** Upon logout, the user's password is "shut down" (cleared) from storage for security, but their username remains, allowing for easier re-login or account recovery (recovery not implemented).</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 5/20/2025</p>
-                                    <p class="text-sm"><strong>Time:</strong> 02:00 PM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: Version 1.0.6 introduces enhanced login security and a more robust multi-user account system for a more personalized and secure experience.</p>
-                                </div>
-                            </div>
-
-                            <!-- New Update: Desktop Layout Refinement -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Desktop Layout Refinement</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.0.7</p>
-                                    <p class="mt-2 text-sm">This update introduces a refreshed desktop layout, moving away from a traditional taskbar to a more fluid, modern dock-based system:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Taskbar Removed:** The fixed full-width taskbar at the bottom of the screen has been removed for a cleaner desktop aesthetic.</li>
-                                        <li>**Floating Dock:** Essential system and pinned application icons are now housed in a visually appealing, centrally-located floating dock at the bottom of the screen.</li>
-                                        <li>**Relocated Clock & Theme Toggles:** The interactive clock (with its dynamic year display) and the theme toggles have been moved from the former taskbar to the top-right corner of the desktop, integrating them more seamlessly into the background.</li>
-                                        <li>**Improved Desktop Cleanliness:** This change aims to provide more screen real estate for open windows and a less cluttered overall appearance.</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 5/25/2025</p>
-                                    <p class="text-sm"><strong>Time:</strong> 11:00 AM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: Version 1.0.7 reimagines the desktop interface, focusing on minimalist design and intuitive access to applications via a streamlined floating dock.</p>
-                                </div>
-                            </div>
-
-                            <!-- New Update: Custom Date/Time Display -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Customizable Date and Time Display</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.0.8</p>
-                                    <p class="mt-2 text-sm">This update refines the desktop clock display, offering more granular control over its appearance:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Separated Time and Date:** The time and date components of the desktop clock are now rendered in separate custom `div` elements within the clock container. This provides individual styling flexibility for each part.</li>
-                                        <li>**Enhanced Styling Control:** Developers and users can now apply distinct CSS classes and styles to the time and date elements independently, allowing for more tailored visual presentation.</li>
-                                        <li>**Maintained Functionality:** All existing interactivity, such as clicking the clock to open settings and toggling the year display, remains fully functional with the new structure.</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 5/30/2025</p>
-                                    <p class="text-sm"><strong>Time:</strong> 09:30 AM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: Version 1.0.8 improves the customizability of the desktop's time and date display by separating these elements into individual, style-friendly `div` containers.</p>
-                                </div>
-                            </div>
-
-                             <!-- New Update: Calculator App -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Calculator Application</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.0.9</p>
-                                    <p class="mt-2 text-sm">A new essential utility has been added to the Windows 13 Concept:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Full-Featured Calculator:** A basic calculator application is now available, supporting addition, subtraction, multiplication, and division.</li>
-                                        <li>**Intuitive Interface:** The calculator features a clear display and a standard keypad layout for ease of use.</li>
-                                        <li>**Integrated into Dock:** The Calculator app can be quickly launched directly from the floating dock at the bottom of the desktop.</li>
-                                        <li>**Window Management:** Like other applications, the Calculator window supports dragging and resizing.</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 6/5/2025</p>
-                                    <p class="text-sm"><strong>Time:</strong> 01:00 PM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: Version 1.0.9 introduces the Calculator app, enhancing the system's utility and providing a convenient tool for everyday calculations.</p>
-                                </div>
-                            </div>
-
-                             <!-- New Update: Task Manager / Process Viewer -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Task Manager / Process Viewer</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.1.0</p>
-                                    <p class="mt-2 text-sm">A new "middle-end" application has been integrated to provide centralized control over running processes:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Process Monitoring:** The Task Manager lists all currently open application windows, displaying their names and unique IDs.</li>
-                                        <li>**End Task Functionality:** Users can select any running application and force it to close using the "End Task" button.</li>
-                                        <li>**Real-time Updates:** The process list can be refreshed to show the most current active windows.</li>
-                                        <li>**Enhanced System Control:** This feature offers a deeper level of interaction with the simulated operating system, allowing for better resource management and troubleshooting.</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 6/10/2025</p>
-                                    <p class="text-sm"><strong>Time:</strong> 10:00 AM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: Version 1.1.0 introduces the Task Manager, significantly improving system control and providing a modern, centralized interface for managing running applications.</p>
-                                </div>
-                            </div>
-
-                             <!-- New Update: Sticky Notes and Updater Hub -->
-                            <div class="mb-6 pb-4 border-b border-white/20 flex flex-wrap">
-                                <div class="w-full md:w-2/3 pr-4">
-                                    <h3 class="font-bold text-lg mb-1">Sticky Notes & Updater Hub with Installers</h3>
-                                    <p class="text-sm"><strong>Version:</strong> 1.2.0</p>
-                                    <p class="mt-2 text-sm">This update brings new desktop productivity and a system for installing applications:</p>
-                                    <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                                        <li>**Sticky Notes:** A new desktop application allowing you to create, save, and display multiple sticky notes directly on your desktop. Notes persist across sessions.</li>
-                                        <li>**Updater Hub:** A dedicated application for managing software installations. It lists available applications (like Web Browser and Media Player) that can be "installed."</li>
-                                        <li>**Simulated Installers:** Clicking 'Install' in the Updater Hub simulates a software installation, making the new applications (Web Browser, Media Player) available in the Start Menu and Dock.</li>
-                                        <li>**Refined UI/UX:** Enhanced styling for windows, buttons, and dock icons for a more polished, modern aesthetic with improved transitions.</li>
-                                    </ul>
-                                </div>
-                                <div class="w-full md:w-1/3 pl-4 border-t md:border-t-0 md:border-l border-white/20 md:pl-4 mt-4 md:mt-0 pt-4 md:pt-0">
-                                    <p class="text-sm"><strong>Date:</strong> 6/15/2025</p>
-                                    <p class="text-sm"><strong>Time:</strong> 03:00 PM</p>
-                                </div>
-                                <div class="w-full mt-4">
-                                    <p class="text-sm font-semibold">Summary: Version 1.2.0 introduces desktop sticky notes and a functional Updater Hub, bringing a new layer of interactivity and simulated software management to the system.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="updates-disclaimer-content" class="updates-content hidden">
-                            <h3 class="font-bold text-lg mb-2">Content Disclaimer</h3>
-                            <p class="text-sm">Please note that all images and graphical assets used in this Windows 13 Concept demonstration were created by the original developer.</p>
-                            <p class="mt-2 text-sm">However, all other elements, including the core logic, application functionality, layout designs, and descriptive text (such as this disclaimer and update notes), have been generated by an AI (Gemini).</p>
-                            <p class="mt-4 text-sm font-semibold">This project serves as a conceptual prototype to showcase the potential of AI-assisted development in creating interactive user interfaces.</p>
-                        </div>
-                        <div id="updater-hub-content" class="updates-content hidden">
-                            <h3 class="font-bold text-lg mb-4">Available Updates</h3>
-                            <div id="available-updates-list" class="space-y-4">
-                                <!-- Available updates dynamically loaded here -->
-                            </div>
-                            <h3 class="font-bold text-lg mt-8 mb-4">Installation Log</h3>
-                            <div id="installation-log" class="bg-black/20 p-3 rounded-lg max-h-48 overflow-y-auto text-sm font-mono">
-                                <!-- Installation log messages here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-            
-            <div id="cpu-monitor-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[600px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-purple-400">developer_board</span><span>CPU Monitor</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="cpu-monitor-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex flex-grow p-4 space-x-4 overflow-hidden">
-                    <div class="w-1/2 flex flex-col bg-white/10 dark:bg-black/10 rounded-xl p-4 overflow-y-auto">
-                        <h3 class="font-bold text-lg mb-4 text-white">CPU Registers</h3>
-                        <div id="cpu-registers" class="grid grid-cols-2 gap-2 text-sm">
-                            </div>
-                        <h3 class="font-bold text-lg mt-6 mb-4 text-white">Program Editor</h3>
-                        <textarea id="program-editor" class="w-full flex-grow bg-gray-900 text-white font-mono text-sm p-2 rounded-xl resize-none" placeholder="Enter CPU program instructions here..."></textarea>
-                        <div class="flex space-x-2 mt-4">
-                            <button id="load-program-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors">Load Program</button>
-                            <button id="run-program-btn" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold transition-colors">Run Program</button>
-                            <button id="step-program-btn" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-white font-semibold transition-colors">Step</button>
-                            <button id="reset-cpu-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors">Reset CPU/Mem</button>
-                        </div>
-                    </div>
-                    <div class="w-1/2 flex flex-col bg-white/10 dark:bg-black/10 rounded-xl p-4 overflow-y-auto">
-                        <h3 class="font-bold text-lg mb-4 text-white">Memory (RAM)</h3>
-                        <div id="memory-display" class="font-mono text-xs grid grid-cols-4 gap-1">
-                            </div>
-                    </div>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-
-            <!-- Calculator Window -->
-            <div id="calculator-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-[450px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-orange-400">calculate</span><span>Calculator</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="calculator-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex flex-col flex-grow p-4">
-                    <div id="calculator-display" class="text-white font-orbitron text-4xl text-right mb-4">0</div>
-                    <div id="calculator-keypad" class="grid grid-cols-4 gap-2 flex-grow">
-                        <button class="calculator-btn clear span-2">C</button>
-                        <button class="calculator-btn operator">&larr;</button>
-                        <button class="calculator-btn operator">/</button>
-                        
-                        <button class="calculator-btn">7</button>
-                        <button class="calculator-btn">8</button>
-                        <button class="calculator-btn">9</button>
-                        <button class="calculator-btn operator">*</button>
-
-                        <button class="calculator-btn">4</button>
-                        <button class="calculator-btn">5</button>
-                        <button class="calculator-btn">6</button>
-                        <button class="calculator-btn operator">-</button>
-
-                        <button class="calculator-btn">1</button>
-                        <button class="calculator-btn">2</button>
-                        <button class="calculator-btn">3</button>
-                        <button class="calculator-btn operator">+</button>
-
-                        <button class="calculator-btn span-2">0</button>
-                        <button class="calculator-btn">.</button>
-                        <button class="calculator-btn equals">=</button>
-                    </div>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-
-            <!-- Task Manager Window -->
-            <div id="task-manager-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-[400px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-blue-400">task_alt</span><span>Task Manager</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="task-manager-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex flex-col flex-grow p-4">
-                    <h3 class="font-bold text-lg mb-4 text-white">Running Applications</h3>
-                    <div id="process-list" class="flex-grow overflow-y-auto space-y-2 pr-2">
-                        <!-- Process items will be injected here by JavaScript -->
-                    </div>
-                    <div class="flex justify-end space-x-2 mt-4">
-                        <button id="refresh-processes-btn" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-semibold transition-colors">Refresh</button>
-                        <button id="end-task-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors">End Task</button>
-                    </div>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-
-            <!-- Web Browser Window (Initially hidden) -->
-            <div id="web-browser-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-3xl h-[500px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-blue-500">public</span><span>Web Browser</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="web-browser-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex-grow p-4 text-center flex flex-col items-center justify-center">
-                    <span class="material-symbols-outlined text-9xl text-blue-500 opacity-50">public</span>
-                    <p class="text-xl text-gray-400 mt-4">A simple web browser concept.</p>
-                    <p class="text-sm text-gray-500 mt-2">(Actual web browsing not supported)</p>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-
-            <!-- Media Player Window (Initially hidden) -->
-            <div id="media-player-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-xl h-[400px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-green-500">play_circle</span><span>Media Player</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="media-player-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex-grow p-4 text-center flex flex-col items-center justify-center">
-                    <span class="material-symbols-outlined text-9xl text-green-500 opacity-50">music_note</span>
-                    <p class="text-xl text-gray-400 mt-4">A simple media player concept.</p>
-                    <p class="text-sm text-gray-500 mt-2">(Actual media playback not supported)</p>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-
-            <!-- Windows Defender Window (New) -->
-            <div id="windows-defender-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-[400px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-green-500">security</span><span>Windows Defender</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="windows-defender-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex flex-col flex-grow p-4">
-                    <h3 class="font-bold text-lg mb-4 text-white">Scan Options</h3>
-                    <div class="space-y-3 mb-6">
-                        <button id="quick-scan-btn" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors">Quick Scan</button>
-                        <button id="full-scan-btn" class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition-colors">Full Scan</button>
-                    </div>
-                    <h3 class="font-bold text-lg mb-2 text-white">Status</h3>
-                    <div id="defender-status" class="flex-grow bg-black/20 p-3 rounded-lg overflow-y-auto text-sm font-mono text-green-300">
-                        Ready to scan for threats.
-                    </div>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-
-            <!-- Calendar Window (NEW) -->
-            <div id="calendar-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-[400px] glassmorphism shadow-2xl flex flex-col animate-open pointer-events-auto">
-                <div class="title-bar flex items-center justify-between p-2">
-                    <div class="flex items-center space-x-2"><span class="material-symbols-outlined text-blue-400">calendar_month</span><span>Calendar</span></div>
-                    <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="calendar-window"><span class="material-symbols-outlined">close</span></button>
-                </div>
-                <div class="flex flex-col flex-grow p-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <button id="prev-month-btn" class="p-2 rounded-full hover:bg-white/20"><span class="material-symbols-outlined">chevron_left</span></button>
-                        <h3 id="current-month-year" class="font-bold text-lg"></h3>
-                        <button id="next-month-btn" class="p-2 rounded-full hover:bg-white/20"><span class="material-symbols-outlined">chevron_right</span></button>
-                    </div>
-                    <div id="calendar-weekdays" class="grid grid-cols-7 text-center font-semibold text-sm mb-2">
-                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-                    </div>
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-1 flex-grow">
-                        <!-- Calendar days will be rendered here -->
-                    </div>
-                </div>
-                <div class="resize-handle"></div>
-            </div>
-
-        </div>
-        <!-- Floating Dock Structure -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 p-2 glassmorphism rounded-2xl shadow-lg z-30">
-            <button id="start-menu-btn" class="dock-icon h-14 w-14 flex items-center justify-center bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all transform hover:scale-110"><span class="material-symbols-outlined text-3xl">widgets</span></button>
-            <div class="h-10 w-px bg-white/20"></div>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="file-explorer-window"><span class="material-symbols-outlined text-3xl text-yellow-500">folder</span></button>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="terminal-window"><span class="material-symbols-outlined text-3xl">terminal</span></button>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="text-editor-window"><span class="material-symbols-outlined text-3xl text-lime-400">edit_note</span></button>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="settings-window"><span class="material-symbols-outlined text-3xl">settings</span></button>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="cpu-monitor-window"><span class="material-symbols-outlined text-3xl text-purple-400">developer_board</span></button>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="calculator-window"><span class="material-symbols-outlined text-3xl text-orange-400">calculate</span></button>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="task-manager-window"><span class="material-symbols-outlined text-3xl text-blue-400">task_alt</span></button>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="sticky-notes-window"><span class="material-symbols-outlined text-3xl text-yellow-300">sticky_note_2</span></button>
-            <button class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110" data-window="updates-window"><span class="material-symbols-outlined text-3xl text-green-400">cloud_download</span></button>
-            <div id="dock-installable-apps">
-                <!-- Installable apps will be dynamically added here -->
-            </div>
-            <div class="h-10 w-px bg-white/20"></div>
-            <div class="flex items-center bg-black/20 rounded-full">
-                <button id="theme-light-btn" class="dock-icon h-12 w-12 flex items-center justify-center rounded-full"><span class="material-symbols-outlined text-yellow-400">light_mode</span></button>
-                <button id="theme-dark-btn" class="dock-icon h-12 w-12 flex items-center justify-center rounded-full"><span class="material-symbols-outlined">dark_mode</span></button>
-            </div>
-            <button id="toggle-scrollbars-btn" class="dock-icon h-14 w-14 flex items-center justify-center rounded-xl hover:bg-white/20 transition-all transform hover:scale-110"><span class="material-symbols-outlined text-3xl">reorder</span></button>
+             <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button></div><div class="flex flex-grow bg-gray-800/50"><div class="w-1/3 p-4 border-r border-white/10 no-scrollbar overflow-y-auto"><h4 class="font-semibold mb-2">System</h4><a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20">About</a><h4 class="font-semibold mb-2 mt-4">Account</h4><a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20">Your Info</a></div><div class="w-2/3 p-4 no-scrollbar overflow-y-auto"><div id="about-content" class="settings-content hidden"><h4 class="font-semibold mb-2">About this PC</h4><div class="space-y-2 text-sm"><div><strong>Device Name:</strong> Win13-Concept</div><div><strong>OS Build:</strong> 1.0.9</div></div></div><div id="account-content" class="settings-content"><h4 class="font-semibold mb-2">Account</h4><div class="flex items-center space-x-4"><img src="https://placehold.co/64x64/7c3aed/ffffff?text=U" class="rounded-full w-16 h-16"><div id="account-username" class="font-semibold">User</div></div></div></div></div><div class="resize-handle"></div></div>
+            <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-yellow-500">folder</span><span id="file-explorer-path">File Explorer</span></div><div class="flex items-center"><button id="new-file-btn" class="p-1 rounded-full hover:bg-white/20" title="New File"><span class="material-symbols-outlined">note_add</span></button><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined">close</span></button></div></div><div id="file-explorer-output" class="p-4 flex-grow overflow-y-auto no-scrollbar grid grid-cols-4 gap-4 content-start bg-gray-800/50"></div><div class="resize-handle"></div></div>
+            <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">close</span></button></div><div id="terminal-output" class="p-4 flex-grow bg-black/80 font-mono text-white text-sm overflow-y-auto no-scrollbar" onclick="document.getElementById('terminal-input')?.focus()"></div><div class="resize-handle"></div></div>
+            <div id="code-editor-window" class="window hidden absolute top-1/4 left-1/4 w-1/2 h-1/2 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-blue-400">data_object</span><span id="code-editor-title">Code Editor</span></div><div><button id="save-file-btn" class="p-1 rounded-full hover:bg-white/20" title="Save File"><span class="material-symbols-outlined">save</span></button><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="code-editor-window"><span class="material-symbols-outlined">close</span></button></div></div><textarea id="code-editor-textarea" class="w-full h-full p-2 bg-gray-900 text-white font-mono outline-none resize-none"></textarea><div class="resize-handle"></div></div>
+            <div id="calculator-window" class="window hidden absolute top-1/4 left-1/4 w-80 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-orange-400">calculate</span><span>Calculator</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="calculator-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-4 bg-gray-800/50 flex flex-col space-y-4"><div id="calc-display" class="w-full bg-black/50 rounded-lg p-4 text-right text-4xl font-mono truncate">0</div><div class="grid grid-cols-4 gap-2"><button class="calculator-btn" data-key="clear">C</button><button class="calculator-btn" data-key="backspace">⌫</button><button class="calculator-btn" data-key="%">%</button><button class="calculator-btn operator" data-key="/">÷</button><button class="calculator-btn" data-key="7">7</button><button class="calculator-btn" data-key="8">8</button><button class="calculator-btn" data-key="9">9</button><button class="calculator-btn operator" data-key="*">×</button><button class="calculator-btn" data-key="4">4</button><button class="calculator-btn" data-key="5">5</button><button class="calculator-btn" data-key="6">6</button><button class="calculator-btn operator" data-key="-">−</button><button class="calculator-btn" data-key="1">1</button><button class="calculator-btn" data-key="2">2</button><button class="calculator-btn" data-key="3">3</button><button class="calculator-btn operator" data-key="+">+</button><button class="calculator-btn col-span-2" data-key="0">0</button><button class="calculator-btn" data-key=".">.</button><button class="calculator-btn operator" data-key="=">=</button></div></div></div>
+            <div id="weather-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-cyan-400">cloudy</span><span>Weather</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="weather-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 text-center"><span class="material-symbols-outlined text-9xl text-yellow-300">sunny</span><p class="text-5xl font-bold">75°F</p><p class="text-lg">Clear Skies</p></div></div>
+            <div id="music-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-pink-400">music_note</span><span>Music</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="music-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 flex flex-col items-center"><p class="font-semibold">Cyberpunk Dreams</p><p class="text-sm text-gray-400">Synthwave AI</p><div class="w-full h-2 bg-gray-600 rounded-full my-4"><div class="h-2 bg-pink-400 rounded-full w-1/2"></div></div><div class="flex items-center space-x-6 text-4xl"><span class="material-symbols-outlined">skip_previous</span><span class="material-symbols-outlined text-5xl">pause_circle</span><span class="material-symbols-outlined">skip_next</span></div></div></div>
+            <div id="support-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-md h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-red-400">support_agent</span><span>Support Lifecycle</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="support-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 text-center"><h4 class="text-lg font-bold">End of Support for Windows 13</h4><p class="text-sm text-gray-400">October 26, 2027</p><div id="support-countdown" class="mt-4 text-2xl font-mono"></div></div></div>
         </div>
     </div>
-    <!-- Link to external JavaScript file -->
-    <script src="script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- VFS & State ---
+        let vfs = { 'C:': { Users: { You: { Desktop: { 'welcome.txt': 'Welcome to Windows 13!' }, Documents: {} } } } };
+        let currentPath = "C:/Users/You/Desktop";
+        // --- DOM Elements ---
+        const loginContainer = document.getElementById('login-container');
+        const desktopContainer = document.getElementById('desktop-container');
+        const disclaimerModal = document.getElementById('disclaimer-modal');
+        const fileExplorerOutput = document.getElementById('file-explorer-output');
+        const fileExplorerPathEl = document.getElementById('file-explorer-path');
+        const terminalOutput = document.getElementById('terminal-output');
+        const sidebarTime = document.getElementById('sidebar-time');
+        const sidebarDate = document.getElementById('sidebar-date');
+        const codeEditorTextarea = document.getElementById('code-editor-textarea');
+        const codeEditorTitle = document.getElementById('code-editor-title');
+        const supportCountdownEl = document.getElementById('support-countdown');
+        
+        // --- Account & Login ---
+        document.getElementById('show-create-account-btn').addEventListener('click', () => { document.getElementById('login-view').classList.add('hidden'); document.getElementById('create-account-view').classList.remove('hidden'); });
+        document.getElementById('show-login-btn').addEventListener('click', () => { document.getElementById('create-account-view').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden'); });
+        document.getElementById('create-account-btn').addEventListener('click', () => {
+            const user = document.getElementById('create-username').value;
+            const pass = document.getElementById('create-password').value;
+            if (user && pass) { localStorage.setItem(`win13_account_${user}`, pass); alert('Account created!'); document.getElementById('show-login-btn').click(); } 
+            else { alert('Please enter a username and password.'); }
+        });
+        document.getElementById('sign-in-btn').addEventListener('click', () => {
+            const user = document.getElementById('login-username').value;
+            const pass = document.getElementById('login-password').value;
+            const storedPass = localStorage.getItem(`win13_account_${user}`);
+            if (storedPass && pass === storedPass) {
+                document.getElementById('account-username').textContent = user;
+                document.getElementById('boot-sound').play().catch(e => {});
+                loginContainer.style.opacity = '0';
+                setTimeout(() => {
+                    loginContainer.classList.add('hidden');
+                    desktopContainer.style.opacity = '1';
+                    if (!localStorage.getItem('win13_disclaimer_seen')) { disclaimerModal.classList.remove('hidden'); }
+                }, 500);
+            } else { alert('Invalid credentials. Create an account if you haven\'t.'); }
+        });
+        document.getElementById('disclaimer-ok-btn').addEventListener('click', () => {
+            disclaimerModal.classList.add('hidden');
+            localStorage.setItem('win13_disclaimer_seen', 'true');
+        });
+
+        // --- Date, Clock & Countdown ---
+        const updateClock = () => {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            sidebarTime.textContent = `${String(hours % 12 || 12)}:${minutes} ${ampm}`;
+            sidebarDate.textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        };
+        const updateCountdown = () => {
+            const endDate = new Date('October 26, 2027 00:00:00');
+            const now = new Date();
+            const diff = endDate - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            if(supportCountdownEl) {
+                supportCountdownEl.textContent = `${days}d ${hours}h ${minutes}m`;
+            }
+        };
+        setInterval(updateClock, 1000);
+        setInterval(updateCountdown, 1000 * 60);
+        updateClock();
+        updateCountdown();
+
+        // --- Calculator Logic ---
+        const calcDisplay = document.getElementById('calc-display');
+        let firstValue = '';
+        let operator = '';
+        let shouldResetDisplay = false;
+        
+        document.querySelectorAll('.calculator-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const key = e.target.dataset.key;
+                const isOperator = e.target.classList.contains('operator');
+                
+                if(!isNaN(key) || key === '.') {
+                    if (shouldResetDisplay) { calcDisplay.textContent = ''; shouldResetDisplay = false; }
+                    calcDisplay.textContent = calcDisplay.textContent === '0' ? key : calcDisplay.textContent + key;
+                } else if(isOperator && key !== '=') {
+                    firstValue = calcDisplay.textContent;
+                    operator = key;
+                    shouldResetDisplay = true;
+                } else if (key === '=') {
+                    if(operator && firstValue) {
+                        const result = eval(`${parseFloat(firstValue)} ${operator} ${parseFloat(calcDisplay.textContent)}`);
+                        calcDisplay.textContent = result;
+                        firstValue = ''; operator = ''; shouldResetDisplay = true;
+                    }
+                } else if (key === 'clear') {
+                    calcDisplay.textContent = '0'; firstValue = ''; operator = '';
+                } else if (key === 'backspace') {
+                    calcDisplay.textContent = calcDisplay.textContent.slice(0, -1) || '0';
+                }
+            });
+        });
+        
+        // --- File System & Explorer ---
+        const getObjectFromPath = (path) => path.split('/').filter(p => p).reduce((o, k) => o && o[k] ? o[k] : null, vfs);
+        const renderFileExplorer = () => {
+            fileExplorerOutput.innerHTML = '';
+            fileExplorerPathEl.textContent = currentPath;
+            const currentDir = getObjectFromPath(currentPath);
+            if (!currentDir) { console.error("Could not find path:", currentPath); return; }
+            if (currentPath !== 'C:') {
+                const upIcon = document.createElement('div');
+                upIcon.className = 'flex flex-col items-center p-2 rounded-lg hover:bg-white/20 cursor-pointer';
+                upIcon.innerHTML = `<span class="material-symbols-outlined text-5xl text-yellow-500">subdirectory_arrow_left</span><span class="text-xs text-center truncate w-full">..</span>`;
+                upIcon.addEventListener('dblclick', () => {
+                    let parts = currentPath.split('/').filter(p => p); parts.pop();
+                    currentPath = parts.length > 0 ? parts.join('/') : 'C:';
+                    renderFileExplorer();
+                });
+                fileExplorerOutput.appendChild(upIcon);
+            }
+            Object.keys(currentDir).forEach(key => {
+                const isDir = typeof currentDir[key] === 'object' && currentDir[key] !== null;
+                const icon = document.createElement('div');
+                icon.className = 'flex flex-col items-center p-2 rounded-lg hover:bg-white/20 cursor-pointer';
+                icon.innerHTML = `<span class="material-symbols-outlined text-5xl ${isDir ? 'text-yellow-500' : 'text-gray-300'}">${isDir ? 'folder' : 'draft'}</span><span class="text-xs text-center truncate w-full">${key}</span>`;
+                icon.addEventListener('dblclick', () => handleFileExplorerClick(key, isDir));
+                fileExplorerOutput.appendChild(icon);
+            });
+        };
+        const handleFileExplorerClick = (name, isDir) => {
+            if (isDir) {
+                currentPath = `${currentPath}/${name}`.replace('//', '/'); renderFileExplorer();
+            } else {
+                const fileContent = getObjectFromPath(currentPath)[name];
+                openWindow('code-editor-window');
+                codeEditorTextarea.value = fileContent; codeEditorTitle.textContent = name;
+                codeEditorTextarea.dataset.filePath = `${currentPath}/${name}`.replace('//', '/');
+            }
+        };
+        document.getElementById('save-file-btn').addEventListener('click', () => {
+            const path = codeEditorTextarea.dataset.filePath;
+            if (!path) return;
+            const parts = path.split('/'); const fileName = parts.pop();
+            const dir = getObjectFromPath(parts.join('/'));
+            if(dir) { dir[fileName] = codeEditorTextarea.value; }
+        });
+        document.getElementById('new-file-btn').addEventListener('click', () => {
+            const fileName = prompt("Enter file name:", "new_file.txt");
+            if (fileName) { const currentDir = getObjectFromPath(currentPath); if (currentDir) { currentDir[fileName] = ''; renderFileExplorer(); } }
+        });
+
+        // --- Terminal ---
+        const processCommand = (cmd) => {
+            const [command, ...args] = cmd.trim().split(' '); if (!command) return;
+            const append = (text) => appendTerminalOutput(text);
+            switch (command.toLowerCase()) {
+                case 'ls':
+                    const dirContent = getObjectFromPath(currentPath);
+                    if (dirContent) append(Object.keys(dirContent).join('  ')); else append('Error: Invalid path');
+                    break;
+                case 'cd':
+                    let newPath = args[0]; if (!newPath) { append('Usage: cd [path]'); break; }
+                    if (newPath === '..') {
+                        let parts = currentPath.split('/').filter(p => p);
+                        if (parts.length > 1) { parts.pop(); currentPath = parts.join('/'); } 
+                        else { currentPath = 'C:'; }
+                    } else {
+                        const targetPath = `${currentPath}/${newPath}`.replace('//', '/');
+                        if (getObjectFromPath(targetPath)) { currentPath = targetPath; } 
+                        else { append(`Error: Directory not found: ${newPath}`); }
+                    }
+                    renderFileExplorer();
+                    break;
+                case 'mkdir':
+                    if (!args[0]) { append("Usage: mkdir [directory_name]"); break; }
+                    const currentDir = getObjectFromPath(currentPath);
+                    if (currentDir) { currentDir[args[0]] = {}; append(`Directory '${args[0]}' created.`); renderFileExplorer(); } 
+                    else { append(`Error: Path not found.`); }
+                    break;
+                case 'restart': append('Restarting...'); setTimeout(() => window.location.reload(), 1000); break;
+                default: append(`'${command}' is not recognized.`);
+            }
+        };
+        const createPrompt = () => {
+            const promptContainer = document.createElement('div');
+            promptContainer.className = 'flex';
+            promptContainer.innerHTML = `<span class="text-green-400">${currentPath}>&nbsp;</span><input type="text" id="terminal-input" class="flex-grow bg-transparent border-none outline-none font-mono text-white">`;
+            terminalOutput.appendChild(promptContainer);
+            const input = document.getElementById('terminal-input');
+            input.focus();
+            input.addEventListener('keydown', (e) => { if(e.key === 'Enter') handleTerminalInput(e); });
+        };
+        const handleTerminalInput = (e) => {
+            const input = e.target; const cmd = input.value;
+            input.parentElement.remove();
+            appendTerminalOutput(`<span class="text-green-400">${currentPath}>&nbsp;</span>${cmd}`);
+            processCommand(cmd);
+            createPrompt();
+        };
+        const appendTerminalOutput = (text) => { terminalOutput.innerHTML += `<div>${text.replace(/\n/g, '<br>')}</div>`; terminalOutput.scrollTop = terminalOutput.scrollHeight; };
+
+        // --- Window Management ---
+        let activeWindow = null, actionType = null, startX, startY, startW, startH, startLeft, startTop;
+        const startAction = (e, windowEl, currentAction) => {
+            actionType = currentAction; activeWindow = windowEl;
+            document.querySelectorAll('.window').forEach(w => w.style.zIndex = '40');
+            activeWindow.style.zIndex = '45';
+            const event = e.type === 'touchstart' ? e.touches[0] : e;
+            startX = event.clientX; startY = event.clientY;
+            startW = parseInt(document.defaultView.getComputedStyle(activeWindow).width, 10);
+            startH = parseInt(document.defaultView.getComputedStyle(activeWindow).height, 10);
+            startLeft = activeWindow.offsetLeft; startTop = activeWindow.offsetTop;
+            document.addEventListener('mousemove', doAction); document.addEventListener('mouseup', endAction);
+            document.addEventListener('touchmove', doAction, { passive: false }); document.addEventListener('touchend', endAction);
+        };
+        const doAction = (e) => {
+            if (!activeWindow) return; e.preventDefault();
+            const event = e.type === 'touchmove' ? e.touches[0] : e;
+            const dx = event.clientX - startX; const dy = event.clientY - startY;
+            if (actionType === 'drag') {
+                activeWindow.style.left = `${startLeft + dx}px`;
+                activeWindow.style.top = `${startTop + dy}px`;
+            } else if (actionType === 'resize') {
+                activeWindow.style.width = `${startW + dx}px`;
+                activeWindow.style.height = `${startH + dy}px`;
+            }
+        };
+        const endAction = () => {
+            activeWindow = null; actionType = null;
+            document.removeEventListener('mousemove', doAction); document.removeEventListener('mouseup', endAction);
+            document.removeEventListener('touchmove', doAction); document.removeEventListener('touchend', endAction);
+        };
+        document.querySelectorAll('.window').forEach(win => {
+            const titleBar = win.querySelector('.title-bar');
+            const resizeHandle = win.querySelector('.resize-handle');
+            if (titleBar) { titleBar.addEventListener('mousedown', e => startAction(e, win, 'drag')); titleBar.addEventListener('touchstart', e => startAction(e, win, 'drag')); }
+            if (resizeHandle) { resizeHandle.addEventListener('mousedown', e => startAction(e, win, 'resize')); resizeHandle.addEventListener('touchstart', e => startAction(e, win, 'resize')); }
+        });
+        
+        // --- Init & Other Listeners ---
+        const openWindow = (windowId) => {
+            const windowEl = document.getElementById(windowId);
+            if(windowEl) windowEl.classList.remove('hidden');
+            if(windowId === 'terminal-window' && !terminalOutput.hasChildNodes()) createPrompt();
+            if(windowId === 'file-explorer-window') renderFileExplorer();
+        };
+        document.querySelectorAll('[data-window]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); openWindow(btn.getAttribute('data-window')); }));
+        document.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); document.getElementById(btn.getAttribute('data-window')).classList.add('hidden'); }));
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const settingsContents = document.querySelectorAll('.settings-content');
+        settingsTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                settingsTabs.forEach(t => t.classList.remove('bg-white/20'));
+                tab.classList.add('bg-white/20');
+                settingsContents.forEach(content => content.classList.add('hidden'));
+                const targetId = tab.getAttribute('href').substring(1) + '-content';
+                document.getElementById(targetId).classList.remove('hidden');
+            });
+        });
+        document.querySelector('.settings-tab[href="#about"]')?.click();
+    });
+    </script>
 </body>
 </html>
