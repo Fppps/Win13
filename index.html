@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
-        body { font-family: 'Inter', sans-serif; user-select: none; color: #e0e0e0; background-color: #1a1a2e; }
+        body { font-family: 'Inter', sans-serif; user-select: none; color: #e0e0e0; background-color: #1a1a2e; overflow: hidden; }
         body.light { color: #1a1a2e; background-color: #e0e0e0; } /* Light mode body colors */
         .font-mono { font-family: 'monospace'; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
@@ -131,14 +131,140 @@
         }
 
         /* Code Editor Specific Styles */
+        .code-editor-container {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+            background-color: #1e1e1e; /* Dark background for code editor */
+            color: #d4d4d4; /* Light text for code */
+            font-family: 'monospace';
+            font-size: 0.875rem; /* text-sm */
+        }
+        body.light .code-editor-container {
+            background-color: #f3f3f3;
+            color: #333;
+        }
+
+        #code-editor-sidebar {
+            width: 180px; /* Fixed width for sidebar */
+            background-color: #252526; /* Darker background for sidebar */
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 8px;
+        }
+        body.light #code-editor-sidebar {
+            background-color: #e6e6e6;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .editor-file-item {
+            display: flex;
+            align-items: center;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            transition: background-color 0.1s ease;
+        }
+        .editor-file-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        body.light .editor-file-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .editor-file-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        body.light .editor-file-item.active {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+
+        .code-editor-main-panel {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #code-editor-tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: #2d2d2d; /* Tabs background */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 5px;
+            flex-shrink: 0; /* Prevent shrinking */
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap; /* Keep tabs in a single line */
+            -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+        }
+        #code-editor-tab-bar::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari, Opera */
+        }
+        body.light #code-editor-tab-bar {
+            background-color: #e0e0e0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .editor-tab {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: #2d2d2d;
+            border-bottom: 3px solid transparent;
+            transition: background-color 0.1s, border-color 0.1s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        body.light .editor-tab {
+            background-color: #e0e0e0;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .editor-tab:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        body.light .editor-tab:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .editor-tab.active {
+            background-color: #1e1e1e; /* Active tab background */
+            border-bottom-color: #007acc; /* VSCode blue indicator */
+        }
+        body.light .editor-tab.active {
+            background-color: #f3f3f3;
+            border-bottom-color: #007acc;
+        }
+
+        .tab-close-btn {
+            font-size: 1rem;
+            margin-left: 8px;
+            cursor: pointer;
+            color: #858585;
+            transition: color 0.1s;
+        }
+        .tab-close-btn:hover {
+            color: #d4d4d4;
+        }
+        body.light .tab-close-btn {
+            color: #555;
+        }
+        body.light .tab-close-btn:hover {
+            color: #333;
+        }
+
+
         .code-editor-content {
             display: flex;
             flex-grow: 1;
             overflow: hidden; /* Important for scroll sync */
-            background-color: #1e1e1e; /* Dark background for code */
-            color: #d4d4d4; /* Light text for code */
-            font-family: 'monospace';
-            font-size: 0.875rem; /* text-sm */
+            /* Background and color inherited from .code-editor-container */
         }
 
         .line-numbers {
@@ -148,8 +274,9 @@
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             background-color: #252526; /* Slightly lighter than code background */
             color: #858585; /* Grayed out line numbers */
-            overflow-y: hidden; /* Hide scrollbar for line numbers */
             flex-shrink: 0; /* Prevent shrinking */
+            line-height: 1.5; /* Match line height with textarea */
+            overflow-y: hidden; /* Keep this to hide scrollbar if textarea has one */
         }
         body.light .line-numbers {
             border-right: 1px solid rgba(0, 0, 0, 0.1);
@@ -171,12 +298,33 @@
             white-space: pre; /* Preserve whitespace for better code display */
             overflow-y: scroll; /* Allow textarea to scroll */
         }
+
+        #code-editor-bottom-panel {
+            flex-shrink: 0; /* Prevent shrinking */
+            height: 100px; /* Fixed height for bottom panel */
+            background-color: #2d2d2d; /* Similar to tab bar */
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            padding: 8px;
+            font-size: 0.8rem;
+            color: #cccccc;
+            white-space: pre-wrap; /* Preserve formatting for output */
+        }
+        body.light #code-editor-bottom-panel {
+            background-color: #e0e0e0;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        /* Boot and Install Screen Styles - HIDDEN/REMOVED */
     </style>
 </head>
 <body class="overflow-hidden">
 
     <audio id="boot-sound" src="bootup/boot.mp3" preload="auto"></audio>
     <div id="power-off-screen" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black transition-opacity duration-500"><h2 id="power-off-message" class="text-2xl font-bold text-white mb-6"></h2></div>
+
+    <!-- Boot Screen - Removed -->
+    <!-- Install Screen - Removed -->
 
     <!-- Login/Register Screen -->
     <div id="login-container" class="absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
@@ -220,7 +368,7 @@
     </div>
 
     <!-- Desktop Container -->
-    <div id="desktop-container" class="h-screen w-screen relative flex flex-col">
+    <div id="desktop-container" class="h-screen w-screen relative flex flex-col hidden">
         
         <!-- Top Bar -->
         <header class="h-20 w-full p-4 flex items-center space-x-4 panel">
@@ -242,13 +390,18 @@
         <!-- Main Content Grid -->
         <main class="flex-grow p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 panel rounded-lg p-6">
-                 <h2 class="text-3xl font-bold text-white mb-4">Version 1.5.0</h2>
-                 <p class="text-gray-300">This update includes a new teaser for what's next in the Windows concept, along with continued improvements to stability and features.</p>
+                 <h2 class="text-3xl font-bold text-white mb-4">Version 2.2.1</h2>
+                 <p class="text-gray-300 mb-4">The installation process has been removed. The system now directly presents the login screen on startup, allowing for quicker access to your Windows 13 experience.</p>
+                 <div class="flex items-center space-x-4 mb-4">
+                    <h3 class="text-xl font-semibold text-gray-400">Current Time:</h3>
+                    <p id="main-content-time" class="text-3xl text-white font-mono"></p>
+                </div>
             </div>
             <div class="lg:col-span-1 flex flex-col space-y-8">
                 <!-- Windows 14 Teaser Block -->
                 <div class="panel rounded-lg p-6 text-center">
                     <h3 class="text-xl font-bold text-white mb-4">A Glimpse into the Future: Windows 14 Concept</h3>
+                    <!-- Updated image source -->
                     <img src="Assets/Windows14/Windows14.png" alt="Windows 14 Concept Teaser" class="w-full h-auto rounded-lg mb-4 object-cover">
                     <p class="text-sm text-gray-300">This is an early idea for the next generation of Windows, focusing on a more fluid and integrated user experience. More details to come!</p>
                 </div>
@@ -258,21 +411,17 @@
                 </div>
                  <div class="panel rounded-lg p-4 text-center">
                     <h3 class="text-lg font-semibold text-gray-400 mb-2">Version</h3>
-                    <p class="text-2xl text-white">1.5.0</p>
-                </div>
-                 <div class="panel rounded-lg p-4 text-center">
-                    <h3 class="text-lg font-semibold text-gray-400 mb-2">Time</h3>
-                    <p id="sidebar-time" class="text-2xl text-white"></p>
+                    <p class="text-2xl text-white">2.2.1</p>
                 </div>
             </div>
         </main>
         
         <!-- Windows Container (overlays everything) -->
         <div id="windows-container" class="absolute inset-0 w-full h-full pointer-events-none">
-             <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button></div><div class="flex flex-grow bg-gray-800/50"><div class="w-1/3 p-4 border-r border-white/10 no-scrollbar overflow-y-auto"><h4 class="font-semibold mb-2">System</h4><a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20">About</a><h4 class="font-semibold mb-2 mt-4">Account</h4><a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20">Your Info</a></div><div class="w-2/3 p-4 no-scrollbar overflow-y-auto"><div id="about-content" class="settings-content hidden"><h4 class="font-semibold mb-2">About this PC</h4><div class="space-y-2 text-sm"><div><strong>Device Name:</strong> Win13-Concept</div><div><strong>OS Build:</strong> 1.5.0</div></div></div><div id="account-content" class="settings-content"><h4 class="font-semibold mb-2">Account</h4><div class="flex items-center space-x-4"><img src="https://placehold.co/64x64/7c3aed/ffffff?text=U" class="rounded-full w-16 h-16"><div id="account-username" class="font-semibold">User</div></div></div></div></div><div class="resize-handle"></div></div>
+             <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button></div><div class="flex flex-grow bg-gray-800/50"><div class="w-1/3 p-4 border-r border-white/10 no-scrollbar overflow-y-auto"><h4 class="font-semibold mb-2">System</h4><a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20">About</a><h4 class="font-semibold mb-2 mt-4">Account</h4><a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20">Your Info</a></div><div class="w-2/3 p-4 no-scrollbar overflow-y-auto"><div id="about-content" class="settings-content hidden"><h4 class="font-semibold mb-2">About this PC</h4><div class="space-y-2 text-sm"><div><strong>Device Name:</strong> Win13-Concept</div><div><strong>OS Build:</strong> 2.2.1</div></div></div><div id="account-content" class="settings-content"><h4 class="font-semibold mb-2">Account</h4><div class="flex items-center space-x-4"><img src="https://placehold.co/64x64/7c3aed/ffffff?text=U" class="rounded-full w-16 h-16"><div id="account-username" class="font-semibold">User</div></div></div></div></div><div class="resize-handle"></div></div>
             <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-yellow-500">folder</span><span id="file-explorer-path">File Explorer</span></div><div class="flex items-center"><button id="new-file-btn" class="p-1 rounded-full hover:bg-white/20" title="New File"><span class="material-symbols-outlined">note_add</span></button><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined">close</span></button></div></div><div id="file-explorer-output" class="p-4 flex-grow overflow-y-auto no-scrollbar grid grid-cols-4 gap-4 content-start bg-gray-800/50"></div><div class="resize-handle"></div></div>
             <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">close</span></button></div><div id="terminal-output" class="p-4 flex-grow bg-black/80 font-mono text-white text-sm overflow-y-auto no-scrollbar" onclick="document.getElementById('terminal-input')?.focus()"></div><div class="resize-handle"></div></div>
-            <div id="code-editor-window" class="window hidden absolute top-1/4 left-1/4 w-1/2 h-1/2 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
+            <div id="code-editor-window" class="window hidden absolute top-1/4 left-1/4 w-3/4 h-3/4 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
                 <div class="title-bar flex items-center justify-between p-2 border-b border-white/10">
                     <div class="flex items-center space-x-2">
                         <span class="material-symbols-outlined text-blue-400">data_object</span>
@@ -284,9 +433,25 @@
                         <button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="code-editor-window"><span class="material-symbols-outlined">close</span></button>
                     </div>
                 </div>
-                <div class="code-editor-content">
-                    <div class="line-numbers no-scrollbar" id="line-numbers"></div>
-                    <textarea id="code-editor-textarea" class="no-scrollbar" spellcheck="false" wrap="off"></textarea>
+                <div class="code-editor-container">
+                    <div id="code-editor-sidebar" class="no-scrollbar">
+                        <h4 class="text-xs font-semibold mb-2 text-gray-400">EXPLORER</h4>
+                        <div id="editor-file-list">
+                            <!-- Files will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="code-editor-main-panel">
+                        <div id="code-editor-tab-bar" class="no-scrollbar">
+                            <!-- Tabs will be rendered here -->
+                        </div>
+                        <div class="code-editor-content">
+                            <div class="line-numbers no-scrollbar" id="line-numbers"></div>
+                            <textarea id="code-editor-textarea" class="no-scrollbar" spellcheck="false" wrap="off"></textarea>
+                        </div>
+                        <div id="code-editor-bottom-panel" class="no-scrollbar">
+                            Output:
+                        </div>
+                    </div>
                 </div>
                 <div class="resize-handle"></div>
             </div>
@@ -299,22 +464,82 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- VFS & State ---
-        let vfs = { 'C:': { Users: { You: { Desktop: { 'welcome.txt': 'Welcome to Windows 13!' }, Documents: {} } } } };
+        let vfs = { 
+            'C:': { 
+                Users: { 
+                    You: { 
+                        Desktop: { 'welcome.txt': 'Welcome to Windows 13!' }, 
+                        Documents: { 
+                            'numpy_example.py': 'import numpy as np\n\narr = np.array([1, 2, 3])\nresult = arr + 5\nprint(f"Array: {arr}")\nprint(f"Result: {result}")\n\nscalar_multiply = np.array([10, 20]) * 2\nprint(f"Scalar multiply: {scalar_multiply}")\n\nmatrix_a = np.array([[1,2],[3,4]])\nmatrix_b = np.array([[5,6],[7,8]])\nmatrix_sum = matrix_a + matrix_b\nprint(f"Matrix sum: {matrix_sum}")',
+                            'hello.py': 'print("Hello from Python in Windows 13!")\nx = 10\ny = 20\nprint(f"X + Y = {x+y}")'
+                        } 
+                    } 
+                } 
+            } 
+        };
         let currentPath = "C:/Users/You/Desktop";
         // --- Simulated Python Environment ---
-        const installedPythonPackages = new Set();
+        const installedPythonPackages = new Set(['numpy']); // NumPy is "pre-installed" for demonstration
         
+        // --- Simulated NumPy Library ---
+        const np = {
+            array: (data) => {
+                // Simplistic array creation for 1D and 2D arrays
+                if (Array.isArray(data) && data.every(Array.isArray)) {
+                    // 2D Array (Matrix)
+                    return {
+                        _data: data,
+                        toString: function() { return `np.array(${JSON.stringify(this._data)})`; },
+                        valueOf: function() { return this._data; },
+                        // Basic matrix addition
+                        plus: function(other) {
+                            if (!Array.isArray(other) || !other.every(Array.isArray) || this._data.length !== other.length || (this._data[0] && this._data[0].length !== other[0].length)) {
+                                throw new Error("Operands must be matrices of the same shape for addition.");
+                            }
+                            return np.array(this._data.map((row, rIdx) => 
+                                row.map((val, cIdx) => val + other[rIdx][cIdx])
+                            ));
+                        }
+                    };
+                } else if (Array.isArray(data)) {
+                    // 1D Array
+                    return {
+                        _data: data,
+                        toString: function() { return `np.array(${JSON.stringify(this._data)})`; },
+                        valueOf: function() { return this._data; },
+                        // Basic scalar addition/subtraction/multiplication/division
+                        plus: function(scalar) { return np.array(this._data.map(val => val + scalar)); },
+                        minus: function(scalar) { return np.array(this._data.map(val => val - scalar)); },
+                        times: function(scalar) { return np.array(this._data.map(val => val * scalar)); },
+                        divide: function(scalar) { return np.array(this._data.map(val => val / scalar)); }
+                    };
+                }
+                return data; // Return as is if not an array
+            }
+        };
+
         // --- DOM Elements ---
+        // Removed bootScreen, installScreen, installProgressBar, installStatusText
         const loginContainer = document.getElementById('login-container');
         const desktopContainer = document.getElementById('desktop-container');
         const disclaimerModal = document.getElementById('disclaimer-modal');
         const fileExplorerOutput = document.getElementById('file-explorer-output');
         const fileExplorerPathEl = document.getElementById('file-explorer-path');
         const terminalOutput = document.getElementById('terminal-output');
-        const sidebarTime = document.getElementById('sidebar-time');
         const sidebarDate = document.getElementById('sidebar-date');
-        const codeEditorTextarea = document.getElementById('code-editor-textarea');
+        const mainContentTime = document.getElementById('main-content-time');
+        
+        const codeEditorWindow = document.getElementById('code-editor-window');
         const codeEditorTitle = document.getElementById('code-editor-title');
+        const codeEditorSidebar = document.getElementById('code-editor-sidebar');
+        const editorFileList = document.getElementById('editor-file-list');
+        const codeEditorTabBar = document.getElementById('code-editor-tab-bar');
+        const codeEditorTextarea = document.getElementById('code-editor-textarea');
+        const lineNumbersElement = document.getElementById('line-numbers');
+        const codeEditorBottomPanel = document.getElementById('code-editor-bottom-panel');
+        const runCodeBtn = document.getElementById('run-code-btn');
+
+
         const supportCountdownEl = document.getElementById('support-countdown');
         const currentUsernameDisplay = document.getElementById('current-username-display');
         const loginUsernameInput = document.getElementById('login-username');
@@ -324,8 +549,97 @@
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
         const themeToggleIcon = document.getElementById('theme-toggle-icon');
         const body = document.body;
-        const lineNumbersElement = document.getElementById('line-numbers');
-        const runCodeBtn = document.getElementById('run-code-btn');
+        
+        // --- Code Editor: Tab Management ---
+        let openEditorTabs = []; // { id: string, filePath: string, title: string, content: string }
+        let activeEditorTabId = null;
+
+        const updateEditorUI = () => {
+            // Update tabs
+            codeEditorTabBar.innerHTML = '';
+            openEditorTabs.forEach(tab => {
+                const tabEl = document.createElement('div');
+                tabEl.className = `editor-tab ${tab.id === activeEditorTabId ? 'active' : ''}`;
+                tabEl.dataset.tabId = tab.id;
+                tabEl.innerHTML = `<span>${tab.title}</span><span class="material-symbols-outlined tab-close-btn text-xs">close</span>`;
+                tabEl.addEventListener('click', () => switchEditorTab(tab.id));
+                tabEl.querySelector('.tab-close-btn').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent switching tab when closing
+                    closeEditorTab(tab.id);
+                });
+                codeEditorTabBar.appendChild(tabEl);
+            });
+
+            // Update textarea content and line numbers
+            const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
+            if (activeTab) {
+                codeEditorTextarea.value = activeTab.content;
+                codeEditorTitle.textContent = activeTab.title;
+                codeEditorTextarea.dataset.filePath = activeTab.filePath;
+                updateLineNumbers();
+            } else {
+                codeEditorTextarea.value = '';
+                codeEditorTitle.textContent = 'Code Editor';
+                codeEditorTextarea.dataset.filePath = '';
+                lineNumbersElement.innerHTML = ''; // Clear line numbers
+                codeEditorBottomPanel.textContent = 'Output:'; // Clear output panel
+            }
+        };
+
+        const openEditorTab = (filePath) => {
+            const fileName = filePath.split('/').pop();
+            let existingTab = openEditorTabs.find(tab => tab.filePath === filePath);
+
+            if (existingTab) {
+                activeEditorTabId = existingTab.id;
+            } else {
+                const fileContent = getObjectFromPath(filePath);
+                if (fileContent !== null && typeof fileContent === 'string') { // Ensure it's a file, not a directory
+                    const newTab = {
+                        id: `tab-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, // Unique ID
+                        filePath: filePath,
+                        title: fileName,
+                        content: fileContent
+                    };
+                    openEditorTabs.push(newTab);
+                    activeEditorTabId = newTab.id;
+                } else {
+                    showAlert(`Cannot open '${fileName}'. It might be a directory or does not exist.`);
+                    return;
+                }
+            }
+            updateEditorUI();
+        };
+
+        const closeEditorTab = (tabIdToClose) => {
+            const index = openEditorTabs.findIndex(tab => tab.id === tabIdToClose);
+            if (index !== -1) {
+                openEditorTabs.splice(index, 1);
+                if (activeEditorTabId === tabIdToClose) {
+                    // If the closed tab was active, switch to the next available tab
+                    activeEditorTabId = openEditorTabs.length > 0 ? openEditorTabs[0].id : null;
+                }
+                updateEditorUI();
+                // If no tabs are open, hide the editor window
+                if (openEditorTabs.length === 0) {
+                    codeEditorWindow.classList.add('hidden');
+                }
+            }
+        };
+
+        const switchEditorTab = (tabIdToActivate) => {
+            activeEditorTabId = tabIdToActivate;
+            updateEditorUI();
+        };
+
+        codeEditorTextarea.addEventListener('input', () => {
+            // Update content of the active tab
+            const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
+            if (activeTab) {
+                activeTab.content = codeEditorTextarea.value;
+            }
+            updateLineNumbers();
+        });
 
 
         // Custom Alert function
@@ -441,6 +755,7 @@
 
                 setTimeout(() => {
                     loginContainer.classList.add('hidden');
+                    desktopContainer.classList.remove('hidden'); // Show desktop
                     desktopContainer.style.opacity = '1';
                     fetchWeather();
                     if (!localStorage.getItem('win13_disclaimer_seen')) { disclaimerModal.classList.remove('hidden'); }
@@ -504,7 +819,10 @@
             const hours = now.getHours();
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const ampm = hours >= 12 ? 'PM' : 'AM';
-            sidebarTime.textContent = `${String(hours % 12 || 12)}:${minutes} ${ampm}`;
+            // Update time in main content grid
+            if (mainContentTime) {
+                mainContentTime.textContent = `${String(hours % 12 || 12)}:${minutes} ${ampm}`;
+            }
             sidebarDate.textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         };
         const updateCountdown = () => {
@@ -585,41 +903,159 @@
         const handleFileExplorerClick = (name, isDir) => {
             if (isDir) {
                 currentPath = `${currentPath}/${name}`.replace('//', '/'); renderFileExplorer();
+                renderCodeEditorSidebar(); // Update code editor sidebar if a directory changes
             } else {
-                const fileContent = getObjectFromPath(currentPath)[name];
+                const filePath = `${currentPath}/${name}`.replace('//', '/');
                 openWindow('code-editor-window');
-                codeEditorTextarea.value = fileContent; 
-                codeEditorTitle.textContent = name;
-                codeEditorTextarea.dataset.filePath = `${currentPath}/${name}`.replace('//', '/');
-                updateLineNumbers(); // Update line numbers when a file is opened
+                openEditorTab(filePath); // Open in code editor tab
             }
         };
         document.getElementById('save-file-btn').addEventListener('click', () => {
-            const path = codeEditorTextarea.dataset.filePath;
-            if (!path) return;
-            const parts = path.split('/'); const fileName = parts.pop();
-            const dir = getObjectFromPath(parts.join('/'));
-            if(dir) { 
-                dir[fileName] = codeEditorTextarea.value; 
+            const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
+            if (!activeTab) {
+                showAlert("No file open to save.");
+                return;
+            }
+            const path = activeTab.filePath;
+            const content = activeTab.content;
+
+            if (!path) {
+                showAlert("Cannot save file: path is missing.");
+                return;
+            }
+
+            const parts = path.split('/'); 
+            const fileName = parts.pop();
+            const dirPath = parts.join('/');
+            const dir = getObjectFromPath(dirPath);
+
+            if(dir && typeof dir === 'object') { 
+                dir[fileName] = content; 
                 showAlert(`File "${fileName}" saved successfully!`);
+                // Re-render file explorer to ensure latest content is reflected if needed
+                renderFileExplorer();
+                renderCodeEditorSidebar(); // Update sidebar too
             } else {
-                showAlert(`Error: Could not save file "${fileName}".`);
+                showAlert(`Error: Could not save file "${fileName}". Directory not found.`);
             }
         });
+
         document.getElementById('new-file-btn').addEventListener('click', () => {
-            showAlert("Enter file name:", "new_file.txt"); // Using custom alert for now
+            showAlert("The 'New File' feature requires a custom prompt. Currently, you can create files via the terminal using 'touch <filename>' (not implemented yet) or by directly editing the VFS structure for demonstration.");
             // To implement this fully, a custom prompt modal would be needed.
             // For now, this will simply show the alert without prompting for input.
-            // Example:
-            // showCustomPrompt("Enter file name:", "new_file.txt", (fileName) => {
-            //     if (fileName) { const currentDir = getObjectFromPath(currentPath); if (currentDir) { currentDir[fileName] = ''; renderFileExplorer(); } }
+            // Example of how it would work with a custom prompt:
+            // showCustomPrompt("Enter new file name:", "new_file.txt", (fileName) => {
+            //     if (fileName) {
+            //         const currentDir = getObjectFromPath(currentPath);
+            //         if (currentDir && typeof currentDir === 'object') {
+            //             if (!currentDir[fileName]) {
+            //                 currentDir[fileName] = ''; // Create empty file
+            //                 renderFileExplorer();
+            //                 renderCodeEditorSidebar(); // Update sidebar
+            //                 openWindow('code-editor-window');
+            //                 openEditorTab(`${currentPath}/${fileName}`);
+            //             } else {
+            //                 showAlert(`Error: File '${fileName}' already exists.`);
+            //             }
+            //         } else {
+            //             showAlert(`Error: Current path is not a directory.`);
+            //         }
+            //     }
             // });
         });
 
+        // --- Code Editor Sidebar ---
+        const renderCodeEditorSidebar = () => {
+            editorFileList.innerHTML = ''; // Clear existing list
+            const currentDir = getObjectFromPath(currentPath);
+            if (!currentDir || typeof currentDir !== 'object') {
+                editorFileList.innerHTML = '<div class="text-gray-500 text-sm">Cannot display files. Invalid path.</div>';
+                return;
+            }
+
+            Object.keys(currentDir).forEach(key => {
+                const isDir = typeof currentDir[key] === 'object' && currentDir[key] !== null;
+                const fileItem = document.createElement('div');
+                fileItem.className = 'editor-file-item';
+                fileItem.innerHTML = `<span class="material-symbols-outlined text-sm mr-2">${isDir ? 'folder' : 'description'}</span><span>${key}</span>`;
+                if (!isDir) { // Only allow opening files, not directories, in the editor
+                    const filePath = `${currentPath}/${key}`.replace('//', '/');
+                    fileItem.dataset.filePath = filePath;
+                    fileItem.addEventListener('click', () => {
+                        openEditorTab(filePath);
+                        updateEditorUI();
+                    });
+                } else {
+                    fileItem.classList.add('opacity-50', 'cursor-not-allowed'); // Indicate it's a directory and not directly editable
+                }
+                editorFileList.appendChild(fileItem);
+            });
+        };
+
         // --- Terminal ---
+        const terminalClearLastLines = (numLines) => {
+            const children = terminalOutput.children;
+            for (let i = 0; i < numLines; i++) {
+                if (children.length > 0) {
+                    terminalOutput.removeChild(children[children.length - 1]);
+                }
+            }
+        };
+
         const processCommand = (cmd) => {
             const [command, ...args] = cmd.trim().split(' '); if (!command) return;
             const append = (text) => appendTerminalOutput(text);
+
+            if (command.toLowerCase() === 'pip' && args[0] === 'install') {
+                const packageName = args[1];
+                if (!packageName) {
+                    append('Usage: pip install [package_name]');
+                    createPrompt();
+                    return;
+                }
+                if (installedPythonPackages.has(packageName)) {
+                    append(`Package '${packageName}' is already installed.`);
+                    createPrompt();
+                    return;
+                }
+
+                // Simulate installation process
+                append(`Downloading package ${packageName}...`);
+                let progress = 0;
+                let progressInterval;
+                let statusLineIndex; // To update the progress line
+
+                setTimeout(() => {
+                    append(`Installing collected packages: ${packageName}`);
+                    append(`<span id="pip-progress-line"></span>`); // Placeholder for the progress bar line
+                    statusLineIndex = terminalOutput.children.length - 1; // Get index of this line
+
+                    progressInterval = setInterval(() => {
+                        progress += 10;
+                        if (progress <= 100) {
+                            const progressBar = '[' + '#'.repeat(progress / 10) + ' '.repeat(10 - (progress / 10)) + ']';
+                            const statusText = `  ${progressBar} ${progress}%`;
+                            
+                            // Update the specific progress line
+                            if (terminalOutput.children[statusLineIndex]) {
+                                terminalOutput.children[statusLineIndex].innerHTML = statusText;
+                            }
+                            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                        } else {
+                            clearInterval(progressInterval);
+                            installedPythonPackages.add(packageName);
+                            terminalClearLastLines(1); // Clear the progress bar line
+                            append(`Successfully installed ${packageName}`);
+                            createPrompt();
+                        }
+                    }, 200); // Update every 200ms
+                }, 1000); // Start installation after 1 second download
+
+                return; // Prevent default prompt creation for pip install
+            }
+
+            // Normal command processing
             switch (command.toLowerCase()) {
                 case 'ls':
                     const dirContent = getObjectFromPath(currentPath);
@@ -640,6 +1076,7 @@
                         }
                     }
                     renderFileExplorer();
+                    renderCodeEditorSidebar(); // Also update the code editor sidebar
                     break;
                 case 'mkdir':
                     if (!args[0]) { append("Usage: mkdir [directory_name]"); break; }
@@ -648,7 +1085,8 @@
                         if (!currentDir[args[0]]) {
                             currentDir[args[0]] = {}; 
                             append(`Directory '${args[0]}' created.`); 
-                            renderFileExplorer(); 
+                            renderFileExplorer();
+                            renderCodeEditorSidebar(); 
                         } else {
                             append(`Error: Directory '${args[0]}' already exists.`);
                         }
@@ -662,6 +1100,13 @@
                         delete parentDir[args[0]];
                         append(`File '${args[0]}' removed.`);
                         renderFileExplorer();
+                        renderCodeEditorSidebar();
+                        // Also close any open tabs for this file
+                        openEditorTabs = openEditorTabs.filter(tab => tab.filePath !== `${currentPath}/${args[0]}`.replace('//', '/'));
+                        if (activeEditorTabId && !openEditorTabs.find(tab => tab.id === activeEditorTabId)) {
+                             activeEditorTabId = openEditorTabs.length > 0 ? openEditorTabs[0].id : null;
+                        }
+                        updateEditorUI();
                     } else {
                         append(`Error: File '${args[0]}' not found or is a directory.`);
                     }
@@ -672,24 +1117,13 @@
                     append("  cd [path] - Change directory (use '..' to go up)");
                     append("  mkdir [name] - Create a new directory");
                     append("  rm [file_name] - Remove a file");
-                    append("  pip install [package] - Simulate installing a Python package");
+                    append("  pip install [package] - Simulate installing a Python package with progress");
                     append("  pip list - List simulated installed Python packages");
                     append("  restart - Restart the OS simulation");
+                    append("  Note: For basic NumPy simulation, run a .py file from the Code Editor.");
                     break;
-                case 'pip':
-                    if (args[0] === 'install') {
-                        const packageName = args[1];
-                        if (packageName) {
-                            if (!installedPythonPackages.has(packageName)) {
-                                installedPythonPackages.add(packageName);
-                                append(`Successfully installed package '${packageName}'.`);
-                            } else {
-                                append(`Package '${packageName}' is already installed.`);
-                            }
-                        } else {
-                            append('Usage: pip install [package_name]');
-                        }
-                    } else if (args[0] === 'list') {
+                case 'pip': // For pip list and other pip commands
+                    if (args[0] === 'list') {
                         if (installedPythonPackages.size > 0) {
                             append('Simulated Installed Python Packages:');
                             installedPythonPackages.forEach(pkg => append(`- ${pkg}`));
@@ -703,7 +1137,9 @@
                 case 'restart': append('Restarting...'); setTimeout(() => window.location.reload(), 1000); break;
                 default: append(`'${command}' is not recognized. Type 'help' for available commands.`);
             }
+            createPrompt(); // Always create prompt after normal command
         };
+
         const createPrompt = () => {
             const promptContainer = document.createElement('div');
             promptContainer.className = 'flex';
@@ -718,11 +1154,10 @@
             input.parentElement.remove();
             appendTerminalOutput(`<span class="text-green-400">${currentPath}>&nbsp;</span>${cmd}`);
             processCommand(cmd);
-            createPrompt();
         };
         const appendTerminalOutput = (text) => { terminalOutput.innerHTML += `<div>${text.replace(/\n/g, '<br>')}</div>`; terminalOutput.scrollTop = terminalOutput.scrollHeight; };
 
-        // --- Code Editor Functionality ---
+        // --- Code Editor: Line Numbers & Run Logic ---
         const updateLineNumbers = () => {
             const lines = codeEditorTextarea.value.split('\n');
             const lineCount = lines.length;
@@ -744,101 +1179,92 @@
         const observer = new MutationObserver((mutationsList) => {
             for (const mutation of mutationsList) {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    if (!codeEditorTextarea.closest('.window').classList.contains('hidden')) {
+                    if (!codeEditorWindow.classList.contains('hidden')) { // Use codeEditorWindow here
                         updateLineNumbers();
+                        renderCodeEditorSidebar(); // Render sidebar when editor opens
                     }
                 }
             }
         });
         // Observe the code editor window for class changes (like hidden/shown)
-        observer.observe(document.getElementById('code-editor-window'), { attributes: true });
+        observer.observe(codeEditorWindow, { attributes: true });
 
 
         // Simulate running Python code
         runCodeBtn.addEventListener('click', () => {
-            const code = codeEditorTextarea.value;
-            appendTerminalOutput(`Running code from ${codeEditorTitle.textContent}:`);
+            const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
+            if (!activeTab) {
+                codeEditorBottomPanel.textContent = 'Output: No file selected to run.';
+                return;
+            }
+
+            const code = activeTab.content;
+            const filename = activeTab.title;
+
+            codeEditorBottomPanel.textContent = `Output:\nRunning code from ${filename}:\n`;
             
-            // Very basic simulation of Python print statements
-            const printRegex = /print\s*\(([^)]*)\)/g;
-            let match;
-            let hasOutput = false;
+            // Handle Python files with NumPy simulation
+            if (filename.endsWith('.py')) {
+                // Output buffer for simulated print statements
+                let simulatedOutput = '';
+                const mockPrint = (message) => {
+                    simulatedOutput += String(message) + '\n';
+                };
 
-            // Redirect console.log within the eval context
-            const originalConsoleLog = console.log;
-            let capturedOutput = '';
-            console.log = (...args) => {
-                capturedOutput += args.map(String).join(' ') + '\n';
-            };
+                try {
+                    let transformedCode = code;
 
-            try {
-                // Use Function constructor for isolated scope, similar to eval but safer than direct eval in global scope.
-                // Note: This is still not a true sandbox and can have security implications with untrusted code.
-                new Function('print', 'variables', code)(
-                    // Mock print function
-                    (message) => { appendTerminalOutput(`Output: ${message}`); hasOutput = true; },
-                    // Pass variables object for simple assignment tracking
-                    {} // Variables are just for conceptual display, not actual manipulation within simulated Python
-                );
-            } catch (e) {
-                appendTerminalOutput(`Error: ${e.message}`);
-                hasOutput = true;
-            } finally {
-                // Restore original console.log
-                console.log = originalConsoleLog;
-                if (capturedOutput) {
-                    appendTerminalOutput(`Console Output:\n${capturedOutput.trim()}`);
-                    hasOutput = true;
-                }
-            }
+                    // 1. Handle 'import numpy as np' by just removing it (np is passed in scope)
+                    transformedCode = transformedCode.replace(/import\s+numpy\s+as\s+np/g, '');
 
-            // Fallback for simple patterns if Function execution didn't produce output
-            if (!hasOutput) {
-                while ((match = printRegex.exec(code)) !== null) {
-                    let content = match[1].trim();
-                    // Remove quotes from string literals
-                    if (content.startsWith("'") && content.endsWith("'")) {
-                        content = content.slice(1, -1);
-                    } else if (content.startsWith('"') && content.endsWith('"')) {
-                        content = content.slice(1, -1);
+                    // 2. Transform print statements to mockPrint calls.
+                    // This needs to evaluate the argument to print *within the target JS scope*.
+                    transformedCode = transformedCode.replace(/print\s*\(([^)]*)\)/g, `mockPrint($1)`);
+
+                    // 3. Transform basic array operations (e.g., arr + 5, arr * 2)
+                    transformedCode = transformedCode.replace(/(\w+)\s*\+\s*(\S+)/g, (match, varName, operand) => `${varName}.plus(${operand})`);
+                    transformedCode = transformedCode.replace(/(\w+)\s*-\s*(\S+)/g, (match, varName, operand) => `${varName}.minus(${operand})`);
+                    transformedCode = transformedCode.replace(/(\w+)\s*\*\s*(\S+)/g, (match, varName, operand) => `${varName}.times(${operand})`);
+                    transformedCode = transformedCode.replace(/(\w+)\s*\/\s*(\S+)/g, (match, varName, operand) => `${varName}.divide(${operand})`);
+
+                    // 4. Transform np.array() creation. This needs to use the provided __simulated_np_array.
+                    // Crucially, the *content* of np.array() needs to be valid JSON in JS. Python uses single quotes.
+                    transformedCode = transformedCode.replace(/np\.array\(([^)]*)\)/g, (match, arrayContent) => {
+                        // Replace Python single quotes with double quotes for JSON parsing
+                        const jsArrayContent = arrayContent.replace(/'/g, '"');
+                        return `__simulated_np_array(${jsArrayContent})`;
+                    });
+
+                    // 5. Transform Python assignments to use `var` in the JS context.
+                    // This is a *very* basic translation and assumes simple assignments.
+                    // Complex expressions on the right-hand side will be evaluated by JS.
+                    transformedCode = transformedCode.replace(/^(\s*)(\w+)\s*=\s*([^\n;]+?)\s*$/gm, (match, leadingSpaces, varName, expression) => {
+                        return `${leadingSpaces}var ${varName} = ${expression};`;
+                    });
+
+                    // Construct the final code string to be executed by new Function
+                    const finalCodeToExecute = `
+                        ${transformedCode}
+                    `;
+
+                    // Execute the transformed code in an isolated scope
+                    // Pass mockPrint and np (our simulated NumPy object) as arguments.
+                    new Function('mockPrint', 'np', '__simulated_np_array', finalCodeToExecute)(mockPrint, np, np.array);
+                    
+                    if (simulatedOutput) {
+                        codeEditorBottomPanel.textContent += `Python Output:\n${simulatedOutput.trim()}\n`;
+                    } else {
+                        codeEditorBottomPanel.textContent += 'Python script executed with no direct output.\n';
                     }
-                    appendTerminalOutput(`Output: ${content}`);
-                    hasOutput = true;
+
+                } catch (e) {
+                    codeEditorBottomPanel.textContent += `Python Runtime Error: ${e.message}\n`;
                 }
-
-                // Simulate simple variable assignments and arithmetic
-                const varAssignmentRegex = /(\w+)\s*=\s*([\s\S]*?)(?=\n|$)/g;
-                const variables = {}; // Reset variables for this simulation pass
-                while ((match = varAssignmentRegex.exec(code)) !== null) {
-                    const varName = match[1];
-                    let varValueString = match[2].trim();
-                    let varValue;
-
-                    try {
-                        // Attempt to evaluate as JSON, number, or boolean
-                        varValue = JSON.parse(varValueString);
-                    } catch (e) {
-                        // If not JSON, check for numbers, then string or reference to existing var
-                        if (!isNaN(parseFloat(varValueString)) && isFinite(varValueString)) {
-                            varValue = parseFloat(varValueString);
-                        } else if (variables[varValueString] !== undefined) {
-                            varValue = variables[varValueString];
-                        } else {
-                            // Default to string, remove quotes if present
-                            varValue = varValueString.replace(/^['"]|['"]$/g, '');
-                        }
-                    }
-                    variables[varName] = varValue;
-                    appendTerminalOutput(`Variable '${varName}' set to: ${variables[varName]}`);
-                    hasOutput = true;
-                }
+            } else {
+                // For non-Python files, just log a message
+                codeEditorBottomPanel.textContent += `Cannot run non-Python files directly yet. (File: ${filename})\n`;
             }
-
-
-            if (!hasOutput) {
-                appendTerminalOutput('No discernible output or operations found.');
-            }
-            appendTerminalOutput('Code execution simulated.');
+            codeEditorBottomPanel.scrollTop = codeEditorBottomPanel.scrollHeight;
         });
 
 
@@ -887,8 +1313,9 @@
             if(windowId === 'terminal-window' && !terminalOutput.hasChildNodes()) createPrompt();
             if(windowId === 'file-explorer-window') renderFileExplorer();
             if(windowId === 'code-editor-window') {
-                // Ensure line numbers are updated when code editor is opened
+                // Ensure line numbers are updated and sidebar rendered when code editor is opened
                 updateLineNumbers();
+                renderCodeEditorSidebar();
             }
         };
         document.querySelectorAll('[data-window]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); openWindow(btn.getAttribute('data-window')); }));
@@ -906,6 +1333,17 @@
             });
         });
         document.querySelector('.settings-tab[href="#about"]')?.click();
+
+
+        // --- Install Process Logic - Removed ---
+        // The previous `simulateInstallation` and `startInstallSteps` functions are now removed.
+        // The logic for handling initial load now resides directly in the DOMContentLoaded listener.
+
+        // Initial Load: Directly show login screen, then transition to desktop on login
+        // Also removed the `isInstalled` localStorage check, as installation is no longer simulated.
+        loginContainer.classList.remove('hidden'); // Show login screen initially
+        loginContainer.style.opacity = '1'; // Ensure it's visible on load
+        desktopContainer.classList.add('hidden'); // Desktop starts hidden
     });
     </script>
 </body>
