@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows 13 Concept</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Fira Code Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         body { font-family: 'Inter', sans-serif; user-select: none; color: #e0e0e0; background-color: #1a1a2e; overflow: hidden; }
@@ -137,8 +138,9 @@
             overflow: hidden;
             background-color: #1e1e1e; /* Dark background for code editor */
             color: #d4d4d4; /* Light text for code */
-            font-family: 'monospace';
+            font-family: 'Fira Code', monospace; /* Fira Code font */
             font-size: 0.875rem; /* text-sm */
+            line-height: 1.5; /* Ensure consistent line height */
         }
         body.light .code-editor-container {
             background-color: #f3f3f3;
@@ -264,7 +266,6 @@
             display: flex;
             flex-grow: 1;
             overflow: hidden; /* Important for scroll sync */
-            /* Background and color inherited from .code-editor-container */
         }
 
         .line-numbers {
@@ -284,20 +285,65 @@
             color: #555;
         }
 
+        .code-area-wrapper {
+            position: relative;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        #code-editor-textarea, #code-highlighting {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 8px;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.5; /* Match line height with line numbers */
+            font-family: 'Fira Code', monospace; /* Fira Code font */
+            white-space: pre; /* Preserve whitespace for better code display */
+            box-sizing: border-box; /* Include padding in width/height */
+        }
 
         #code-editor-textarea {
-            flex-grow: 1;
-            padding: 8px;
             resize: none;
             outline: none;
             border: none;
-            background-color: transparent; /* Textarea background handled by parent */
-            color: inherit; /* Inherit text color from parent */
-            line-height: 1.5; /* Match line height with line numbers */
-            caret-color: #d4d4d4; /* Cursor color */
-            white-space: pre; /* Preserve whitespace for better code display */
+            background-color: transparent; /* Make it transparent */
+            color: transparent; /* Make text transparent */
+            caret-color: #d4d4d4; /* Keep cursor visible */
+            z-index: 1; /* Place textarea above highlighting */
             overflow-y: scroll; /* Allow textarea to scroll */
         }
+        body.light #code-editor-textarea {
+             caret-color: #333;
+        }
+
+
+        #code-highlighting {
+            z-index: 0; /* Place highlighting behind textarea */
+            pointer-events: none; /* Allow mouse events to pass through to textarea */
+            overflow-y: scroll; /* Synchronize scroll with textarea */
+        }
+        
+        /* Syntax highlighting colors */
+        .syntax-keyword { color: #569cd6; } /* Blue */
+        .syntax-string { color: #ce9178; } /* Orange/Brown */
+        .syntax-comment { color: #6a9955; } /* Green */
+        .syntax-number { color: #b5cea8; } /* Light green */
+        .syntax-function { color: #dcdcaa; } /* Yellow */
+        .syntax-operator { color: #d4d4d4; } /* White/Light gray */
+        .syntax-variable { color: #9cdcfe; } /* Light blue */
+
+        /* Light mode syntax highlighting colors */
+        body.light .syntax-keyword { color: #0000ff; } /* Darker blue */
+        body.light .syntax-string { color: #a31515; } /* Darker red */
+        body.light .syntax-comment { color: #008000; } /* Darker green */
+        body.light .syntax-number { color: #098677; } /* Teal */
+        body.light .syntax-function { color: #795e26; } /* Darker yellow */
+        body.light .syntax-operator { color: #333333; } /* Darker gray */
+        body.light .syntax-variable { color: #001080; } /* Darker blue */
+
 
         #code-editor-bottom-panel {
             flex-shrink: 0; /* Prevent shrinking */
@@ -316,6 +362,70 @@
             color: #333;
         }
         /* Boot and Install Screen Styles - HIDDEN/REMOVED */
+
+        /* Custom Modal Styles (reused for alert and prompt) */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .custom-modal-content {
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            color: white;
+        }
+
+        .custom-modal-content button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #custom-alert-ok-btn, #custom-prompt-ok-btn {
+            background-color: #6d28d9; /* Purple */
+            color: white;
+        }
+        #custom-alert-ok-btn:hover, #custom-prompt-ok-btn:hover {
+            background-color: #5b21aa;
+        }
+        #custom-prompt-cancel-btn {
+            background-color: #4a5568; /* Gray */
+            color: white;
+        }
+        #custom-prompt-cancel-btn:hover {
+            background-color: #2d3748;
+        }
+        /* Add light mode styles for the modal content */
+        body.light .custom-modal-content {
+            background-color: #f3f3f3;
+            color: #1a1a2e;
+        }
+        body.light .custom-modal-content button {
+            color: white; /* Buttons in light mode remain white text for contrast */
+        }
+        body.light #custom-prompt-input {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #1a1a2e;
+        }
+        body.light #custom-prompt-input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body class="overflow-hidden">
@@ -367,6 +477,19 @@
         </div>
     </div>
 
+    <!-- Custom Prompt Modal Structure -->
+    <div id="custom-prompt-modal" class="custom-modal hidden">
+        <div class="custom-modal-content">
+            <h3 id="custom-prompt-title" class="font-bold text-lg text-white mb-2"></h3>
+            <p id="custom-prompt-message" class="text-sm text-gray-300 mb-4"></p>
+            <input type="text" id="custom-prompt-input" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mt-2 mb-4">
+            <div class="flex justify-end space-x-2">
+                <button id="custom-prompt-cancel-btn" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-md text-white font-semibold">Cancel</button>
+                <button id="custom-prompt-ok-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white font-semibold">OK</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Desktop Container -->
     <div id="desktop-container" class="h-screen w-screen relative flex flex-col hidden">
         
@@ -390,7 +513,7 @@
         <!-- Main Content Grid -->
         <main class="flex-grow p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 panel rounded-lg p-6">
-                 <h2 class="text-3xl font-bold text-white mb-4">Version 2.2.1</h2>
+                 <h2 class="text-3xl font-bold text-white mb-4">Version 2.2.5</h2>
                  <p class="text-gray-300 mb-4">The installation process has been removed. The system now directly presents the login screen on startup, allowing for quicker access to your Windows 13 experience.</p>
                  <div class="flex items-center space-x-4 mb-4">
                     <h3 class="text-xl font-semibold text-gray-400">Current Time:</h3>
@@ -411,14 +534,14 @@
                 </div>
                  <div class="panel rounded-lg p-4 text-center">
                     <h3 class="text-lg font-semibold text-gray-400 mb-2">Version</h3>
-                    <p class="text-2xl text-white">2.2.1</p>
+                    <p class="text-2xl text-white">2.2.5</p>
                 </div>
             </div>
         </main>
         
         <!-- Windows Container (overlays everything) -->
         <div id="windows-container" class="absolute inset-0 w-full h-full pointer-events-none">
-             <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button></div><div class="flex flex-grow bg-gray-800/50"><div class="w-1/3 p-4 border-r border-white/10 no-scrollbar overflow-y-auto"><h4 class="font-semibold mb-2">System</h4><a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20">About</a><h4 class="font-semibold mb-2 mt-4">Account</h4><a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20">Your Info</a></div><div class="w-2/3 p-4 no-scrollbar overflow-y-auto"><div id="about-content" class="settings-content hidden"><h4 class="font-semibold mb-2">About this PC</h4><div class="space-y-2 text-sm"><div><strong>Device Name:</strong> Win13-Concept</div><div><strong>OS Build:</strong> 2.2.1</div></div></div><div id="account-content" class="settings-content"><h4 class="font-semibold mb-2">Account</h4><div class="flex items-center space-x-4"><img src="https://placehold.co/64x64/7c3aed/ffffff?text=U" class="rounded-full w-16 h-16"><div id="account-username" class="font-semibold">User</div></div></div></div></div><div class="resize-handle"></div></div>
+             <div id="settings-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-2xl panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">settings</span><span>Settings</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="settings-window"><span class="material-symbols-outlined">close</span></button></div><div class="flex flex-grow bg-gray-800/50"><div class="w-1/3 p-4 border-r border-white/10 no-scrollbar overflow-y-auto"><h4 class="font-semibold mb-2">System</h4><a href="#about" class="settings-tab block p-2 rounded-lg hover:bg-white/20">About</a><h4 class="font-semibold mb-2 mt-4">Account</h4><a href="#account" class="settings-tab block p-2 rounded-lg hover:bg-white/20">Your Info</a></div><div class="w-2/3 p-4 no-scrollbar overflow-y-auto"><div id="about-content" class="settings-content hidden"><h4 class="font-semibold mb-2">About this PC</h4><div class="space-y-2 text-sm"><div><strong>Device Name:</strong> Win13-Concept</div><div><strong>OS Build:</strong> 2.2.5</div></div></div><div id="account-content" class="settings-content"><h4 class="font-semibold mb-2">Account</h4><div class="flex items-center space-x-4"><img src="https://placehold.co/64x64/7c3aed/ffffff?text=U" class="rounded-full w-16 h-16"><div id="account-username" class="font-semibold">User</div></div></div></div></div><div class="resize-handle"></div></div>
             <div id="file-explorer-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-yellow-500">folder</span><span id="file-explorer-path">File Explorer</span></div><div class="flex items-center"><button id="new-file-btn" class="p-1 rounded-full hover:bg-white/20" title="New File"><span class="material-symbols-outlined">note_add</span></button><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="file-explorer-window"><span class="material-symbols-outlined">close</span></button></div></div><div id="file-explorer-output" class="p-4 flex-grow overflow-y-auto no-scrollbar grid grid-cols-4 gap-4 content-start bg-gray-800/50"></div><div class="resize-handle"></div></div>
             <div id="terminal-window" class="window hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined">terminal</span><span>Terminal</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="terminal-window"><span class="material-symbols-outlined">close</span></button></div><div id="terminal-output" class="p-4 flex-grow bg-black/80 font-mono text-white text-sm overflow-y-auto no-scrollbar" onclick="document.getElementById('terminal-input')?.focus()"></div><div class="resize-handle"></div></div>
             <div id="code-editor-window" class="window hidden absolute top-1/4 left-1/4 w-3/4 h-3/4 panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden">
@@ -446,7 +569,11 @@
                         </div>
                         <div class="code-editor-content">
                             <div class="line-numbers no-scrollbar" id="line-numbers"></div>
-                            <textarea id="code-editor-textarea" class="no-scrollbar" spellcheck="false" wrap="off"></textarea>
+                            <!-- Wrapper for textarea and highlighting -->
+                            <div class="code-area-wrapper">
+                                <pre><code id="code-highlighting"></code></pre>
+                                <textarea id="code-editor-textarea" class="no-scrollbar" spellcheck="false" wrap="off"></textarea>
+                            </div>
                         </div>
                         <div id="code-editor-bottom-panel" class="no-scrollbar">
                             Output:
@@ -455,7 +582,7 @@
                 </div>
                 <div class="resize-handle"></div>
             </div>
-            <div id="calculator-window" class="window hidden absolute top-1/4 left-1/4 w-80 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-orange-400">calculate</span><span>Calculator</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="calculator-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-4 bg-gray-800/50 flex flex-col space-y-4"><div id="calc-display" class="w-full bg-black/50 rounded-lg p-4 text-right text-4xl font-mono truncate">0</div><div class="grid grid-cols-4 gap-2"><button class="calculator-btn" data-key="clear">C</button><button class="calculator-btn" data-key="backspace">⌫</button><button class="calculator-btn" data-key="%">%</button><button class="calculator-btn operator" data-key="/">÷</button><button class="calculator-btn" data-key="7">7</button><button class="calculator-btn" data-key="8">8</button><button class="calculator-btn" data-key="9">9</button><button class="calculator-btn operator" data-key="*">×</button><button class="calculator-btn" data-key="4">4</button><button class="calculator-btn" data-key="5">5</button><button class="calculator-btn" data-key="6">6</button><button class="calculator-btn operator" data-key="-">−</button><button class="calculator-btn" data-key="1">1</button><button class="calculator-btn" data-key="2">2</button><button class="calculator-btn" data-key="3">3</button><button class="calculator-btn operator" data-key="+">+</button><button class="calculator-btn col-span-2" data-key="0">0</button><button class="calculator-btn" data-key=".">.</button><button class="calculator-btn operator" data-key="=">=</button></div></div></div>
+            <div id="calculator-window" class="window hidden absolute top-1/4 left-1/4 w-80 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-orange-400">calculate</span><span>Calculator</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="calculator-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-4 bg-gray-800/50 flex flex-col space-y-4"><div id="calc-display" class="w-full bg-black/50 rounded-lg p-4 text-right text-4xl font-mono truncate">0</div><div class="grid grid-cols-4 gap-2"><button class="calculator-btn" data-key="clear">C</button><button class="calculator-btn" data-key="%">%</button><button class="calculator-btn" data-key="backspace">⌫</button><button class="calculator-btn operator" data-key="/">÷</button><button class="calculator-btn" data-key="7">7</button><button class="calculator-btn" data-key="8">8</button><button class="calculator-btn" data-key="9">9</button><button class="calculator-btn operator" data-key="*">×</button><button class="calculator-btn" data-key="4">4</button><button class="calculator-btn" data-key="5">5</button><button class="calculator-btn" data-key="6">6</button><button class="calculator-btn operator" data-key="-">−</button><button class="calculator-btn" data-key="1">1</button><button class="calculator-btn" data-key="2">2</button><button class="calculator-btn" data-key="3">3</button><button class="calculator-btn operator" data-key="+">+</button><button class="calculator-btn col-span-2" data-key="0">0</button><button class="calculator-btn" data-key=".">.</button><button class="calculator-btn operator" data-key="=">=</button></div></div></div>
             <div id="weather-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-cyan-400">cloudy</span><span>Weather</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="weather-window"><span class="material-symbols-outlined">close</span></button></div><div id="weather-content" class="p-6 bg-gray-800/50 text-center flex flex-col items-center justify-center h-48"><p>Loading weather...</p></div></div>
             <div id="music-window" class="window hidden absolute top-1/4 left-1/4 w-96 h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-pink-400">music_note</span><span>Music</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="music-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 flex flex-col items-center"><p class="font-semibold">Cyberpunk Dreams</p><p class="text-sm text-gray-400">Synthwave AI</p><div class="w-full h-2 bg-gray-600 rounded-full my-4"><div class="h-2 bg-pink-400 rounded-full w-1/2"></div></div><div class="flex items-center space-x-6 text-4xl"><span class="material-symbols-outlined">skip_previous</span><span class="material-symbols-outlined text-5xl">pause_circle</span><span class="material-symbols-outlined">skip_next</span></div></div></div>
             <div id="support-window" class="window hidden absolute top-1/4 left-1/4 w-full max-w-md h-auto panel rounded-lg shadow-2xl flex flex-col animate-open pointer-events-auto overflow-hidden"><div class="title-bar flex items-center justify-between p-2 border-b border-white/10"><div class="flex items-center space-x-2"><span class="material-symbols-outlined text-red-400">support_agent</span><span>Support Lifecycle</span></div><button class="close-btn p-1 rounded-full hover:bg-red-500 hover:text-white transition-colors" data-window="support-window"><span class="material-symbols-outlined">close</span></button></div><div class="p-6 bg-gray-800/50 text-center"><h4 class="text-lg font-bold">End of Support for Windows 13</h4><p class="text-sm text-gray-400">October 26, 2027</p><div id="support-countdown" class="mt-4 text-2xl font-mono"></div></div></div>
@@ -536,6 +663,7 @@
         const codeEditorTabBar = document.getElementById('code-editor-tab-bar');
         const codeEditorTextarea = document.getElementById('code-editor-textarea');
         const lineNumbersElement = document.getElementById('line-numbers');
+        const codeHighlighting = document.getElementById('code-highlighting'); // New element reference
         const codeEditorBottomPanel = document.getElementById('code-editor-bottom-panel');
         const runCodeBtn = document.getElementById('run-code-btn');
 
@@ -570,15 +698,17 @@
                 codeEditorTabBar.appendChild(tabEl);
             });
 
-            // Update textarea content and line numbers
+            // Update textarea content, highlighting and line numbers
             const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
             if (activeTab) {
                 codeEditorTextarea.value = activeTab.content;
+                codeHighlighting.innerHTML = highlightCode(activeTab.content); // Apply highlighting
                 codeEditorTitle.textContent = activeTab.title;
                 codeEditorTextarea.dataset.filePath = activeTab.filePath;
                 updateLineNumbers();
             } else {
                 codeEditorTextarea.value = '';
+                codeHighlighting.innerHTML = ''; // Clear highlighting
                 codeEditorTitle.textContent = 'Code Editor';
                 codeEditorTextarea.dataset.filePath = '';
                 lineNumbersElement.innerHTML = ''; // Clear line numbers
@@ -637,6 +767,7 @@
             const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
             if (activeTab) {
                 activeTab.content = codeEditorTextarea.value;
+                codeHighlighting.innerHTML = highlightCode(activeTab.content); // Update highlighting
             }
             updateLineNumbers();
         });
@@ -651,6 +782,51 @@
         customAlertOkBtn.addEventListener('click', () => {
             customAlertModal.classList.add('hidden');
         });
+
+        // Custom Prompt function
+        const showCustomPrompt = (title, message, defaultValue = '', callback) => {
+            document.getElementById('custom-prompt-title').textContent = title;
+            document.getElementById('custom-prompt-message').textContent = message;
+            document.getElementById('custom-prompt-input').value = defaultValue;
+            document.getElementById('custom-prompt-modal').classList.remove('hidden');
+
+            const okBtn = document.getElementById('custom-prompt-ok-btn');
+            const cancelBtn = document.getElementById('custom-prompt-cancel-btn');
+            const input = document.getElementById('custom-prompt-input');
+
+            const handleOk = () => {
+                const value = input.value;
+                document.getElementById('custom-prompt-modal').classList.add('hidden');
+                callback(value);
+                removeListeners();
+            };
+
+            const handleCancel = () => {
+                document.getElementById('custom-prompt-modal').classList.add('hidden');
+                callback(null);
+                removeListeners();
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter') {
+                    handleOk();
+                } else if (e.key === 'Escape') {
+                    handleCancel();
+                }
+            };
+
+            okBtn.addEventListener('click', handleOk);
+            cancelBtn.addEventListener('click', handleCancel);
+            input.addEventListener('keydown', handleKeyDown);
+
+            const removeListeners = () => {
+                okBtn.removeEventListener('click', handleOk);
+                cancelBtn.removeEventListener('click', handleCancel);
+                input.removeEventListener('keydown', handleKeyDown);
+            };
+
+            input.focus();
+        };
 
         // --- Theme Management ---
         const applyTheme = (theme) => {
@@ -941,28 +1117,28 @@
         });
 
         document.getElementById('new-file-btn').addEventListener('click', () => {
-            showAlert("The 'New File' feature requires a custom prompt. Currently, you can create files via the terminal using 'touch <filename>' (not implemented yet) or by directly editing the VFS structure for demonstration.");
-            // To implement this fully, a custom prompt modal would be needed.
-            // For now, this will simply show the alert without prompting for input.
-            // Example of how it would work with a custom prompt:
-            // showCustomPrompt("Enter new file name:", "new_file.txt", (fileName) => {
-            //     if (fileName) {
-            //         const currentDir = getObjectFromPath(currentPath);
-            //         if (currentDir && typeof currentDir === 'object') {
-            //             if (!currentDir[fileName]) {
-            //                 currentDir[fileName] = ''; // Create empty file
-            //                 renderFileExplorer();
-            //                 renderCodeEditorSidebar(); // Update sidebar
-            //                 openWindow('code-editor-window');
-            //                 openEditorTab(`${currentPath}/${fileName}`);
-            //             } else {
-            //                 showAlert(`Error: File '${fileName}' already exists.`);
-            //             }
-            //         } else {
-            //             showAlert(`Error: Current path is not a directory.`);
-            //         }
-            //     }
-            // });
+            showCustomPrompt("Create New File", "Enter the name for the new file:", "new_file.txt", (fileName) => {
+                if (fileName) { // If user provided a filename (not cancelled)
+                    const currentDir = getObjectFromPath(currentPath);
+                    if (currentDir && typeof currentDir === 'object') {
+                        if (!currentDir[fileName]) {
+                            currentDir[fileName] = ''; // Create empty file
+                            renderFileExplorer(); // Re-render to show new file
+                            renderCodeEditorSidebar(); // Update sidebar too
+                            showAlert(`File '${fileName}' created successfully!`);
+                            // Optionally, open the new file in the editor
+                            openWindow('code-editor-window');
+                            openEditorTab(`${currentPath}/${fileName}`);
+                        } else {
+                            showAlert(`Error: File or directory named '${fileName}' already exists.`);
+                        }
+                    } else {
+                        showAlert(`Error: Current path is not a valid directory.`);
+                    }
+                } else {
+                    showAlert("File creation cancelled.");
+                }
+            });
         });
 
         // --- Code Editor Sidebar ---
@@ -1170,18 +1346,95 @@
             lineNumbersElement.scrollTop = codeEditorTextarea.scrollTop;
         };
 
-        codeEditorTextarea.addEventListener('input', updateLineNumbers);
-        codeEditorTextarea.addEventListener('scroll', () => {
-            lineNumbersElement.scrollTop = codeEditorTextarea.scrollTop;
+        // Helper to escape HTML characters for display within a <pre> tag
+        const escapeHtmlForDisplay = (str) => {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        };
+
+        // Basic Syntax Highlighting Function (Python-focused)
+        const highlightCode = (text) => {
+            const keywords = '\\b(import|as|def|print|return|if|else|elif|for|while|in|True|False|None|and|or|not|class|try|except|finally|with|as|del|from|global|is|lambda|nonlocal|pass|raise|yield|print|input|len|range|list|dict|set|tuple|str|int|float|bool|append|insert|remove|pop|sort|reverse|keys|values|items)\\b';
+            const strings = '(["\'])(?:(?=(\\\\?))\\2.)*?\\1'; // Handles " and ' strings, escaped internal quotes
+            const comments = '#.*$'; // Matches until end of line
+            const numbers = '\\b\\d+(\\.\\d+)?\\b';
+            const functions = '\\b([a-zA-Z_]\\w*)\\s*\\('; // Captures function name only, looks ahead for '('
+            const operators = '[+\\-*/%=!&|<>]=?|[+\\-*/%=!&|<>]{1}'; // Covers +, -, *, /, %, =, ==, !=, >=, <=, etc.
+
+            // Combine all regexes with capture groups for each type.
+            // Order matters: more specific (like strings, comments) before less specific (like keywords)
+            // to prevent partial matches.
+            const regex = new RegExp(
+                `(${comments})|` +      // Group 1: Comments
+                `(${strings})|` +       // Group 2: Strings
+                `(${keywords})|` +      // Group 3: Keywords
+                `(${numbers})|` +       // Group 4: Numbers
+                `(${functions})|` +     // Group 5: Function Calls (whole match for func + '(')
+                `(${operators})|` +     // Group 6: Operators
+                `([^\\n]+)`             // Group 7: Catch-all for plain text per line
+            , 'gm'); // g for global, m for multiline (for comments)
+
+            // The main replace function for syntax highlighting
+            return text.replace(regex, (match, comment, str, keyword, num, funcCall, operator, plainText) => {
+                if (comment !== undefined) { // Check for undefined as empty match is possible
+                    return `<span class="syntax-comment">${escapeHtmlForDisplay(comment)}</span>`;
+                } else if (str !== undefined) {
+                    return `<span class="syntax-string">${escapeHtmlForDisplay(str)}</span>`;
+                } else if (keyword !== undefined) {
+                    return `<span class="syntax-keyword">${escapeHtmlForDisplay(keyword)}</span>`;
+                } else if (num !== undefined) {
+                    return `<span class="syntax-number">${escapeHtmlForDisplay(num)}</span>`;
+                } else if (funcCall !== undefined) {
+                    // funcCall is like "func("
+                    // We need to extract the name and apply the span, then add the '('.
+                    const funcNameMatch = funcCall.match(/\b([a-zA-Z_]\w*)\s*\(/);
+                    if (funcNameMatch && funcNameMatch[1]) {
+                        const funcName = funcNameMatch[1]; // The function name itself
+                        const parenPart = funcCall.substring(funcName.length); // The '(' part
+                        return `<span class="syntax-function">${escapeHtmlForDisplay(funcName)}</span>${escapeHtmlForDisplay(parenPart)}`;
+                    }
+                    return escapeHtmlForDisplay(funcCall); // Fallback if regex for funcNameMatch fails
+                } else if (operator !== undefined) {
+                    return `<span class="syntax-operator">${escapeHtmlForDisplay(operator)}</span>`;
+                } else if (plainText !== undefined) {
+                    // This handles newlines correctly and ensures any un-matched text is escaped.
+                    return escapeHtmlForDisplay(plainText);
+                }
+                return escapeHtmlForDisplay(match); // Fallback for unmatched characters, ensures they are escaped
+            });
+        };
+
+
+        codeEditorTextarea.addEventListener('input', () => {
+            // Update content of the active tab
+            const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
+            if (activeTab) {
+                activeTab.content = codeEditorTextarea.value;
+                codeHighlighting.innerHTML = highlightCode(activeTab.content); // Update highlighting
+            }
+            updateLineNumbers();
         });
 
-        // Initial update of line numbers when the editor is opened
+        codeEditorTextarea.addEventListener('scroll', () => {
+            lineNumbersElement.scrollTop = codeEditorTextarea.scrollTop;
+            codeHighlighting.scrollTop = codeEditorTextarea.scrollTop; // Synchronize highlighting scroll
+        });
+
+        // Initial update of line numbers and highlighting when the editor is opened
         const observer = new MutationObserver((mutationsList) => {
             for (const mutation of mutationsList) {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                     if (!codeEditorWindow.classList.contains('hidden')) { // Use codeEditorWindow here
                         updateLineNumbers();
                         renderCodeEditorSidebar(); // Render sidebar when editor opens
+                        // Ensure highlighting is applied when opening a file
+                        const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
+                        if (activeTab) {
+                            codeHighlighting.innerHTML = highlightCode(activeTab.content);
+                        }
                     }
                 }
             }
@@ -1222,6 +1475,8 @@
                     transformedCode = transformedCode.replace(/print\s*\(([^)]*)\)/g, `mockPrint($1)`);
 
                     // 3. Transform basic array operations (e.g., arr + 5, arr * 2)
+                    // Ensure these transformations are applied carefully to avoid issues with strings/comments.
+                    // For a simple demo, we'll assume these operations are on variables.
                     transformedCode = transformedCode.replace(/(\w+)\s*\+\s*(\S+)/g, (match, varName, operand) => `${varName}.plus(${operand})`);
                     transformedCode = transformedCode.replace(/(\w+)\s*-\s*(\S+)/g, (match, varName, operand) => `${varName}.minus(${operand})`);
                     transformedCode = transformedCode.replace(/(\w+)\s*\*\s*(\S+)/g, (match, varName, operand) => `${varName}.times(${operand})`);
@@ -1316,6 +1571,11 @@
                 // Ensure line numbers are updated and sidebar rendered when code editor is opened
                 updateLineNumbers();
                 renderCodeEditorSidebar();
+                // Re-apply highlighting when the window is opened
+                const activeTab = openEditorTabs.find(tab => tab.id === activeEditorTabId);
+                if (activeTab) {
+                    codeHighlighting.innerHTML = highlightCode(activeTab.content);
+                }
             }
         };
         document.querySelectorAll('[data-window]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); openWindow(btn.getAttribute('data-window')); }));
